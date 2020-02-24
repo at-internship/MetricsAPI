@@ -1,13 +1,13 @@
-package com.bolsadeideas.spring.web.app;
+package com.metrics;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class SpringTestApplication {
+public class MetricsApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(SpringTestApplication.class, args);
+		SpringApplication.run(MetricsApplication.class, args);
 	}
 
 }

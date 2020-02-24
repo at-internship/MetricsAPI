@@ -1,10 +1,10 @@
-package com.bolsadeideas.spring.web.app;
+package com.metrics;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class SpringTestApplicationTests {
+class MetricsApplicationTests {
 
 	@Test
 	void contextLoads() {
