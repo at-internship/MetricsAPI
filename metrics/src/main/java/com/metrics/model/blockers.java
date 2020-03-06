@@ -5,7 +5,7 @@ package com.metrics.model;
 public class blockers {
 
 	private boolean blocked;
-	private String commentsGGGGGGGGGGGG;
+	private String commentsGGGGGGGGGGG;
 	public boolean isBlocked() {
 		return blocked;
 	}
