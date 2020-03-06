@@ -1,11 +1,11 @@
 package com.metrics.model;
 
 
-//this is a commit aksjgcwkjgc
+//this is a commit
 public class blockers {
 
 	private boolean blocked;
-	private String commentsGGGGGGGGGGG;
+	private String comments;
 	public boolean isBlocked() {
 		return blocked;
 	}
