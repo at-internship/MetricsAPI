@@ -20,9 +20,9 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document(collection = "Metrics Collection")
 public class MetricsCollection {
 	@Id
-	private long id;
-	private long evaluator_id;
-	private long evaluated_id;
+	private String id;
+	private String evaluator_id;
+	private String evaluated_id;
 	private String type;
 	private Timestamp date;
 	private long sprint_id;

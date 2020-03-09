@@ -12,5 +12,6 @@ import lombok.ToString;
 @AllArgsConstructor
 @ToString
 public class CreateMetricRequest {
-
+		private String id;
+	
 }
