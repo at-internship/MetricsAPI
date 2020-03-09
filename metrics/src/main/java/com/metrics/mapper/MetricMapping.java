@@ -1,5 +1,6 @@
 package com.metrics.mapper;
 
-public class MetricMapping {
+import ma.glasnost.orika.MapperFactory;
+import net.rakugakibox.spring.boot.orika.OrikaMapperFactoryConfigurer;
 
-}
+

@@ -1,8 +1,7 @@
 package com.metrics.repository;
 
-import org.springframework.stereotype.Repository;
+import org.springframework.data.mongodb.repository.MongoRepository;
 
-@Repository
-public class MetricRepository {
+public interface MetricRepository extends MongoRepository<Metric, String>{
 
 }
