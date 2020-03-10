@@ -3,6 +3,7 @@ package com.metrics.model;
 import java.sql.Timestamp;
 
 import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -11,21 +12,19 @@ import javax.persistence.*;
 
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@Getter
-@Setter
-@ToString
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Document(collection = "Metrics Collection")
+@Document(collection = "metrics")
 public class MetricsCollection {
 	@Id
 	private String id;
 	private String evaluator_id;
 	private String evaluated_id;
 	private String type;
-	private Timestamp date;
-	private long sprint_id;
+	private String date;
+	private String sprint_id;
 	private metrics metrics;
 	
 	public MetricsCollection(String type, 

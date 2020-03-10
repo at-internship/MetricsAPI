@@ -20,9 +20,7 @@ public class MetricsServiceImpl implements MetricsService{
 		List<MetricsCollection> metricsCollection = new ArrayList<>();
 		
 		//log.warn("No user was found for given phone & first name combination.");
-
 		metricsCollection = repository.findAll();
-
 		log.debug("Records found on DB - " + metricsCollection.toString());
 		return metricsCollection;
 	}

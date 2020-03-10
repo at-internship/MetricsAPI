@@ -21,7 +21,7 @@ public class MetricsController {
 	
 	
 	@ResponseStatus(value = HttpStatus.OK)
-	@GetMapping("/metric")
+	@GetMapping("/metrics")
 	public List<MetricsCollection> getMetrics() {
 		log.debug("Records test:");
 		return service.getMetrics();
