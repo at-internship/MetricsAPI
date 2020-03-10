@@ -17,7 +17,7 @@ public class MongoBasicServiceImpl implements MongoBasicService {
 	 public void deleteMetric(String id) {
 		 if (repository.existsById(id)) {
 			 log.debug("Deleting user with id: " + id);
-			 repository.deleteByID(id);
+			 repository.deleteById(id);
 		 }
 		 else {
 			 log.error("No user was found for the given id.");
