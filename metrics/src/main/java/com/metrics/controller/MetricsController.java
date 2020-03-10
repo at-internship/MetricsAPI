@@ -23,6 +23,6 @@ public class MetricsController {
 	public MetricsCollection updateMetric(@RequestBody CreateMetricRequest request, @PathVariable String id) {
 		log.debug("Update user request - id=" + id + " " + request.toString());
 		return service.updateMetric(request, id);
-	}
+	}	
 	
 }

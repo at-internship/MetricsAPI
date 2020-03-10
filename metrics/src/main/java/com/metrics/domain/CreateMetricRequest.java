@@ -1,7 +1,5 @@
 package com.metrics.domain;
 
-import java.sql.Timestamp;
-
 import com.metrics.model.metrics;
 
 import lombok.AllArgsConstructor;
@@ -21,12 +19,12 @@ public class CreateMetricRequest {
 	private String evaluator_id;
 	private String evaluated_id;
 	private String type;
-	private Timestamp date;
-	private long sprint_id;
+	private String date;
+	private String sprint_id;
 	private metrics metrics;
 	
 	public CreateMetricRequest(String type, 
-							 Timestamp date,
+							 String date,
 							 com.metrics.model.metrics metrics) {
 		this.type = type;
 		this.date = date;
