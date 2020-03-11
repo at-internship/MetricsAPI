@@ -28,10 +28,11 @@ public class MetricsController {
 		try {
 			MappingTest test = new MappingTest();
 			if(test.MappingTestMetric(request)){
+				//service.SetDefaultDataEmptyField(request);
 				resultMetric = service.updateMetric(request, id);
 			}else {
 				throw new ResponseStatusException(
-				          HttpStatus.BAD_REQUEST, "Metric not found");
+				          HttpStatus.BAD_REQUEST, "Data structure error");
 			}
 		}catch(Exception error ){
 			throw new ResponseStatusException(

@@ -11,6 +11,7 @@ import com.metrics.domain.CreateMetricRequest;
 import com.metrics.model.MetricsCollection;
 
 public class MappingTest {
+	
 	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(MetricsController.class);
 	public boolean MappingTestMetric(CreateMetricRequest metric) {
 		boolean statusTest = false;
@@ -20,18 +21,20 @@ public class MappingTest {
 	    	json = mapper.writerWithDefaultPrettyPrinter()
 	                .writeValueAsString(metric);
 	    }catch(Exception e) {
-	    	log.debug("invalid data structure");
+	    	log.debug("invalid json data structure");
 	    }
+	    
+	    
 	    
 	    try {
 	    	mapper.readValue(json, MetricsCollection.class);
-	          
-	          statusTest = true;
+	    	
+	        statusTest = true;
 	    }
 	    catch (IOException error)
 	    {
 	    	throw new ResponseStatusException(
-			          HttpStatus.NOT_FOUND, "Metric not found", error);
+			          HttpStatus.BAD_REQUEST, "invalid json data structure");
 	    }
 	    
 	    return statusTest;

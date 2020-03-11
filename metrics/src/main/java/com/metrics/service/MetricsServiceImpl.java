@@ -28,4 +28,31 @@ public class MetricsServiceImpl implements MetricsService {
 		metric.setId(id);
 		return repository.save(metric);
 	}
+	@Override
+	public void SetDefaultDataEmptyField(CreateMetricRequest metric) {
+		if(metric.getMetrics().isAttendance() == (Boolean) null) {
+			metric.getMetrics().setAttendance(false);
+		}
+		if(metric.getMetrics().isCarried_over() == (Boolean) null) {
+			metric.getMetrics().setCarried_over(false);
+		}
+		if(metric.getMetrics().getBlockers().isBlocked() == (Boolean) null) {
+			metric.getMetrics().getBlockers().setBlocked(false);
+		}
+		if(metric.getMetrics().getProactive().isLooked_for_help() == (Boolean) null) {
+			metric.getMetrics().getProactive().setLooked_for_help(false);;
+		}
+		if(metric.getMetrics().getProactive().isProvided_help() == (Boolean) null) {
+			metric.getMetrics().getProactive().setProvided_help(false);
+		}
+		if(metric.getMetrics().getProactive().isShared_resources() == (Boolean) null) {
+			metric.getMetrics().getProactive().setShared_resources(false);
+		}
+		if(metric.getMetrics().getProactive().isWorked_ahead() == (Boolean) null) {
+			metric.getMetrics().getProactive().setWorked_ahead(false);
+		}
+		if(metric.getMetrics().getRetroactive().isDelayed_looking_help() == (Boolean) null) {
+			metric.getMetrics().getRetroactive().setDelayed_looking_help(false);
+		}
+	}
 }

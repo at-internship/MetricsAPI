@@ -6,4 +6,5 @@ import com.metrics.model.MetricsCollection;
 public interface MetricsService {
 
 	MetricsCollection updateMetric(CreateMetricRequest request, String id);
+	public void SetDefaultDataEmptyField(CreateMetricRequest metric);
 }
