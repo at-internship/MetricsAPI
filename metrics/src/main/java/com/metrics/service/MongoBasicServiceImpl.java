@@ -1,6 +1,8 @@
 package com.metrics.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.metrics.repository.MetricRepository;
@@ -14,13 +16,13 @@ public class MongoBasicServiceImpl implements MongoBasicService {
 
 	
 	 @Override
-	 public void deleteMetric(String id) {
+	 public ResponseEntity deleteMetric(String id) {
 		 if (repository.existsById(id)) {
-			 log.debug("Deleting user with id: " + id);
 			 repository.deleteById(id);
+			 return new ResponseEntity(HttpStatus.NO_CONTENT);
 		 }
 		 else {
-			 log.error("No user was found for the given id.");
+			 return new ResponseEntity(HttpStatus.NOT_FOUND);
 		 }
 	 }
 }

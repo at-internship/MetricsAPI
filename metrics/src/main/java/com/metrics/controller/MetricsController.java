@@ -2,6 +2,7 @@ package com.metrics.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,8 +26,7 @@ public class MetricsController {
 	}
 	
 	@DeleteMapping("/metric/{id}")
-	@ResponseStatus(value = HttpStatus.ACCEPTED)
-	public void deleteMetric(@PathVariable String id) {
-		service.deleteMetric(id);
+	public ResponseEntity deleteMetric(@PathVariable String id) {
+		return service.deleteMetric(id);
 	}
 }
