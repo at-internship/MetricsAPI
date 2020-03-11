@@ -7,9 +7,11 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.metrics.domain.CreateMetricRequest;
 import com.metrics.model.MetricsCollection;
+import com.metrics.service.MappingTest;
 import com.metrics.service.MetricsServiceImpl;
 
 @RestController
@@ -18,11 +20,25 @@ public class MetricsController {
 	@Autowired
 	MetricsServiceImpl service;
 	
-	@ResponseStatus(value = HttpStatus.OK)
+	@ResponseStatus(value = HttpStatus.ACCEPTED	)
 	@PutMapping("/metrics/{id}")
 	public MetricsCollection updateMetric(@RequestBody CreateMetricRequest request, @PathVariable String id) {
+		MetricsCollection resultMetric = new MetricsCollection();
 		log.debug("Update user request - id=" + id + " " + request.toString());
-		return service.updateMetric(request, id);
+		try {
+			MappingTest test = new MappingTest();
+			if(test.MappingTestMetric(request)){
+				resultMetric = service.updateMetric(request, id);
+			}else {
+				throw new ResponseStatusException(
+				          HttpStatus.BAD_REQUEST, "Metric not found");
+			}
+		}catch(Exception error ){
+			throw new ResponseStatusException(
+			          HttpStatus.NOT_FOUND, "Metric not found", error);
+		}
+		
+		return resultMetric;
 	}	
 	
 }

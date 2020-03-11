@@ -3,16 +3,12 @@ package com.metrics.domain;
 import com.metrics.model.metrics;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
 
-@Setter
-@Getter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString
 public class CreateMetricRequest {
 
 	private String id;
