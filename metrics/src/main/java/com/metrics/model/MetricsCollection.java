@@ -1,13 +1,9 @@
 package com.metrics.model;
 
-import java.sql.Timestamp;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
 import javax.persistence.*;
 
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -28,7 +24,7 @@ public class MetricsCollection {
 	private metrics metrics;
 	
 	public MetricsCollection(String type, 
-							 Timestamp date,
+							 String date,
 							 com.metrics.model.metrics metrics) {
 		this.type = type;
 		this.date = date;

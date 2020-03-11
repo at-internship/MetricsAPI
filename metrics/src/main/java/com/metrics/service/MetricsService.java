@@ -1,6 +1,7 @@
 package com.metrics.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import com.metrics.model.MetricsCollection;
 
@@ -8,4 +9,5 @@ import com.metrics.model.MetricsCollection;
 public interface MetricsService {
 
 	List<MetricsCollection> getMetrics();
+	Optional <MetricsCollection> findById(String id);
 }
