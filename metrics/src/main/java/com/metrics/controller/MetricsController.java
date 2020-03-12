@@ -25,19 +25,10 @@ public class MetricsController {
 	public MetricsCollection updateMetric(@RequestBody CreateMetricRequest request, @PathVariable String id) {
 		MetricsCollection resultMetric = new MetricsCollection();
 		log.debug("Update user request - id=" + id + " " + request.toString());
-		try {
+		
 			MappingTest test = new MappingTest();
-			if(test.MappingTestMetric(request)){
-				//service.SetDefaultDataEmptyField(request);
+			if(test.MappingTestMetric(request))
 				resultMetric = service.updateMetric(request, id);
-			}else {
-				throw new ResponseStatusException(
-				          HttpStatus.BAD_REQUEST, "Data structure error");
-			}
-		}catch(Exception error ){
-			throw new ResponseStatusException(
-			          HttpStatus.NOT_FOUND, "Metric not found", error);
-		}
 		
 		return resultMetric;
 	}	
