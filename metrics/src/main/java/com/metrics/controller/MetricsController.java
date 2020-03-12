@@ -10,14 +10,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.metrics.service.MongoBasicServiceImpl;
+import com.metrics.service.MetricsServiceImpl;
 
 @RestController
 public class MetricsController {
 	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(MetricsController.class);
 	
 	@Autowired
-	MongoBasicServiceImpl service;
+	MetricsServiceImpl service;
 	
 	@ResponseStatus(value = HttpStatus.NO_CONTENT)
 	@DeleteMapping("/metric/{id}")

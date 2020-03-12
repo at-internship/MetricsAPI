@@ -9,14 +9,12 @@ import org.springframework.web.server.ResponseStatusException;
 import com.metrics.repository.MetricRepository;
 
 @Service
-public class MongoBasicServiceImpl implements MongoBasicService {
-	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(MongoBasicServiceImpl.class);
+public class MetricsServiceImpl {
+	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(MetricsServiceImpl.class);
 	
 	@Autowired
 	MetricRepository repository;
 
-	
-	 @Override
 	 public void deleteMetric(String id) {
 		 if (repository.existsById(id)) {
 			 repository.deleteById(id);
