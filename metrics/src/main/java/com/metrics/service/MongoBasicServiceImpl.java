@@ -22,7 +22,7 @@ public class MongoBasicServiceImpl implements MongoBasicService {
 			 repository.deleteById(id);
 		 }
 		 else {
-			 throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+			 throw new ResponseStatusException(HttpStatus.NOT_FOUND, "The given ID does not exist");
 		 }
 	 }
 }

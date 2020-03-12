@@ -19,7 +19,7 @@ public class MetricsController {
 	@Autowired
 	MongoBasicServiceImpl service;
 	
-	
+	@ResponseStatus(value = HttpStatus.NO_CONTENT)
 	@DeleteMapping("/metric/{id}")
 	public void deleteMetric(@PathVariable String id) {
 		service.deleteMetric(id);
