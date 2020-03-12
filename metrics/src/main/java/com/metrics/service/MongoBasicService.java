@@ -4,5 +4,5 @@ import org.springframework.http.ResponseEntity;
 
 public interface MongoBasicService {
 
-	ResponseEntity deleteMetric(String id);
+	void deleteMetric(String id);
 }

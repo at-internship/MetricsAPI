@@ -19,14 +19,9 @@ public class MetricsController {
 	@Autowired
 	MongoBasicServiceImpl service;
 	
-	@ResponseStatus(value = HttpStatus.OK)
-	@GetMapping("/greetings")
-	public String greetings(@RequestParam(value = "name", defaultValue = "World") String name) {
-		return new String("Hello " + name + "!");
-	}
 	
 	@DeleteMapping("/metric/{id}")
-	public ResponseEntity deleteMetric(@PathVariable String id) {
-		return service.deleteMetric(id);
+	public void deleteMetric(@PathVariable String id) {
+		service.deleteMetric(id);
 	}
 }

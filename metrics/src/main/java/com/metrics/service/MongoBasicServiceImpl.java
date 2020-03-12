@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.metrics.repository.MetricRepository;
 
@@ -16,13 +17,12 @@ public class MongoBasicServiceImpl implements MongoBasicService {
 
 	
 	 @Override
-	 public ResponseEntity deleteMetric(String id) {
+	 public void deleteMetric(String id) {
 		 if (repository.existsById(id)) {
 			 repository.deleteById(id);
-			 return new ResponseEntity(HttpStatus.NO_CONTENT);
 		 }
 		 else {
-			 return new ResponseEntity(HttpStatus.NOT_FOUND);
+			 throw new ResponseStatusException(HttpStatus.NOT_FOUND);
 		 }
 	 }
 }
