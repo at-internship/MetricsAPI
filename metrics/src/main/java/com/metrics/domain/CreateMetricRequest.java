@@ -1,16 +1,22 @@
 package com.metrics.domain;
 
+import javax.persistence.Id;
+
 import com.metrics.model.metrics;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
-@Data
+@Setter
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString
 public class CreateMetricRequest {
-
+	@Id
 	private String id;
 	private String evaluator_id;
 	private String evaluated_id;
@@ -26,4 +32,5 @@ public class CreateMetricRequest {
 		this.date = date;
 		this.metrics = metrics;
 	}
+	
 }
