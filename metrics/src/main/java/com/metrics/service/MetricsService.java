@@ -4,5 +4,5 @@ import com.metrics.model.MetricsCollection;
 public interface MetricsService 
 {	
 	MetricsCollection newMetric(CreateMetricRequest request);
-	
+	void deleteMetric(String id);
 }

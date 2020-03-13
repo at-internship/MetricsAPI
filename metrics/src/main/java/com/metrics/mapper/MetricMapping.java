@@ -1,5 +1,3 @@
-package com.metrics.mapper;
-
 import org.springframework.context.annotation.Configuration;
 
 import com.metrics.domain.CreateMetricRequest;
