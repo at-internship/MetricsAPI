@@ -12,8 +12,6 @@ import com.metrics.repository.MetricRepository;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.metrics.domain.CreateMetricRequest;
 import ma.glasnost.orika.MapperFacade;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 @Service
