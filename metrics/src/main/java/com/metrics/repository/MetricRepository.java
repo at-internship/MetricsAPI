@@ -1,8 +1,12 @@
 package com.metrics.repository;
 
+import java.util.List;
+
 import org.springframework.data.mongodb.repository.MongoRepository;
-import org.springframework.stereotype.Repository;
+
 import com.metrics.model.MetricsCollection;
-@Repository
-public interface MetricRepository extends MongoRepository<MetricsCollection, String>{
+
+public interface MetricRepository extends MongoRepository<MetricsCollection, String> {
+	List<MetricsCollection> findAll();
+	MetricsCollection findById();
 }

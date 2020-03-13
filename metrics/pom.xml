@@ -55,11 +55,8 @@
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
-		</dependency>
-		
-		
-		
-		
+		</dependency>		
+	
 		<dependency>
 		   <groupId>javax.persistence</groupId>
 		   <artifactId>persistence-api</artifactId>

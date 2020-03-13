@@ -1,13 +1,17 @@
 package com.metrics.service;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.metrics.domain.CreateMetricRequest;
+import org.springframework.web.client.HttpClientErrorException;
 import com.metrics.model.MetricsCollection;
 import com.metrics.repository.MetricRepository;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.metrics.domain.CreateMetricRequest;
 import ma.glasnost.orika.MapperFacade;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -18,10 +22,26 @@ public class MetricsServiceImpl implements MetricsService
 {
 	@Autowired
 	private MapperFacade orikaMapperFacade;
-	@Autowired
+	
+  @Autowired
 	MetricRepository repository;
-  
+	
 	@Override
+	public List<MetricsCollection> getMetrics() {
+		List<MetricsCollection> metricsCollection = new ArrayList<>();
+		metricsCollection = repository.findAll();
+		log.debug("Records found on DB - " + metricsCollection.toString());
+		return metricsCollection;
+	}
+	
+	@Override
+	public Optional<MetricsCollection> findById(String id) {
+		if (!repository.existsById(id))
+			throw new HttpClientErrorException(HttpStatus.NOT_FOUND, "No metric found with the given id");	
+		return repository.findById(id);
+    }
+    
+    	@Override
 	public MetricsCollection newMetric(CreateMetricRequest request)
 	{
 			MetricsCollection metric = new MetricsCollection();

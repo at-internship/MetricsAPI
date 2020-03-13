@@ -1,19 +1,22 @@
 package com.metrics.domain;
 
-//import java.sql.Timestamp;
-//import javax.persistence.*;
-import com.metrics.model.*;
+import javax.persistence.Id;
+
+import com.metrics.model.metrics;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
+@Setter
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor
-@Data
-public class CreateMetricRequest 
-{
-
+@ToString
+public class CreateMetricRequest {
+	@Id
 	private String id;
 	private String evaluator_id;
 	private String evaluated_id;
@@ -21,4 +24,13 @@ public class CreateMetricRequest
 	private String date;
 	private String sprint_id;
 	private metrics metrics;
+	
+	public CreateMetricRequest(String type, 
+							 String date,
+							 com.metrics.model.metrics metrics) {
+		this.type = type;
+		this.date = date;
+		this.metrics = metrics;
+	}
+	
 }
