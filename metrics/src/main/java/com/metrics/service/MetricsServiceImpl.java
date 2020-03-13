@@ -26,8 +26,16 @@ public class MetricsServiceImpl implements MetricsService {
 			throw new ResponseStatusException(
 			          HttpStatus.NOT_FOUND, "Metric not found");
 		MetricsCollection metric = new MetricsCollection();
-		metric = orikaMapperFacade.map(request, MetricsCollection.class);
-		metric.setId(id);
+		MappingTest test = new MappingTest();
+		if(test.MappingTestMetric(request)) {
+			
+			metric = orikaMapperFacade.map(request, MetricsCollection.class);
+			metric.setId(id);
+		}else {
+			throw new ResponseStatusException(
+			          HttpStatus.BAD_REQUEST);
+		}
+		
 		return repository.save(metric);
 	}
 	

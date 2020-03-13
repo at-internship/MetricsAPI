@@ -26,9 +26,8 @@ public class MetricsController {
 		MetricsCollection resultMetric = new MetricsCollection();
 		log.debug("Update user request - id=" + id + " " + request.toString());
 		
-			MappingTest test = new MappingTest();
-			if(test.MappingTestMetric(request))
-				resultMetric = service.updateMetric(request, id);
+			
+		resultMetric = service.updateMetric(request, id);
 		
 		return resultMetric;
 	}	
