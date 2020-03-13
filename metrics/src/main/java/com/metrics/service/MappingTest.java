@@ -56,7 +56,7 @@ public class MappingTest {
 		 if (collection.getMetrics().getRetroactive() == null) {
 			 collection.getMetrics().setRetroactive(new retroactive(false,"Empty"));
 		 }
-		 
+
 		 if(collection.getDate().isEmpty() || collection.getDate().isBlank()) {
 			 collection.setDate("1000-01-01");
 		 }
@@ -77,7 +77,7 @@ public class MappingTest {
 			 throw new ResponseStatusException(
 			          HttpStatus.BAD_REQUEST);
 		 }
-		 
+
 		 if(collection.getMetrics().getBlockers().getComments().isEmpty() || collection.getDate().isBlank()) {
 			 collection.getMetrics().getBlockers().setComments("Empty");
 		 }

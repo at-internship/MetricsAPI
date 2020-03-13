@@ -12,5 +12,4 @@ public class MetricMapping implements OrikaMapperFactoryConfigurer{
 		orikaMapperFactory.classMap(CreateMetricRequest.class, MetricsCollection.class).byDefault().register();
 	}
 	
-
 }
