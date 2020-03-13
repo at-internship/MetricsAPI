@@ -1,4 +1,3 @@
-
 package com.metrics.model;
 
 import lombok.AllArgsConstructor;
@@ -14,5 +13,4 @@ public class proactive {
 	private boolean provided_help;
 	private boolean worked_ahead;
 	private boolean shared_resources;
-	
 }

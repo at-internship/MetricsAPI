@@ -9,5 +9,4 @@ import com.metrics.model.MetricsCollection;
 public interface MetricRepository extends MongoRepository<MetricsCollection, String> {
 	List<MetricsCollection> findAll();
 	MetricsCollection findById();
-
 }

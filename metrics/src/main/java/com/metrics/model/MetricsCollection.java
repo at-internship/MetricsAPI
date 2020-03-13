@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import javax.persistence.*;
-
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Data
@@ -22,7 +21,8 @@ public class MetricsCollection {
 	private String date;
 	private String sprint_id;
 	private metrics metrics;
-	
+
+
 	public MetricsCollection(String type, 
 							 String date,
 							 com.metrics.model.metrics metrics) {
