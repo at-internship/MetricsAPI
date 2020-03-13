@@ -1,11 +1,24 @@
 package com.metrics.domain;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+//import java.sql.Timestamp;
+//import javax.persistence.*;
+import com.metrics.model.*;
 
-public class CreateMetricRequest {
-	private String ejemplo;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@NoArgsConstructor
+@AllArgsConstructor
+@Data
+public class CreateMetricRequest 
+{
+
+	private String id;
+	private String evaluator_id;
+	private String evaluated_id;
+	private String type;
+	private String date;
+	private String sprint_id;
+	private metrics metrics;
 }

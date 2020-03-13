@@ -1,5 +1,8 @@
 package com.metrics.service;
-
-public interface MetricsService {
+import com.metrics.domain.CreateMetricRequest;
+import com.metrics.model.MetricsCollection;
+public interface MetricsService 
+{	
+	MetricsCollection newMetric(CreateMetricRequest request);
 	void deleteMetric(String id);
 }
