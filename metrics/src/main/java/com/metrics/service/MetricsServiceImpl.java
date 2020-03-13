@@ -30,7 +30,6 @@ public class MetricsServiceImpl implements MetricsService
 	public List<MetricsCollection> getMetrics() {
 		List<MetricsCollection> metricsCollection = new ArrayList<>();
 		metricsCollection = repository.findAll();
-		log.debug("Records found on DB - " + metricsCollection.toString());
 		return metricsCollection;
 	}
 	
