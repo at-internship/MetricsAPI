@@ -9,7 +9,7 @@ public interface MetricsService {
 
 	List<MetricsCollection> getMetrics();
 	Optional <MetricsCollection> findById(String id);
-  MetricsCollection newMetric(CreateMetricRequest request);
+    MetricsCollection newMetric(CreateMetricRequest request);
 	void deleteMetric(String id);
-  MetricsCollection updateMetric(CreateMetricRequest request, String id);
+    MetricsCollection updateMetric(CreateMetricRequest request, String id);
 }
