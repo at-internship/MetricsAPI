@@ -1,6 +1,9 @@
 package com.metrics.service;
 
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -20,11 +23,16 @@ public class MappingTest {
 		String json ="";
 	    ObjectMapper mapper = new ObjectMapper();
 	    try {
+	    	 SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 	    	json = mapper.writerWithDefaultPrettyPrinter()
 	                .writeValueAsString(SetDefaultDataEmptyField(metric));
 	    	
 	    	
 	    	mapper.readValue(json, MetricsCollection.class);
+	    	
+	    	 Date dateTest = formatter.parse(metric.getDate());
+	    	 metric.setDate(formatter.format(dateTest));
+	    	 
 	    	
 	        statusTest = true;
 	    	

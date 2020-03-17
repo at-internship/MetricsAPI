@@ -1,5 +1,7 @@
 package com.metrics.domain;
 
+import java.util.Date;
+
 import javax.persistence.Id;
 
 import com.metrics.model.metrics;
