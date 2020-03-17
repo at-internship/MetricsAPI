@@ -62,6 +62,8 @@ class MetricRepositoryTest {
      assertTrue(metricsCollection.length > 0);
      }
      
+     
+     
      @Test
      public void getMetricByIdTest() throws Exception {
      CreateMetricRequest metric = newCreateMetricRequest();
@@ -69,8 +71,7 @@ class MetricRepositoryTest {
      String uri = "/metrics/{id}";
      MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.get(uri,metric.getId())
     		 .accept(MediaType.APPLICATION_JSON_VALUE)).andDo(print())
-             .andReturn();
-           
+             .andReturn();      
      int status = mvcResult.getResponse().getStatus();
      assertEquals(200, status);
      String content = mvcResult.getResponse().getContentAsString();
