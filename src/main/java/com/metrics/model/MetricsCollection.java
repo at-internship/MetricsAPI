@@ -3,9 +3,6 @@ package com.metrics.model;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.Date;
-
 import javax.persistence.*;
 import org.springframework.data.mongodb.core.mapping.Document;
 

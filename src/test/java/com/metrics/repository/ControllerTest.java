@@ -2,10 +2,6 @@ package com.metrics.repository;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.handler;
-
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
@@ -19,20 +15,15 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
- 
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.metrics.MetricsApplication;
 import com.metrics.controller.MetricsController;
 import com.metrics.domain.CreateMetricRequest;
-import com.metrics.model.MetricsCollection;
 import com.metrics.model.blockers;
 import com.metrics.model.metrics;
 import com.metrics.model.proactive;
 import com.metrics.model.retroactive;
-import com.metrics.service.MetricsServiceImpl;
 
  
 
