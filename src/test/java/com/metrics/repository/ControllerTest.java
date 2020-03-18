@@ -1,10 +1,10 @@
 package com.metrics.repository;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.handler;
 
- 
-
+import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
@@ -31,6 +31,7 @@ import com.metrics.model.blockers;
 import com.metrics.model.metrics;
 import com.metrics.model.proactive;
 import com.metrics.model.retroactive;
+import com.metrics.service.Functions;
 import com.metrics.service.MetricsServiceImpl;
 
  
@@ -54,23 +55,22 @@ class MetricRepositoryTest {
     
     @Test
     public void test_update_user_success() throws Exception {
+    	
         CreateMetricRequest metric = newCreateMetricRequest();
         
+        assertTrue(ObjectId.isValid(metric.getId()));
         
-
- 
-
         MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.
                 put("/metrics/{id}", metric.getId())
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .content(mapToJson(metric)))
+                        .content(Functions.mapToJson(metric)))
                 .andExpect(handler().handlerType(MetricsController.class))
                 .andExpect(handler().methodName("updateMetric"))
                 .andDo(print())
                 .andReturn();
         assertEquals(202, mvcResult.getResponse().getStatus());
         String jsonResponse = mvcResult.getResponse().getContentAsString();
-        assertEquals(jsonResponse, mapToJson(metric));
+        assertEquals(jsonResponse, Functions.mapToJson(metric));
     }
 
  
@@ -81,12 +81,12 @@ class MetricRepositoryTest {
     public void test_update_user_fail_404_not_found() throws Exception {
         CreateMetricRequest falseMetric = falseCreateMetricRequest();
 
- 
+        
 
         MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.
                 put("/metrics/{id}", falseMetric.getId())
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .content(mapToJson(falseMetric)))
+                        .content(Functions.mapToJson(falseMetric)))
                 .andExpect(handler().handlerType(MetricsController.class))
                 .andExpect(handler().methodName("updateMetric"))
                 .andDo(print())
@@ -98,21 +98,7 @@ class MetricRepositoryTest {
         
     }
 
-	@Test
-	public void testPOSTMetric() throws Exception
-	{
-		
-		CreateMetricRequest metric = newCreateMetricRequest();
-        
-        MvcResult result = mvc.perform(
-        					MockMvcRequestBuilders.post("/metrics")
-        						.contentType(MediaType.APPLICATION_JSON)
-        						.accept(MediaType.APPLICATION_JSON).content(mapToJson(metric)))
-        						.andReturn();            
-       
-        assertEquals(201, result.getResponse().getStatus());
-        
-	}
+	
     
     
     private CreateMetricRequest newCreateMetricRequest () {
@@ -123,14 +109,9 @@ class MetricRepositoryTest {
     }
     
     private CreateMetricRequest falseCreateMetricRequest () {
-        return new CreateMetricRequest("5e691fd8cdc","Empty","Empty","Empty","1001-01-02","Empty",new metrics(false,false,
+        return new CreateMetricRequest("5e691cdc","Empty","Empty","Empty","1001-01-02","Empty",new metrics(false,false,
                                     new blockers(false,"Empty"),
                                     new proactive(false, false,false,false),
                                     new retroactive(false,"Empty")));
     }
-    
-    protected String mapToJson(Object obj) throws JsonProcessingException {
-          ObjectMapper objectMapper = new ObjectMapper();
-          return objectMapper.writeValueAsString(obj);
-       }
 }

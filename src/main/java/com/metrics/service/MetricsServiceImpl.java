@@ -58,18 +58,19 @@ public class MetricsServiceImpl implements MetricsService
    
    	@Override
 	public MetricsCollection updateMetric(CreateMetricRequest request, String id) {
+   		
+   		MetricsCollection metric = new MetricsCollection();
+   		MappingTest test = new MappingTest();
+   		
 		if (!repository.existsById(id))
-			throw new ResponseStatusException(
-			          HttpStatus.NOT_FOUND, "Metric not found");
-		MetricsCollection metric = new MetricsCollection();
-		MappingTest test = new MappingTest();
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Metric not found");
+		
 		if(test.MappingTestMetric(request)) {
-			
 			metric = orikaMapperFacade.map(request, MetricsCollection.class);
+			Functions.VerifyingUUID(id);
 			metric.setId(id);
 		}else {
-			throw new ResponseStatusException(
-			          HttpStatus.BAD_REQUEST);
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
 		}
 		
 		return repository.save(metric);
