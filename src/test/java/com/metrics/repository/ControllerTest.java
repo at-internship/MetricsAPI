@@ -2,9 +2,6 @@ package com.metrics.repository;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.handler;
-
- 
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
@@ -18,20 +15,15 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
- 
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.metrics.MetricsApplication;
 import com.metrics.controller.MetricsController;
 import com.metrics.domain.CreateMetricRequest;
-import com.metrics.model.MetricsCollection;
 import com.metrics.model.blockers;
 import com.metrics.model.metrics;
 import com.metrics.model.proactive;
 import com.metrics.model.retroactive;
-import com.metrics.service.MetricsServiceImpl;
 
  
 
@@ -57,8 +49,8 @@ class MetricRepositoryTest {
         CreateMetricRequest metric = newCreateMetricRequest();
         
         
-
- 
+        
+        
 
         MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.
                 put("/metrics/{id}", metric.getId())
@@ -102,7 +94,7 @@ class MetricRepositoryTest {
 	public void testPOSTMetric() throws Exception
 	{
 		
-		CreateMetricRequest metric = newCreateMetricRequest();
+		CreateMetricRequest metric = newCreateMetricPOSTRequest();
         
         MvcResult result = mvc.perform(
         					MockMvcRequestBuilders.post("/metrics")
@@ -113,21 +105,70 @@ class MetricRepositoryTest {
         assertEquals(201, result.getResponse().getStatus());
         
 	}
+	
+	@Test
+	public void testWrongPOSTMetric() throws Exception
+	{
+		
+		CreateMetricRequest metric = falseCreateMetricRequest();
+        
+        MvcResult result = mvc.perform(
+        					MockMvcRequestBuilders.post("/metrics")
+        						.contentType(MediaType.APPLICATION_JSON)
+        						.accept(MediaType.APPLICATION_JSON).content(mapToJson(metric)))
+        						.andReturn();  
+       
+        assertEquals(400, result.getResponse().getStatus());
+        
+	}
     
     
     private CreateMetricRequest newCreateMetricRequest () {
-        return new CreateMetricRequest("5e691fd8cdcafe60f029b807","Empty","Empty","Empty","1001-01-02","Empty",new metrics(false,false,
-                                    new blockers(false,"Empty"),
-                                    new proactive(false, false,false,false),
-                                    new retroactive(false,"Empty")));
+    	
+    	try {
+    		
+    		return new CreateMetricRequest("5e71378c0d386b2e07b600dc","Empty","Empty","Empty","2020-03-17","Empty",new metrics(false,false,
+                    new blockers(false,"POST TESTV2 2020-03-17"),
+                    new proactive(false, false,false,false),
+                    new retroactive(false,"Empty")));
+    	}catch(Exception e)
+    	{
+    		
+    		System.out.println("FALLO PARSEO");
+    		return null;
+    	}
+        
     }
     
-    private CreateMetricRequest falseCreateMetricRequest () {
-        return new CreateMetricRequest("5e691fd8cdc","Empty","Empty","Empty","1001-01-02","Empty",new metrics(false,false,
-                                    new blockers(false,"Empty"),
-                                    new proactive(false, false,false,false),
-                                    new retroactive(false,"Empty")));
+    
+ private CreateMetricRequest newCreateMetricPOSTRequest () {
+    	
+    	try {
+    		
+    		return new CreateMetricRequest("","Empty","Empty","Empty","2020-03-17","Empty",new metrics(false,false,
+                    new blockers(false,"POST TESTV2 2020-03-17"),
+                    new proactive(false, false,false,false),
+                    new retroactive(false,"Empty")));
+    	}catch(Exception e)
+    	{
+    		
+    		System.out.println("FALLO PARSEO");
+    		return null;
+    	}
+ }
+private CreateMetricRequest falseCreateMetricRequest () {
+    	try {
+    		
+    		return new CreateMetricRequest("e60f029b807","Empty","Empty","Empty","DATE","Empty",new metrics(false,false,
+                    new blockers(false,"Empty"),
+                    new proactive(false, false,false,false),
+                    new retroactive(false,"Empty")));
+    	}catch(Exception e)
+    	{
+    		return null;
+    	}
     }
+   
     
     protected String mapToJson(Object obj) throws JsonProcessingException {
           ObjectMapper objectMapper = new ObjectMapper();

@@ -1,6 +1,9 @@
 package com.metrics.service;
 
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -20,11 +23,16 @@ public class MappingTest {
 		String json ="";
 	    ObjectMapper mapper = new ObjectMapper();
 	    try {
+	    	 SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 	    	json = mapper.writerWithDefaultPrettyPrinter()
 	                .writeValueAsString(SetDefaultDataEmptyField(metric));
 	    	
 	    	
 	    	mapper.readValue(json, MetricsCollection.class);
+	    	
+	    	 Date dateTest = formatter.parse(metric.getDate());
+	    	 metric.setDate(formatter.format(dateTest));
+	    	 
 	    	
 	        statusTest = true;
 	    	
@@ -56,36 +64,36 @@ public class MappingTest {
 		 if (collection.getMetrics().getRetroactive() == null) {
 			 collection.getMetrics().setRetroactive(new retroactive(false,"Empty"));
 		 }
-/*
-		 if(collection.getDate().isEmpty() || collection.getDate().isBlank()) {
+
+		 if(collection.getDate().isEmpty()) {
 			 collection.setDate("1000-01-01");
 		 }
 		 
-		 if(collection.getType().isEmpty() || collection.getType().isBlank()) {
+		 if(collection.getType().isEmpty()) {
 			 collection.setDate("Empty");
 		 }
-		 if(collection.getEvaluated_id().isEmpty() || collection.getEvaluated_id().isBlank()) {
+		 if(collection.getEvaluated_id().isEmpty()) {
 			 throw new ResponseStatusException(
 			          HttpStatus.BAD_REQUEST);
 		 }
 		 
-		 if(collection.getEvaluator_id().isEmpty() || collection.getEvaluator_id().isBlank()) {
+		 if(collection.getEvaluator_id().isEmpty()) {
 			 throw new ResponseStatusException(
 			          HttpStatus.BAD_REQUEST);
 		 }
-		 if(collection.getSprint_id().isEmpty() || collection.getSprint_id().isBlank()) {
+		 if(collection.getSprint_id().isEmpty()) {
 			 throw new ResponseStatusException(
 			          HttpStatus.BAD_REQUEST);
 		 }
 
-		 if(collection.getMetrics().getBlockers().getComments().isEmpty() || collection.getDate().isBlank()) {
+		 if(collection.getMetrics().getBlockers().getComments().isEmpty()) {
 			 collection.getMetrics().getBlockers().setComments("Empty");
 		 }
 		 
-		 if(collection.getMetrics().getRetroactive().getComments().isEmpty() || collection.getDate().isBlank()) {
+		 if(collection.getMetrics().getRetroactive().getComments().isEmpty()) {
 			 collection.getMetrics().getRetroactive().setComments("Empty");
 		 }
-		 */
+		 
 		 
 		return collection;
 	}
