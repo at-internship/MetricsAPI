@@ -3,6 +3,7 @@ package com.metrics.service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -31,6 +32,7 @@ public class MetricsServiceImpl implements MetricsService
 		return metricsCollection;
 	}
 	
+	
 	@Override
 	public Optional<MetricsCollection> findById(String id) {
 		if (!repository.existsById(id))
@@ -58,18 +60,19 @@ public class MetricsServiceImpl implements MetricsService
    
    	@Override
 	public MetricsCollection updateMetric(CreateMetricRequest request, String id) {
+   		
+   		MetricsCollection metric = new MetricsCollection();
+   		MappingTest test = new MappingTest();
+   		
 		if (!repository.existsById(id))
-			throw new ResponseStatusException(
-			          HttpStatus.NOT_FOUND, "Metric not found");
-		MetricsCollection metric = new MetricsCollection();
-		MappingTest test = new MappingTest();
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Metric not found");
+		
 		if(test.MappingTestMetric(request)) {
-			
 			metric = orikaMapperFacade.map(request, MetricsCollection.class);
+			Functions.VerifyingUUID(id);
 			metric.setId(id);
 		}else {
-			throw new ResponseStatusException(
-			          HttpStatus.BAD_REQUEST);
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
 		}
 		
 		return repository.save(metric);
