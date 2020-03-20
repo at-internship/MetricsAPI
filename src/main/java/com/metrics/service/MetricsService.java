@@ -11,7 +11,7 @@ public interface MetricsService {
 	List<MetricsCollection> getMetrics();
 	
 	Optional <MetricsCollection> findById(String id);
-	
+
  	MetricsCollection newMetric(CreateMetricRequest request);
   
 	void deleteMetric(String id);
