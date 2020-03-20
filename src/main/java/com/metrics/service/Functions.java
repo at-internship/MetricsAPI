@@ -55,65 +55,6 @@ public class Functions {
 		return parseDate;
 	}
 	
-	public static List<MetricsCollection> OrderByAscending(List<MetricsCollection> listMetric, int orderByPropertie){
-		List<MetricsCollection> listOrder = listMetric;
-		switch(orderByPropertie) {
-		case 0:{
-			Collections.sort(listOrder, new Comparator<MetricsCollection>() {
-				@Override
-				public int compare(MetricsCollection arg0, MetricsCollection arg1) {
-					
-					return arg0.getId().compareTo(arg1.getId());
-				}
-				
-			});
-			
-		}
-		case 1:{
-			Collections.sort(listOrder, new Comparator<MetricsCollection>() {
-				@Override
-				public int compare(MetricsCollection arg0, MetricsCollection arg1) {
-					
-					return arg0.getEvaluator_id().compareTo(arg1.getEvaluator_id());
-				}
-				
-			});
-			
-		}
-		case 2:{
-			Collections.sort(listOrder, new Comparator<MetricsCollection>() {
-				@Override
-				public int compare(MetricsCollection arg0, MetricsCollection arg1) {
-					
-					return arg0.getEvaluated_id().compareTo(arg1.getEvaluated_id());
-				}
-				
-			});
-			
-		}
-		case 3:{
-			Collections.sort(listOrder, new Comparator<MetricsCollection>() {
-
-				@Override
-				public int compare(MetricsCollection o1, MetricsCollection o2) {
-					
-					return o1.getSprint_id().compareTo(o2.getSprint_id());
-				}});
-		}
-		case 4:{
-			Collections.sort(listOrder, new Comparator<MetricsCollection>() {
-				@Override
-				public int compare(MetricsCollection arg0, MetricsCollection arg1) {
-					
-					return arg0.getSprint_id().compareTo(arg1.getSprint_id());
-				}
-				
-			});
-		}
-		}
-		return listOrder;
-	}
-	
 	public static String mapToJson(Object obj) throws JsonProcessingException {
          ObjectMapper objectMapper = new ObjectMapper();
          return objectMapper.writeValueAsString(obj);

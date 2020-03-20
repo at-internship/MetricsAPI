@@ -44,66 +44,8 @@ public class MetricsController {
 	
 	@ResponseStatus(value = HttpStatus.OK)
 	@GetMapping("/metrics")
-	public List<MetricsCollection> getMetrics(@RequestParam(value = "start", defaultValue = "-1") int start,
-			   								  @RequestParam(value = "size", defaultValue = "-1") int size,
-											  @RequestParam(value = "startDate", defaultValue = "1000-01-01") String startDate,
-											  @RequestParam(value = "endDate", defaultValue = "1000-01-01") String endDate,
-											  @RequestParam(value = "startId", defaultValue = "") String startId,
-											  @RequestParam(value = "endId", defaultValue = "") String endId,
-											  @RequestParam(value = "filterdBy", defaultValue = "0") int filterdBy,
-											  @RequestParam(value = "orderBy", defaultValue = "0") int orderBy){
-		
-		List<MetricsCollection> ListMetric = service.getMetrics();
-		Date defaultValueDate = Functions.stringToDate("1000-01-01");
-		Date startDateLocal = Functions.stringToDate(startDate);
-		Date endDateLocal = Functions.stringToDate(endDate);
-		boolean withFilters = false;
-		
-		System.out.println(startId.compareTo(""));
-		System.out.println(endId.compareTo(""));
-		//Applying filter by id with range of id's
-		if(startId.compareTo("") > 0 && endId.compareTo("") > 0) {
-			withFilters = true;
-			System.out.println("Applying filter for ids");
-			
-			//The method use the next numbers to apply filter
-			// 0 = Filter by id
-			// 1 = Filter by evaluator_id
-			// 2 = Filter by evaluated_id
-			// 3 = Filter by sprint_id;
-			
-			//The method use the next numbers to apply order by
-			// 0 = Filter by id
-			// 1 = Filter by evaluator_id
-			// 2 = Filter by evaluated_id
-			// 3 = Filter by sprint_id;
-			//The filter order is ascendant
-			
-			ListMetric = service.getSpecificItemsFromTypeIdRange(startId, endId, ListMetric, filterdBy, orderBy);
-			System.out.println(ListMetric.size());
-		}
-		//Applying filter of pagination and applying order by ascendant
-		if(start != -1 && size != -1) {
-			withFilters = true;
-			System.out.println("Applying filter with range");
-			ListMetric = service.getAllMetricsPaginated(start, size, ListMetric, orderBy);
-		}
-		//Applying filter by date range and applying order by ascendant
-		if(startDateLocal.compareTo(defaultValueDate) > 0 && endDateLocal.compareTo(defaultValueDate) > 0) {
-			withFilters = true;
-			ListMetric = service.getItemsFromDateRange(startDateLocal, endDateLocal, ListMetric, orderBy);
-			System.out.println("Applying filter for dates");
-			System.out.println(ListMetric.size());
-			
-		}
-		//Not applying anything filter
-		if (!withFilters){
-			System.out.println("EApplying without filter");
-			System.out.println(ListMetric.size());
-			return service.getMetrics();
-			
-		}
-		return ListMetric;
+	public List<MetricsCollection> getMetrics(){
+		return service.getMetrics();
 	}
 
 	@ResponseStatus(value = HttpStatus.OK)
