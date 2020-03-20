@@ -1,4 +1,5 @@
 package com.metrics.repository;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -45,8 +46,21 @@ class MetricRepositoryTest {
            mvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
        }
 
- 
-
+   @Test
+ 	   public void deleteMetricCorrect() throws Exception {
+ 	      String uri = "/metrics/424y5y5y56y";
+ 	      MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.delete(uri)).andReturn();
+ 	      int status = mvcResult.getResponse().getStatus();
+ 	      assertEquals(204, status);
+ 	   }
+        
+        @Test
+  	   public void deleteMetricBadID() throws Exception {
+  	      String uri = "/metrics/t54t5yt5";
+  	      MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.delete(uri)).andReturn();
+  	      int status = mvcResult.getResponse().getStatus();
+  	      assertEquals(404, status);
+  	   }
     
     @Test
     public void test_update_user_success() throws Exception {
@@ -68,7 +82,6 @@ class MetricRepositoryTest {
         assertEquals(jsonResponse, Functions.mapToJson(metric));
     }
 
- 
 @Test
      public void getMetricsList() throws Exception {
      String uri = "/metrics";
