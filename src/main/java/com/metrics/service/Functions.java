@@ -1,8 +1,11 @@
 package com.metrics.service;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
-import java.util.UUID;
+import java.util.List;
 
 import org.bson.types.ObjectId;
 import org.springframework.http.HttpStatus;
@@ -11,6 +14,7 @@ import org.springframework.web.server.ResponseStatusException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.metrics.domain.CreateMetricRequest;
+import com.metrics.model.MetricsCollection;
 import com.metrics.model.blockers;
 import com.metrics.model.metrics;
 import com.metrics.model.proactive;
@@ -29,10 +33,8 @@ public class Functions {
 	}
 	
 	public static void VerifyingDate(String date) {
-		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 		try {
-			Date dateFormat = formatter.parse(date);
-			formatter.format(dateFormat);
+			new SimpleDateFormat("yyyy-MM-dd").parse(date);
 		}catch(Exception error) {
 			 throw new ResponseStatusException(
 			          HttpStatus.BAD_REQUEST,
@@ -40,11 +42,83 @@ public class Functions {
 		}
 	}
 	
-	 public static String mapToJson(Object obj) throws JsonProcessingException {
+	public static Date stringToDate(String date) {
+		Date parseDate = new Date();
+		try {
+			
+			parseDate = new SimpleDateFormat("yyyy-MM-dd").parse(date);
+		}catch(Exception error) {
+			 throw new ResponseStatusException(
+			          HttpStatus.BAD_REQUEST,
+			          "The Date has incorrect Format");
+		}
+		return parseDate;
+	}
+	
+	public static List<MetricsCollection> OrderByAscending(List<MetricsCollection> listMetric, int orderByPropertie){
+		List<MetricsCollection> listOrder = listMetric;
+		switch(orderByPropertie) {
+		case 0:{
+			Collections.sort(listOrder, new Comparator<MetricsCollection>() {
+				@Override
+				public int compare(MetricsCollection arg0, MetricsCollection arg1) {
+					
+					return arg0.getId().compareTo(arg1.getId());
+				}
+				
+			});
+			
+		}
+		case 1:{
+			Collections.sort(listOrder, new Comparator<MetricsCollection>() {
+				@Override
+				public int compare(MetricsCollection arg0, MetricsCollection arg1) {
+					
+					return arg0.getEvaluator_id().compareTo(arg1.getEvaluator_id());
+				}
+				
+			});
+			
+		}
+		case 2:{
+			Collections.sort(listOrder, new Comparator<MetricsCollection>() {
+				@Override
+				public int compare(MetricsCollection arg0, MetricsCollection arg1) {
+					
+					return arg0.getEvaluated_id().compareTo(arg1.getEvaluated_id());
+				}
+				
+			});
+			
+		}
+		case 3:{
+			Collections.sort(listOrder, new Comparator<MetricsCollection>() {
+
+				@Override
+				public int compare(MetricsCollection o1, MetricsCollection o2) {
+					
+					return o1.getSprint_id().compareTo(o2.getSprint_id());
+				}});
+		}
+		case 4:{
+			Collections.sort(listOrder, new Comparator<MetricsCollection>() {
+				@Override
+				public int compare(MetricsCollection arg0, MetricsCollection arg1) {
+					
+					return arg0.getSprint_id().compareTo(arg1.getSprint_id());
+				}
+				
+			});
+		}
+		}
+		return listOrder;
+	}
+	
+	public static String mapToJson(Object obj) throws JsonProcessingException {
          ObjectMapper objectMapper = new ObjectMapper();
          return objectMapper.writeValueAsString(obj);
      }
-	 public static CreateMetricRequest SetDefaultDataEmptyField(CreateMetricRequest metric) {
+	public static CreateMetricRequest SetDefaultDataEmptyField(CreateMetricRequest metric) {
 			CreateMetricRequest collection = metric;
 			
 			 if (collection.getMetrics() == null) {
@@ -98,5 +172,4 @@ public class Functions {
 			 
 			return collection;
 		}
-
 }
