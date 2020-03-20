@@ -10,10 +10,6 @@ import org.springframework.web.server.ResponseStatusException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.metrics.domain.CreateMetricRequest;
 import com.metrics.model.MetricsCollection;
-import com.metrics.model.blockers;
-import com.metrics.model.metrics;
-import com.metrics.model.proactive;
-import com.metrics.model.retroactive;
 
 public class MappingTest {
 	
@@ -23,12 +19,26 @@ public class MappingTest {
 		String json ="";
 	    ObjectMapper mapper = new ObjectMapper();
 	    try {
+	    	//Creating Json structure from CreateMetricRequest
+	    	json = Functions.mapToJson(Functions.SetDefaultDataEmptyField(metric));
+	    		    	
+	    	mapper.readValue(json, MetricsCollection.class);
 	    	 SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 	    	json = mapper.writerWithDefaultPrettyPrinter()
 	                .writeValueAsString(SetDefaultDataEmptyField(metric));
 	    	
 	    	
-	    	mapper.readValue(json, MetricsCollection.class);
+	    	//Verifying Date
+	    	Functions.VerifyingDate(metric.getDate());
+	    	
+	    	//Verifying UUID id
+	    	//Functions.VerifyingUUID(metric.getId());
+	    	//Verifying UUID Evaluated_id
+	    	//Functions.VerifyingUUID(metric.getEvaluated_id());
+	    	//Verifying UUID Evaluator_id
+	    	//Functions.VerifyingUUID(metric.getEvaluator_id());
+	    	//Verifying UUID Sprint_id
+	    	//Functions.VerifyingUUID(metric.getSprint_id());
 	    	
 	    	 Date dateTest = formatter.parse(metric.getDate());
 	    	 metric.setDate(formatter.format(dateTest));
@@ -43,6 +53,7 @@ public class MappingTest {
 	    
 	    return statusTest;
 	}
+
 	private CreateMetricRequest SetDefaultDataEmptyField(CreateMetricRequest metric) {
 		CreateMetricRequest collection = metric;
 		
