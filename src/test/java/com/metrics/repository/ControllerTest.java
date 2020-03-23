@@ -23,6 +23,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.metrics.MetricsApplication;
 import com.metrics.controller.MetricsController;
 import com.metrics.domain.CreateMetricRequest;
+import com.metrics.model.MetricsCollection;
 import com.metrics.model.blockers;
 import com.metrics.model.metrics;
 import com.metrics.model.proactive;
@@ -92,7 +93,7 @@ class MetricRepositoryTest {
      int status = mvcResult.getResponse().getStatus();
      assertEquals(200, status);
      String content = mvcResult.getResponse().getContentAsString();
-     MetricsCollection[] metricsCollection = mapFromJson(content, MetricsCollection[].class);
+     MetricsCollection[] metricsCollection = Functions.mapFromJson(content, MetricsCollection[].class);
      assertTrue(metricsCollection.length > 0);
      }
    
@@ -154,7 +155,7 @@ class MetricRepositoryTest {
         MvcResult result = mvc.perform(
         					MockMvcRequestBuilders.post("/metrics")
         						.contentType(MediaType.APPLICATION_JSON)
-        						.accept(MediaType.APPLICATION_JSON).content(mapToJson(metric)))
+        						.accept(MediaType.APPLICATION_JSON).content(Functions.mapToJson(metric)))
         						.andReturn();            
        
         assertEquals(201, result.getResponse().getStatus());
@@ -170,7 +171,7 @@ class MetricRepositoryTest {
         MvcResult result = mvc.perform(
         					MockMvcRequestBuilders.post("/metrics")
         						.contentType(MediaType.APPLICATION_JSON)
-        						.accept(MediaType.APPLICATION_JSON).content(mapToJson(metric)))
+        						.accept(MediaType.APPLICATION_JSON).content(Functions.mapToJson(metric)))
         						.andReturn();  
        
         assertEquals(400, result.getResponse().getStatus());
@@ -221,10 +222,4 @@ private CreateMetricRequest falseCreateMetricRequest () {
     		return null;
     	}
     }
-   
-    
-    protected String mapToJson(Object obj) throws JsonProcessingException {
-          ObjectMapper objectMapper = new ObjectMapper();
-          return objectMapper.writeValueAsString(obj);
-       }
 }

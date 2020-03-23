@@ -1,5 +1,6 @@
 package com.metrics.service;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -11,7 +12,9 @@ import org.bson.types.ObjectId;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.metrics.domain.CreateMetricRequest;
 import com.metrics.model.MetricsCollection;
@@ -59,6 +62,14 @@ public class Functions {
          ObjectMapper objectMapper = new ObjectMapper();
          return objectMapper.writeValueAsString(obj);
      }
+	
+	public static <T> T mapFromJson(String json, Class<T> clazz)
+		      throws JsonParseException, JsonMappingException, IOException {
+	      
+	      ObjectMapper objectMapper = new ObjectMapper();
+	      return objectMapper.readValue(json, clazz);
+	}
+	
 	public static CreateMetricRequest SetDefaultDataEmptyField(CreateMetricRequest metric) {
 			CreateMetricRequest collection = metric;
 			

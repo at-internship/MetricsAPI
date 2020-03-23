@@ -9,6 +9,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.metrics.MetricsApplication;
 import com.metrics.domain.CreateMetricRequest;
 import com.metrics.model.MetricsCollection;
+import com.metrics.model.blockers;
+import com.metrics.model.metrics;
+import com.metrics.model.proactive;
+import com.metrics.model.retroactive;
 
 public class MappingTest {
 	
