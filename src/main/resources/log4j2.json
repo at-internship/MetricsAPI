@@ -1,0 +1,35 @@
+{
+   "Configuration": {
+      "Appenders": {
+         "Console": {
+            "PatternLayout": {
+               "pattern": "%d{yyyy-MMM-dd HH:mm:ss a} [%t] %-5level %logger{36} - %msg%n"
+            },
+            "name": "Console",
+            "target": "SYSTEM_OUT",
+            "follow":"true"
+         },
+         "File": {
+            "name": "File",
+            "fileName": "log/app.log",
+            "JSONLayout":{"compact":"true", "eventEol":"true", "properties":"true"}
+         }
+      },
+      "Loggers": {
+         "Root": {
+            "AppenderRef": [
+               {
+               	  "level": "TRACE",
+                  "ref": "Console"
+               },
+               {
+                  "level": "TRARCE",
+                  "ref": "File"
+               }
+            ],
+            "level": "TRACE",
+            "additivity":"false"
+         }
+      }
+   }
+}
