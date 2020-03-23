@@ -27,7 +27,7 @@
                   "ref": "File"
                }
             ],
-            "level": "TRACE",
+            "level": "WARN",
             "additivity":"false"
          }
       }

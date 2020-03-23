@@ -27,7 +27,7 @@ public class MetricsServiceImpl implements MetricsService
 	
 	@Override
 	public List<MetricsCollection> getMetrics() {
-		MetricsApplication.logger.info("Creating list");
+		MetricsApplication.logger.info("Creating list..");
 		List<MetricsCollection> metricsCollection = new ArrayList<>();
 		MetricsApplication.logger.info("Filling list with info");
 		metricsCollection = repository.findAll();

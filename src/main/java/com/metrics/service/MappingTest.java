@@ -33,11 +33,11 @@ public class MappingTest {
 	    	 Date dateTest = formatter.parse(metric.getDate());
 	    	 metric.setDate(formatter.format(dateTest));
 	    	 
-	    	 MetricsApplication.logger.info("Data validation test passed");
+	    	 MetricsApplication.logger.info("Data validation test passed..");
 	        statusTest = true;
 	    	
 	    }catch(Exception e) {
-	    	MetricsApplication.logger.error("Bad json found");
+	    	MetricsApplication.logger.error("Bad json structure");
 	    	throw new ResponseStatusException(
 			          HttpStatus.BAD_REQUEST, "invalid json data structure");
 	    }

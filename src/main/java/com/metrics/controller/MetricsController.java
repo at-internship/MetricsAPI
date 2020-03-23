@@ -33,7 +33,7 @@ public class MetricsController {
 		
 		MetricsApplication.logger.info("calling update service");
 		resultMetric = service.updateMetric(request, id);
-		MetricsApplication.logger.info("update successfull, returning updated object");
+		MetricsApplication.logger.info("update successfull, returning updated object..");
 		return resultMetric;
 	}
 
