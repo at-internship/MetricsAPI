@@ -56,14 +56,19 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
+		
+
 	</dependencies>
 
 	<build>
+	<sourceDirectory>src/main/java</sourceDirectory>
 		<plugins>
 			<plugin>
+				
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
+			
 		</plugins>
 	</build>
 
