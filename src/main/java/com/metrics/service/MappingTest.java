@@ -9,10 +9,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.metrics.MetricsApplication;
 import com.metrics.domain.CreateMetricRequest;
 import com.metrics.model.MetricsCollection;
-import com.metrics.model.blockers;
-import com.metrics.model.metrics;
-import com.metrics.model.proactive;
-import com.metrics.model.retroactive;
 
 public class MappingTest {
 	
@@ -30,6 +26,7 @@ public class MappingTest {
 	    	MetricsApplication.logger.info("Validation integrity of the json");
 	    	mapper.readValue(json, MetricsCollection.class);
 	    	MetricsApplication.logger.info("Validating the data format");
+
 	    	 Date dateTest = formatter.parse(metric.getDate());
 	    	 metric.setDate(formatter.format(dateTest));
 	    	 
@@ -44,6 +41,7 @@ public class MappingTest {
 	    
 	    return statusTest;
 	}
+
 	private CreateMetricRequest SetDefaultDataEmptyField(CreateMetricRequest metric) {
 		MetricsApplication.logger.info("Starting the default value method");
 		CreateMetricRequest collection = metric;

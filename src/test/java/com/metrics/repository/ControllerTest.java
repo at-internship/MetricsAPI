@@ -1,7 +1,10 @@
 package com.metrics.repository;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.handler;
+import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
@@ -24,6 +27,8 @@ import com.metrics.model.blockers;
 import com.metrics.model.metrics;
 import com.metrics.model.proactive;
 import com.metrics.model.retroactive;
+import com.metrics.service.Functions;
+import com.metrics.service.MetricsServiceImpl;
 
  
 
@@ -41,44 +46,94 @@ class MetricRepositoryTest {
            mvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
        }
 
- 
-
+   @Test
+ 	   public void deleteMetricCorrect() throws Exception {
+ 	      String uri = "/metrics/424y5y5y56y";
+ 	      MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.delete(uri)).andReturn();
+ 	      int status = mvcResult.getResponse().getStatus();
+ 	      assertEquals(204, status);
+ 	   }
+        
+        @Test
+  	   public void deleteMetricBadID() throws Exception {
+  	      String uri = "/metrics/t54t5yt5";
+  	      MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.delete(uri)).andReturn();
+  	      int status = mvcResult.getResponse().getStatus();
+  	      assertEquals(404, status);
+  	   }
     
     @Test
     public void test_update_user_success() throws Exception {
+    	
         CreateMetricRequest metric = newCreateMetricRequest();
         
+        assertTrue(ObjectId.isValid(metric.getId()));
         
-        
-        
-
         MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.
                 put("/metrics/{id}", metric.getId())
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .content(mapToJson(metric)))
+                        .content(Functions.mapToJson(metric)))
                 .andExpect(handler().handlerType(MetricsController.class))
                 .andExpect(handler().methodName("updateMetric"))
                 .andDo(print())
                 .andReturn();
         assertEquals(202, mvcResult.getResponse().getStatus());
         String jsonResponse = mvcResult.getResponse().getContentAsString();
-        assertEquals(jsonResponse, mapToJson(metric));
+        assertEquals(jsonResponse, Functions.mapToJson(metric));
     }
 
- 
-
+@Test
+     public void getMetricsList() throws Exception {
+     String uri = "/metrics";
+     MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.get(uri)
+    		 .accept(MediaType.APPLICATION_JSON_VALUE)).andDo(print())
+             .andReturn();
+           
+     int status = mvcResult.getResponse().getStatus();
+     assertEquals(200, status);
+     String content = mvcResult.getResponse().getContentAsString();
+     MetricsCollection[] metricsCollection = mapFromJson(content, MetricsCollection[].class);
+     assertTrue(metricsCollection.length > 0);
+     }
+   
+     @Test
+     public void getMetricByIdTest() throws Exception {
+     CreateMetricRequest metric = newCreateMetricRequest();
+     
+     String uri = "/metrics/{id}";
+     MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.get(uri,metric.getId())
+    		 .accept(MediaType.APPLICATION_JSON_VALUE)).andDo(print())
+             .andReturn();      
+     int status = mvcResult.getResponse().getStatus();
+     assertEquals(200, status);
+     String content = mvcResult.getResponse().getContentAsString();
+     assertTrue(!content.isEmpty());
+     }
+     
+     @Test
+     public void getMetricByIdTest_404_NOTFOUND() throws Exception {
+     CreateMetricRequest metric = falseCreateMetricRequest();
+     
+     String uri = "/metrics/{id}";
+     MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.get(uri,metric.getId())
+    		 .accept(MediaType.APPLICATION_JSON_VALUE)).andDo(print())
+             .andReturn();      
+     int status = mvcResult.getResponse().getStatus();
+     assertEquals(404, status);
+     String content = mvcResult.getResponse().getContentAsString();
+     assertTrue(content.isEmpty());
+     }
     
-    
-    @Test
+     @Test
     public void test_update_user_fail_404_not_found() throws Exception {
         CreateMetricRequest falseMetric = falseCreateMetricRequest();
 
- 
+        
 
         MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.
                 put("/metrics/{id}", falseMetric.getId())
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .content(mapToJson(falseMetric)))
+                        .content(Functions.mapToJson(falseMetric)))
                 .andExpect(handler().handlerType(MetricsController.class))
                 .andExpect(handler().methodName("updateMetric"))
                 .andDo(print())
@@ -122,7 +177,6 @@ class MetricRepositoryTest {
         
 	}
     
-    
     private CreateMetricRequest newCreateMetricRequest () {
     	
     	try {
@@ -139,8 +193,7 @@ class MetricRepositoryTest {
     	}
         
     }
-    
-    
+ 
  private CreateMetricRequest newCreateMetricPOSTRequest () {
     	
     	try {
