@@ -22,7 +22,7 @@ public class MappingTest {
 		String json ="";
 	    ObjectMapper mapper = new ObjectMapper();
 	    try {
-	    	MetricsApplication.logger.info("Starting validation format");
+	    	MetricsApplication.logger.info("Starting date validation format");
 	    	 SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 	    	json = mapper.writerWithDefaultPrettyPrinter()
 	                .writeValueAsString(SetDefaultDataEmptyField(metric));
