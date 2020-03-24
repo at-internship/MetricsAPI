@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import com.metrics.model.MetricsCollection;
+import com.metrics.model.UsersCollection;
 import com.metrics.repository.MetricRepository;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.metrics.MetricsApplication;
@@ -50,15 +51,15 @@ public class MetricsServiceImpl implements MetricsService
     
     	@Override
 	public MetricsCollection newMetric(CreateMetricRequest request)
-	{
-    		MetricsApplication.logger.info("Generating container");
+	{		
     		MetricsCollection metric = new MetricsCollection();
-    		MetricsApplication.logger.info("mapping request object into metric object");
-			metric = orikaMapperFacade.map(request, MetricsCollection.class);
-			MetricsApplication.logger.info("Calling save method and saving  metric object into the data base");
-			repository.save(metric);
-			MetricsApplication.logger.info("Returning the metric object");
-			return metric;
+            MetricsApplication.logger.info("mapping request object into metric object");
+        	metric = orikaMapperFacade.map(request, MetricsCollection.class);
+        	MetricsApplication.logger.info("Calling save method and saving  metric object into the data base");
+        	repository.save(metric);
+        	MetricsApplication.logger.info("Returning the metric object");
+        		
+    		return metric;
 	}
 	
 	 public void deleteMetric(String id) {
