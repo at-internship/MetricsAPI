@@ -1,8 +1,6 @@
 package com.metrics.service;
 
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -23,18 +21,22 @@ public class MappingTest {
 	    ObjectMapper mapper = new ObjectMapper();
 	    try {
 	    	MetricsApplication.logger.info("Starting date validation format");
-	    	 SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 	    	json = mapper.writerWithDefaultPrettyPrinter()
 	                .writeValueAsString(SetDefaultDataEmptyField(metric));
 	    	
 	    	MetricsApplication.logger.info("Validation integrity of the json");
 	    	mapper.readValue(json, MetricsCollection.class);
-	    	MetricsApplication.logger.info("Validating the data format");
-
-	    	 Date dateTest = formatter.parse(metric.getDate());
-	    	 metric.setDate(formatter.format(dateTest));
+	    	
+	    	MetricsApplication.logger.info("Validating the date format");
+	    	Functions.VerifyingDate(metric.getDate());
+	    	
+	    	MetricsApplication.logger.info("Validating the ids formats");
+	    	Functions.VerifyingUUID(metric.getEvaluator_id());
+	    	Functions.VerifyingUUID(metric.getEvaluated_id());
+	    	Functions.VerifyingUUID(metric.getSprint_id());
+	    	
 	    	 
-	    	 MetricsApplication.logger.info("Data validation test passed..");
+	    	MetricsApplication.logger.info("Data validation test passed..");
 	        statusTest = true;
 	    	
 	    }catch(Exception e) {
@@ -42,9 +44,11 @@ public class MappingTest {
 	    	throw new ResponseStatusException(
 			          HttpStatus.BAD_REQUEST, "invalid json data structure");
 	    }
-	    
+	    MetricsApplication.logger.info("Return status.." + statusTest);
 	    return statusTest;
 	}
+	
+	
 
 	private CreateMetricRequest SetDefaultDataEmptyField(CreateMetricRequest metric) {
 		MetricsApplication.logger.info("Starting the default value method");

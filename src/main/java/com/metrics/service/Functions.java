@@ -2,7 +2,6 @@ package com.metrics.service;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -16,6 +15,7 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.metrics.MetricsApplication;
 import com.metrics.domain.CreateMetricRequest;
 import com.metrics.model.MetricsCollection;
 import com.metrics.model.blockers;
@@ -24,14 +24,32 @@ import com.metrics.model.proactive;
 import com.metrics.model.retroactive;
 
 public class Functions {
-	
-	public static void VerifyingUUID(String uuid) {
+	public static  CreateMetricRequest MetricsCollectionToCreateMetricRequest(MetricsCollection metric) {
+		CreateMetricRequest listIncoming = new CreateMetricRequest(metric.getId(), metric.getEvaluator_id(), metric.getEvaluated_id(), metric.getType(), metric.getDate(), metric.getSprint_id(), metric.getMetrics());
+		return listIncoming;
+	}
+	public static void VerifyingUUID(String uuid) throws IllegalArgumentException {
 		try {
 			ObjectId.isValid(uuid);
-		}catch(Exception error) {
+		}catch(IllegalArgumentException error) {
 			 throw new ResponseStatusException(
 			          HttpStatus.BAD_REQUEST,
 			          "The UUID has incorrect Format");
+		}
+	}
+	
+	public static void  IsDBEmpty (List<MetricsCollection> metrics) {
+	MetricsApplication.logger.info("The method found " + metrics.size() + " records");
+	if (metrics.size() == 0)
+		throw new ResponseStatusException(HttpStatus.NO_CONTENT, "The DB have not records");
+	}
+	
+	public static void  VerifyingAllTypesDatasIntoDB (List<MetricsCollection> metrics) {
+	MappingTest testingList = new MappingTest();
+	MetricsApplication.logger.info("Verifying records and validating type data");
+		for (MetricsCollection metric: metrics) {
+			if (!testingList.MappingTestMetric(Functions.MetricsCollectionToCreateMetricRequest(metric)))
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid structure metric " + metric.getId());
 		}
 	}
 	
@@ -124,4 +142,26 @@ public class Functions {
 			 
 			return collection;
 		}
+	public static List<MetricsCollection> OrderByAscending(List<MetricsCollection> listMetric){
+		List<MetricsCollection> listOrder = listMetric;
+			Collections.sort(listOrder, new Comparator<MetricsCollection>() {
+				@Override
+				public int compare(MetricsCollection arg0, MetricsCollection arg1) {
+					
+					return arg0.getDate().compareTo(arg1.getDate());
+				}
+			});
+		return listOrder;
+	}
+	public static List<MetricsCollection> OrderByDescending(List<MetricsCollection> listMetric){
+		List<MetricsCollection> listOrder = listMetric;
+		Collections.sort(listOrder, new Comparator<MetricsCollection>() {
+			@Override
+			public int compare(MetricsCollection arg0, MetricsCollection arg1) {
+				
+				return arg1.getDate().compareTo(arg0.getDate());
+			}
+		});
+	return listOrder;
+	}
 }

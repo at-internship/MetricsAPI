@@ -1,5 +1,6 @@
 package com.metrics.service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,4 +18,10 @@ public interface MetricsService {
 	void deleteMetric(String id);
 	
 	MetricsCollection updateMetric(CreateMetricRequest request, String id);
+	
+	List<MetricsCollection> getAllMetricsPaginated(int start, int size, List<MetricsCollection> metrics, int orderBy);
+	
+	List<MetricsCollection> getItemsFromIdFilter(String id, List<MetricsCollection> metrics, int typeId, int orderBy);
+	
+	List<MetricsCollection> getItemsFromDateRange(Date startDate, Date endDate, List<MetricsCollection> metrics, int orderBy);
 }

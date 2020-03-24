@@ -1,9 +1,11 @@
 package com.metrics.service;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -95,5 +97,124 @@ public class MetricsServiceImpl implements MetricsService
 		}
 		MetricsApplication.logger.info("Object created and validated successfully, saving into the database and returning the object");
 		return repository.save(metric);
+	}
+   	@Override
+	public List<MetricsCollection> getAllMetricsPaginated(int start, int size, List<MetricsCollection> metrics, int orderBy) {
+   		
+		List<MetricsCollection> listMetrics = metrics;
+		MetricsApplication.logger.info("Applying filter selected to " + metrics.size() + " elements");
+		if(orderBy == 0) {
+			MetricsApplication.logger.info("Applying filter selected to " + listMetrics.size() + " elements");
+			listMetrics = Functions.OrderByAscending(listMetrics);
+		}else if(orderBy == 1) {
+			MetricsApplication.logger.info("Applying filter selected to " + listMetrics.size() + " elements");
+			listMetrics = Functions.OrderByDescending(listMetrics);
+		}
+		if (size > metrics.size())
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "the size especified is out of size of list ");
+		if (start >= metrics.size())
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "the start especified is out of size of list "); 
+		MetricsApplication.logger.info("Return new paginated list, starting " + start + " to "+ size);
+		  return listMetrics.subList(start, size);
+	}
+	
+	@Override
+	public List<MetricsCollection> getItemsFromDateRange(Date startDate, Date endDate, List<MetricsCollection> metrics, int orderBy) {
+		
+		MetricsApplication.logger.info("Creating list to save filter by range date");
+		List<MetricsCollection> listMetricsFiltredDates = new ArrayList<MetricsCollection>();
+		MetricsApplication.logger.info("Getting range dates");
+		for (MetricsCollection metric: metrics) {
+			
+			if ((Functions.stringToDate(metric.getDate()).after(startDate) || Functions.stringToDate(metric.getDate()).equals(startDate))&& 
+			    Functions.stringToDate(metric.getDate()).before(endDate) || Functions.stringToDate(metric.getDate()).equals(endDate)) {
+				listMetricsFiltredDates.add(metric);
+			}
+		}
+		// 0 = Filter by id
+		// 1 = evaluator_id
+		// 2 = evaluated_id
+		// 3 = date;
+		// 4 = sprint_id;
+		if(orderBy == 0) {
+			MetricsApplication.logger.info("Applying filter selected to " + listMetricsFiltredDates.size() + " elements");
+			listMetricsFiltredDates = Functions.OrderByAscending(listMetricsFiltredDates);
+		}else if(orderBy == 1) {
+			MetricsApplication.logger.info("Applying filter selected to " + listMetricsFiltredDates.size() + " elements");
+			listMetricsFiltredDates = Functions.OrderByDescending(listMetricsFiltredDates);
+		}
+		
+		MetricsApplication.logger.info("Return new list with the metric matches with " + listMetricsFiltredDates.size() + " elements");
+		return listMetricsFiltredDates;
+	}
+	
+	@Override
+	public List<MetricsCollection> getItemsFromIdFilter(String id, List<MetricsCollection> metrics, int typeId, int orderBy) {
+		
+		MetricsApplication.logger.info("Parsing id to ObjectId");
+		ObjectId idIncoming = new ObjectId(id);
+		
+		MetricsApplication.logger.info("Creating list to save filter by id");
+		List<MetricsCollection> listMetricsFiltredDates = new ArrayList<MetricsCollection>();
+		
+		MetricsApplication.logger.info("the liat have " + metrics.size() + " elements");
+		MetricsApplication.logger.info("Comparing id in list whit value id provided by user");
+		// 0 = evaluator_id
+		// 1 = evaluated_id
+		// 2 = sprint_id
+		switch(typeId) {
+		case 0:{
+			MetricsApplication.logger.info("Comparing evaluator_id in list whit value id provided by user");
+			for (MetricsCollection metric: metrics) {
+				MetricsApplication.logger.info("Parsing Evaluator_id to ObjectId");
+				ObjectId idDB = new ObjectId(metric.getEvaluator_id());
+				if (idDB.compareTo(idIncoming) == 0) {
+					
+					listMetricsFiltredDates.add(metric);
+				}
+			}
+			if (listMetricsFiltredDates.size() == 0)
+				throw new ResponseStatusException(HttpStatus.NOT_FOUND, "were not found with the getEvaluator_id specified"); 
+			break;
+		}
+		case 1:{
+			MetricsApplication.logger.info("Comparing evaluated_id in list whit value id provided by user");
+			for (MetricsCollection metric: metrics) {
+				MetricsApplication.logger.info("Parsing getEvaluated_id to ObjectId");
+				ObjectId idDB = new ObjectId(metric.getEvaluated_id());
+				if (idDB.compareTo(idIncoming) == 0) {
+					
+					listMetricsFiltredDates.add(metric);
+				}
+			}
+			if (listMetricsFiltredDates.size() == 0)
+				throw new ResponseStatusException(HttpStatus.NOT_FOUND, "were not found with the evaluated_id specified"); 
+			break;
+		}
+		case 2:{
+			MetricsApplication.logger.info("Comparing sprint_id in list whit value id provided by user");
+			for (MetricsCollection metric: metrics) {
+				MetricsApplication.logger.info("Parsing getSprint_id to ObjectId");
+				ObjectId idDB = new ObjectId(metric.getSprint_id());
+				if (idDB.compareTo(idIncoming) == 0) {
+					
+					listMetricsFiltredDates.add(metric);
+				}
+			}
+			if (listMetricsFiltredDates.size() == 0)
+				throw new ResponseStatusException(HttpStatus.NOT_FOUND, "were not found with the sprint_id specified"); 
+			break;
+		}
+		
+		}
+		if(orderBy == 0) {
+			MetricsApplication.logger.info("Applying filter selected to " + listMetricsFiltredDates.size() + " elements");
+			listMetricsFiltredDates = Functions.OrderByAscending(listMetricsFiltredDates);
+		}else if(orderBy == 1) {
+			MetricsApplication.logger.info("Applying filter selected to " + listMetricsFiltredDates.size() + " elements");
+			listMetricsFiltredDates = Functions.OrderByDescending(listMetricsFiltredDates);
+		}
+		MetricsApplication.logger.info("Return new list with the metric matches with " + listMetricsFiltredDates.size() + " elements");
+		return listMetricsFiltredDates;
 	}
 }
