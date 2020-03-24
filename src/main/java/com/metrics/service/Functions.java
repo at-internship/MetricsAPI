@@ -21,6 +21,7 @@ import com.metrics.MetricsApplication;
 import com.metrics.domain.CreateMetricRequest;
 import com.metrics.model.MetricsCollection;
 import com.metrics.model.SprintsCollection;
+import com.metrics.model.UsersCollection;
 import com.metrics.model.blockers;
 import com.metrics.model.metrics;
 import com.metrics.model.proactive;
@@ -128,7 +129,7 @@ public class Functions {
 			return collection;
 		}
 	
-	private static String getSprint()
+private static String getSprint()
 	{
 	    final String uri = "http://sprints-qa.us-east-2.elasticbeanstalk.com/sprints/";
 	    RestTemplate restTemplate = new RestTemplate();
@@ -158,6 +159,44 @@ public class Functions {
 			MetricsApplication.logger.error("Could not create object from API SPRINTS COLLECTIONS");
 			throw new ResponseStatusException(
 			          HttpStatus.BAD_REQUEST, "No SPRINT ID found");
+		}
+		
+		return result;
+	}
+  
+	private static String getUsersList() {
+		final String uri = "http://sourcescusersapi-test.us-west-1.elasticbeanstalk.com/api/users/";
+		RestTemplate restTemplate = new RestTemplate();
+		
+		return restTemplate.getForObject(uri, String.class);
+	}
+	
+	public static boolean EvaluatorsIdVerification(CreateMetricRequest request){
+		boolean evaluated_id = false, evaluator_id = false;
+		boolean result = false;
+		MetricsApplication.logger.info("Generating container");
+		try {
+			String UsersList = Functions.getUsersList();
+			MetricsApplication.logger.info(UsersList);
+    		UsersCollection[] Users = Functions.mapFromJson(UsersList, UsersCollection[].class);
+    		for(UsersCollection user: Users) {
+    			if(user.getUserId().equals(request.getEvaluated_id())) {
+    				evaluated_id = true;
+    			}
+    			if(user.getUserId().equals(request.getEvaluator_id())) {
+    				evaluator_id = true;
+    			}
+    		}
+    		if (evaluated_id && evaluator_id) {
+    			result = true;
+    		}else {
+    			throw new ResponseStatusException(
+  			          HttpStatus.BAD_REQUEST);
+    		}
+		}catch(Exception e){
+			MetricsApplication.logger.error("Could not create object from API USERS COLLECTIONS");
+			throw new ResponseStatusException(
+			          HttpStatus.BAD_REQUEST, "No evaluated or evaluator ID's found");
 		}
 		
 		return result;

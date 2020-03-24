@@ -36,7 +36,7 @@ public class MetricsController {
 		MetricsApplication.logger.info("Creating container");
 		MetricsCollection resultMetric = new MetricsCollection();
 		
-		if(Functions.SprintsIdVerification(request)) {
+		if(Functions.SprintsIdVerification(request) && Functions.EvaluatorsIdVerification(request)) {
 			MetricsApplication.logger.info("calling update service");
 			resultMetric = service.updateMetric(request, id);
 			MetricsApplication.logger.info("update successfull, returning updated object..");
@@ -70,9 +70,10 @@ public class MetricsController {
 	@PostMapping("/metrics")
 	public String newMetric(@RequestBody CreateMetricRequest request) {
 		String id = "";
-		MetricsApplication.logger.info("Calling the data validation method");
+		MetricsApplication.logger.info("Calling the data validation method and ID Validation for Evaluator and Evaluated ID");
 		MappingTest test = new MappingTest();
-		if (test.MappingTestMetric(request) && Functions.SprintsIdVerification(request)) {
+    
+		if (test.MappingTestMetric(request) && Functions.SprintsIdVerification(request) && Functions.EvaluatorsIdVerification(request)) {
 			MetricsApplication.logger.info("data validation successfull,calling the newMetric service");
 			id = service.newMetric(request).getId();
 			MetricsApplication.logger.info("saving id into String to return");
