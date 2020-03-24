@@ -36,9 +36,11 @@ public class MetricsController {
 		MetricsApplication.logger.info("Creating container");
 		MetricsCollection resultMetric = new MetricsCollection();
 		
-		MetricsApplication.logger.info("calling update service");
-		resultMetric = service.updateMetric(request, id);
-		MetricsApplication.logger.info("update successfull, returning updated object..");
+		if(Functions.SprintsIdVerification(request)) {
+			MetricsApplication.logger.info("calling update service");
+			resultMetric = service.updateMetric(request, id);
+			MetricsApplication.logger.info("update successfull, returning updated object..");
+		}
 		return resultMetric;
 	}
 
@@ -70,7 +72,7 @@ public class MetricsController {
 		String id = "";
 		MetricsApplication.logger.info("Calling the data validation method");
 		MappingTest test = new MappingTest();
-		if (test.MappingTestMetric(request)) {
+		if (test.MappingTestMetric(request) && Functions.SprintsIdVerification(request)) {
 			MetricsApplication.logger.info("data validation successfull,calling the newMetric service");
 			id = service.newMetric(request).getId();
 			MetricsApplication.logger.info("saving id into String to return");
@@ -85,5 +87,6 @@ public class MetricsController {
 		MetricsApplication.logger.info("Calling deleteMetric service");
 		service.deleteMetric(id);
 	}
+	
 
 }

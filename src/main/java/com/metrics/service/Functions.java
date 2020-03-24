@@ -10,14 +10,17 @@ import java.util.List;
 
 import org.bson.types.ObjectId;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.metrics.MetricsApplication;
 import com.metrics.domain.CreateMetricRequest;
 import com.metrics.model.MetricsCollection;
+import com.metrics.model.SprintsCollection;
 import com.metrics.model.blockers;
 import com.metrics.model.metrics;
 import com.metrics.model.proactive;
@@ -124,4 +127,39 @@ public class Functions {
 			 
 			return collection;
 		}
+	
+	private static String getSprint()
+	{
+	    final String uri = "http://sprints-qa.us-east-2.elasticbeanstalk.com/sprints/";
+	    RestTemplate restTemplate = new RestTemplate();
+		return restTemplate.getForObject(uri, String.class);
+	}
+	
+	public static boolean SprintsIdVerification(CreateMetricRequest request){
+		boolean sprint_id = false;
+		boolean result = false;
+		MetricsApplication.logger.info("Generating container");
+		try {
+			String SprintsList = Functions.getSprint();
+			MetricsApplication.logger.info(SprintsList);
+    		SprintsCollection[] Sprints = Functions.mapFromJson(SprintsList, SprintsCollection[].class);
+    		for(SprintsCollection sprint: Sprints) {
+    			if(sprint.getId().equals(request.getSprint_id())) {
+    				sprint_id = true;
+    			}
+    		}
+    		if (sprint_id) {
+    			result = true;
+    		}else {
+    			throw new ResponseStatusException(
+  			          HttpStatus.BAD_REQUEST);
+    		}
+		}catch(Exception e){
+			MetricsApplication.logger.error("Could not create object from API SPRINTS COLLECTIONS");
+			throw new ResponseStatusException(
+			          HttpStatus.BAD_REQUEST, "No SPRINT ID found");
+		}
+		
+		return result;
+	}
 }
