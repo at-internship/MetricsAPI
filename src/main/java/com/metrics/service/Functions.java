@@ -33,11 +33,17 @@ public class Functions {
 		return listIncoming;
 	}
 
-	public static void VerifyingUUID(String uuid) throws IllegalArgumentException {
+	public static void VerifyingUUID(String uuid)  {
 		try {
-			ObjectId.isValid(uuid);
+			MetricsApplication.logger.info(uuid);
+			if (uuid.length() == 24) {
+				ObjectId.isValid(uuid);
+			}else{
+				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The UUID has incorrect Format");
+			}
+				
 		} catch (IllegalArgumentException error) {
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The UUID has incorrect Format");
+			
 		}
 	}
 

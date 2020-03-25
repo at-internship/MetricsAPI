@@ -28,7 +28,9 @@ public class MappingTest {
 			Functions.VerifyingTimeStampValid(metric.getDate());
 
 			MetricsApplication.logger.info("Validating the ids formats");
+			MetricsApplication.logger.info(metric.getEvaluator_id());
 			Functions.VerifyingUUID(metric.getEvaluator_id());
+			MetricsApplication.logger.info(metric.getEvaluated_id());
 			Functions.VerifyingUUID(metric.getEvaluated_id());
 			Functions.VerifyingUUID(metric.getSprint_id());
 
