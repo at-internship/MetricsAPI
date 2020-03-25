@@ -18,7 +18,7 @@ import com.metrics.service.Functions;
 import com.metrics.service.MappingTest;
 import com.metrics.service.MetricsServiceImpl;
 
-import java.util.Date;
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -49,26 +49,18 @@ public class MetricsController {
 			@RequestParam(value = "endDate", defaultValue = "1000-01-01") String endDate,
 			@RequestParam(value = "evaluator_id", defaultValue = "") String evaluator_id,
 			@RequestParam(value = "evaluated_id", defaultValue = "") String evaluated_id,
-			@RequestParam(value = "sprint_id", defaultValue = "") String sprint_id,	
-			@RequestParam(value = "orderBy", defaultValue = "0") int orderBy) {
+			@RequestParam(value = "sprint_id", defaultValue = "") String sprint_id,
+			@RequestParam(value = "orderBy", defaultValue = "-1") int orderBy) {
 
 		MetricsApplication.logger.info("Getting list of metrics");
+
 		List<MetricsCollection> ListMetric = service.getMetrics();
 
 		MetricsApplication.logger.info("Verifying if DB is empty");
 		Functions.IsDBEmpty(ListMetric);
 
 		MetricsApplication.logger.info("Verifying all types datas into DB");
-		//Functions.VerifyingAllTypesDatasIntoDB(ListMetric);
-
-		MetricsApplication.logger.info("Creating default value and parse to type date");
-		Date defaultValueDate = Functions.stringToDate("1000-01-01");
-
-		MetricsApplication.logger.info("Parse to type date the content of the incoming variable startDate");
-		Date startDateLocal = Functions.stringToDate(startDate);
-
-		MetricsApplication.logger.info("Parse to type date the content of the incoming variable endtDate");
-		Date endDateLocal = Functions.stringToDate(endDate);
+		// Functions.VerifyingAllTypesDatasIntoDB(ListMetric);
 
 		MetricsApplication.logger.info("Setting false the variable withFilters");
 		boolean withFilters = false;
@@ -114,14 +106,31 @@ public class MetricsController {
 
 		}
 		// Applying filter by date range and applying order by ascendant
+		try {
+			MetricsApplication.logger.info("Creating default value and parse to type date");
+			Timestamp defaultValueDate = Functions.stringToTimestamp("1000-01-01");
 
-		if (startDateLocal.compareTo(defaultValueDate) > 0 && endDateLocal.compareTo(defaultValueDate) > 0) {
-			MetricsApplication.logger.info("Applying filter by date range and applying order by ascendant");
-			MetricsApplication.logger.info("Setting true variable withFilters in range dates");
-			withFilters = true;
-			ListMetric = service.getItemsFromDateRange(startDateLocal, endDateLocal, ListMetric, orderBy);
+			MetricsApplication.logger.info("Parse to type date the content of the incoming variable startDate");
+			MetricsApplication.logger.info(startDate);
+			Timestamp startDateLocal = Functions.stringToTimestamp(startDate);
+			MetricsApplication.logger.info(startDateLocal);
 
+			MetricsApplication.logger.info("Parse to type date the content of the incoming variable endtDate");
+			MetricsApplication.logger.info(endDate);
+			Timestamp endDateLocal = Functions.stringToTimestamp(endDate);
+			MetricsApplication.logger.info(endDateLocal);
+
+			if (startDateLocal.compareTo(defaultValueDate) > 0 && endDateLocal.compareTo(defaultValueDate) > 0) {
+				MetricsApplication.logger.info("Applying filter by date range and applying order by ascendant");
+				MetricsApplication.logger.info("Setting true variable withFilters in range dates");
+				withFilters = true;
+				ListMetric = service.getItemsFromDateRange(startDateLocal, endDateLocal, ListMetric, orderBy);
+
+			}
+		} catch (Exception e) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Error to try parse date to Timestamp");
 		}
+
 		// Applying filter of pagination and applying order by ascendant
 
 		if (start != -1 && size != -1) {
@@ -130,14 +139,21 @@ public class MetricsController {
 			withFilters = true;
 			ListMetric = service.getAllMetricsPaginated(start, size, ListMetric, orderBy);
 		}
-		// Not applying anything filter
-
-		if (!withFilters) {
-			MetricsApplication.logger.info("Not applying anything filter");
-			MetricsApplication.logger.info("Return list with all metrics");
-			return service.getMetrics();
-
+		if (orderBy == 1) {
+			MetricsApplication.logger.info("Applying Descending filter");
+			withFilters = true;
+			ListMetric = Functions.OrderByDescending(ListMetric);
+		} else if (orderBy == 0) {
+			MetricsApplication.logger.info("Applying Ascending filter");
+			withFilters = true;
+			ListMetric = Functions.OrderByAscending(ListMetric);
 		}
+
+		// Not applying anything filter
+		if (!withFilters)
+			MetricsApplication.logger.info("Not applying anything filter");
+
+		MetricsApplication.logger.info("Return list with all metrics");
 		return ListMetric;
 	}
 
