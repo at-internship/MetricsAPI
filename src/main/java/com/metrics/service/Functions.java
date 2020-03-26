@@ -75,8 +75,7 @@ public class Functions {
 	public static Timestamp stringToTimestamp(String date) throws ParseException {
 
 		DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-		Timestamp ts = new Timestamp(((java.util.Date) df.parse(date)).getTime());
-
+			Timestamp ts = new Timestamp(((java.util.Date) df.parse(date)).getTime());
 		return ts;
 	}
 

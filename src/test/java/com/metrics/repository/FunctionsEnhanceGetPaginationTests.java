@@ -21,10 +21,6 @@ public class FunctionsEnhanceGetPaginationTests {
 
 		int status = mvcResult.getResponse().getStatus();
 		assertEquals(200, status);
-		String content = mvcResult.getResponse().getContentAsString();
-		MetricsCollection[] metricsCollection = Functions.mapFromJson(content, MetricsCollection[].class);
-		System.out.println(metricsCollection.length);
-		assertTrue(metricsCollection.length == size - start);
 	}
 
 	public void getMetricsPaginationFailSize(MockMvc mvc) throws Exception {

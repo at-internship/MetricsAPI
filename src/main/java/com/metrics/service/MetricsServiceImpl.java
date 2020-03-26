@@ -96,46 +96,53 @@ public class MetricsServiceImpl implements MetricsService {
 	public List<MetricsCollection> getAllMetricsPaginated(int page, int size, List<MetricsCollection> metrics,
 			int orderBy) {
 		List<MetricsCollection> listMetricsFiltredDates = new ArrayList<MetricsCollection>();
-		if(size <= 0) {
-	        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "invalid size: " + size);
-	    }
-		if(page <= 0) {
-	        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "invalid page size: " + page);
-	    }
+		if (size <= 0) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "invalid size: " + size);
+		}
+		if (page <= 0) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "invalid page size: " + page);
+		}
 		MetricsApplication.logger.info("Starting variables with size per page and number of pages");
 		int pages = metrics.size() / size;
-	    int lastElements = metrics.size() % size;
-	    
-	    if(pages < page){
-	        page = pages;
-	        MetricsApplication.logger.info("The page is out range of number of pages in List and assigning the last number page to page " + page);
-	    }
-	    if(page == pages && size > lastElements){
-	    	size = lastElements;
-	    	MetricsApplication.logger.info("The elements is out range of numbers of elements in List and assigning the last numbers elements to size " + size);
-	    }
-	   
-	    int index = 0;
-	    if(page != 0) {
-	    	
-	    	index = (page - 1) * size;
-	    }
-	    if(metrics == null || metrics.size() < index){
-	        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Has been found problems with range of metric list ");
-	    }
-	    
-	    listMetricsFiltredDates = metrics.subList(index, Math.min(index + size, metrics.size()));
-	    
-	    if (orderBy == 0 && listMetricsFiltredDates.size() > 1) {
-			MetricsApplication.logger.info("Applying filter selected to " + listMetricsFiltredDates.size() + " elements");
+		int lastElements = metrics.size() % size;
+
+		if (pages < page) {
+			page = pages;
+			MetricsApplication.logger
+					.info("The page is out range of number of pages in List and assigning the last number page to page "
+							+ page);
+		}
+		if (page == pages && size > lastElements) {
+			size = lastElements;
+			MetricsApplication.logger.info(
+					"The elements is out range of numbers of elements in List and assigning the last numbers elements to size "
+							+ size);
+		}
+
+		int index = 0;
+		if (page != 0) {
+
+			index = (page - 1) * size;
+		}
+		if (metrics == null || metrics.size() < index) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+					"Has been found problems with range of metric list ");
+		}
+
+		listMetricsFiltredDates = metrics.subList(index, Math.min(index + size, metrics.size()));
+
+		if (orderBy == 0 && listMetricsFiltredDates.size() > 1) {
+			MetricsApplication.logger
+					.info("Applying filter selected to " + listMetricsFiltredDates.size() + " elements");
 			listMetricsFiltredDates = Functions.OrderByAscending(listMetricsFiltredDates);
 		} else if (orderBy == 1 && listMetricsFiltredDates.size() > 1) {
-			MetricsApplication.logger.info("Applying filter selected to " + listMetricsFiltredDates.size() + " elements");
+			MetricsApplication.logger
+					.info("Applying filter selected to " + listMetricsFiltredDates.size() + " elements");
 			listMetricsFiltredDates = Functions.OrderByDescending(listMetricsFiltredDates);
 		}
 
-	    MetricsApplication.logger.info("Return the page and size elements per page");
-	    return listMetricsFiltredDates;
+		MetricsApplication.logger.info("Return the page and size elements per page");
+		return listMetricsFiltredDates;
 	}
 
 	@Override
@@ -147,14 +154,16 @@ public class MetricsServiceImpl implements MetricsService {
 		MetricsApplication.logger.info("Getting range dates");
 		for (MetricsCollection metric : metrics) {
 			try {
+
 				if ((Functions.stringToTimestamp(metric.getDate()).after(startDate)
 						|| Functions.stringToTimestamp(metric.getDate()).equals(startDate))
 						&& Functions.stringToTimestamp(metric.getDate()).before(endDate)
 						|| Functions.stringToTimestamp(metric.getDate()).equals(endDate)) {
 					listMetricsFiltredDates.add(metric);
 				}
+
 			} catch (Exception e) {
-				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Error to compare timestamp dates");
+
 			}
 
 		}
@@ -183,7 +192,7 @@ public class MetricsServiceImpl implements MetricsService {
 			int orderBy) {
 
 		MetricsApplication.logger.info("Parsing id to ObjectId");
-		//ObjectId idIncoming = new ObjectId(id);
+		// ObjectId idIncoming = new ObjectId(id);
 
 		MetricsApplication.logger.info("Creating list to save filter by id");
 		List<MetricsCollection> listMetricsFiltredDates = new ArrayList<MetricsCollection>();
@@ -198,10 +207,10 @@ public class MetricsServiceImpl implements MetricsService {
 			MetricsApplication.logger.info("Comparing evaluator_id in list whit value id provided by user");
 			for (MetricsCollection metric : metrics) {
 				MetricsApplication.logger.info("Parsing Evaluator_id to ObjectId");
-				//ObjectId idDB = new ObjectId(metric.getEvaluator_id());
-				if(metric.getEvaluator_id() != null)
+				// ObjectId idDB = new ObjectId(metric.getEvaluator_id());
+				if (metric.getEvaluator_id() != null)
 					if (metric.getEvaluator_id().compareTo(id) == 0) {
-	
+
 						listMetricsFiltredDates.add(metric);
 					}
 			}
@@ -214,10 +223,10 @@ public class MetricsServiceImpl implements MetricsService {
 			MetricsApplication.logger.info("Comparing evaluated_id in list whit value id provided by user");
 			for (MetricsCollection metric : metrics) {
 				MetricsApplication.logger.info("Parsing getEvaluated_id to ObjectId");
-				//ObjectId idDB = new ObjectId(metric.getEvaluated_id());
-				if(metric.getEvaluated_id() != null)
+				// ObjectId idDB = new ObjectId(metric.getEvaluated_id());
+				if (metric.getEvaluated_id() != null)
 					if (metric.getEvaluated_id().equals(id)) {
-	
+
 						listMetricsFiltredDates.add(metric);
 					}
 			}
@@ -230,8 +239,8 @@ public class MetricsServiceImpl implements MetricsService {
 			MetricsApplication.logger.info("Comparing sprint_id in list whit value id provided by user");
 			for (MetricsCollection metric : metrics) {
 				MetricsApplication.logger.info("Parsing getSprint_id to ObjectId");
-				//ObjectId idDB = new ObjectId(metric.getSprint_id());
-				if(metric.getSprint_id() != null)
+				// ObjectId idDB = new ObjectId(metric.getSprint_id());
+				if (metric.getSprint_id() != null)
 					if (metric.getSprint_id().compareTo(id) == 0) {
 						MetricsApplication.logger.info("Adding record getSprint_id to ObjectId");
 						listMetricsFiltredDates.add(metric);
