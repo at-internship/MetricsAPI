@@ -49,7 +49,7 @@ class MetricRepositoryTest {
 
    @Test
  	   public void deleteMetricCorrect() throws Exception {
- 	      String uri = "/metrics/424y5y5y56y";
+ 	      String uri = "/metrics/5e7c1e45f59ec77b5162aabd";
  	      MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.delete(uri)).andReturn();
  	      int status = mvcResult.getResponse().getStatus();
  	      assertEquals(204, status);
@@ -78,7 +78,7 @@ class MetricRepositoryTest {
                 .andExpect(handler().methodName("updateMetric"))
                 .andDo(print())
                 .andReturn();
-        assertEquals(202, mvcResult.getResponse().getStatus());
+        assertEquals(200, mvcResult.getResponse().getStatus());
         String jsonResponse = mvcResult.getResponse().getContentAsString();
         assertEquals(jsonResponse, Functions.mapToJson(metric));
     }
@@ -127,7 +127,7 @@ class MetricRepositoryTest {
     
      @Test
     public void test_update_user_fail_404_not_found() throws Exception {
-        CreateMetricRequest falseMetric = falseCreateMetricRequest();
+        CreateMetricRequest falseMetric = falseUpdateMetricRequest();
 
         
 
@@ -182,7 +182,7 @@ class MetricRepositoryTest {
     	
     	try {
     		
-    		return new CreateMetricRequest("5e71378c0d386b2e07b600dc","Empty","Empty","Empty","2020-03-17","Empty",new metrics(false,false,
+    		return new CreateMetricRequest("5e7a699a3b09d6412bb1e573","5e6bbc854244ac0cbc8df65d","5e6bbc924244ac0cbc8df65e","Empty","2020-03-17","5e78f5e792675632e42d1a96",new metrics(false,false,
                     new blockers(false,"POST TESTV2 2020-03-17"),
                     new proactive(false, false,false,false),
                     new retroactive(false,"Empty")));
@@ -199,7 +199,7 @@ class MetricRepositoryTest {
     	
     	try {
     		
-    		return new CreateMetricRequest("","Empty","Empty","Empty","2020-03-17","Empty",new metrics(false,false,
+    		return new CreateMetricRequest("","5e6bbc854244ac0cbc8df65d","5e6bbc924244ac0cbc8df65e","Empty","2020-03-17","5e78f5e792675632e42d1a96",new metrics(false,false,
                     new blockers(false,"POST TESTV2 2020-03-17"),
                     new proactive(false, false,false,false),
                     new retroactive(false,"Empty")));
@@ -213,7 +213,7 @@ class MetricRepositoryTest {
 private CreateMetricRequest falseCreateMetricRequest () {
     	try {
     		
-    		return new CreateMetricRequest("e60f029b807","Empty","Empty","Empty","DATE","Empty",new metrics(false,false,
+    		return new CreateMetricRequest("5e7a600a3b09d6412bb1e663","5e6bbc854244ac0cbc8df65d","5e6bbc924244ac0cbc8df65e","Empty","2020-03-17","5e78f5e792675632e42d1a69",new metrics(false,false,
                     new blockers(false,"Empty"),
                     new proactive(false, false,false,false),
                     new retroactive(false,"Empty")));
@@ -221,5 +221,18 @@ private CreateMetricRequest falseCreateMetricRequest () {
     	{
     		return null;
     	}
-    }
+   }
+
+private CreateMetricRequest falseUpdateMetricRequest () {
+	try {
+		
+		return new CreateMetricRequest("5e7a600a3b09d6412bb16663","5e6bbc854244ac0cbc8df65d","5e6bbc924244ac0cbc8df65e","Empty","2020-03-17","5e78f5e792675632e42d1a96",new metrics(false,false,
+                new blockers(false,"Empty"),
+                new proactive(false, false,false,false),
+                new retroactive(false,"Empty")));
+	}catch(Exception e)
+	{
+		return null;
+	}
+}
 }
