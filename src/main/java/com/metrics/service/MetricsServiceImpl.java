@@ -105,12 +105,11 @@ public class MetricsServiceImpl implements MetricsService {
 		MetricsApplication.logger.info("Starting variables with size per page and number of pages");
 		int pages = metrics.size() / size;
 		int lastElements = metrics.size() % size;
-
+		
 		if (pages < page) {
-			page = pages;
-			MetricsApplication.logger
-					.info("The page is out range of number of pages in List and assigning the last number page to page "
-							+ page);
+			MetricsApplication.logger.info(
+					"Return empty list");
+			return listMetricsFiltredDates;
 		}
 		if (page == pages && size > lastElements) {
 			size = lastElements;
@@ -163,7 +162,6 @@ public class MetricsServiceImpl implements MetricsService {
 				}
 
 			} catch (Exception e) {
-
 			}
 
 		}
