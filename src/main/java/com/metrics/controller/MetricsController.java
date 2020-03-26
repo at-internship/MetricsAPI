@@ -43,7 +43,7 @@ public class MetricsController {
 
 	@ResponseStatus(value = HttpStatus.OK)
 	@GetMapping("/metrics")
-	public List<MetricsCollection> getMetrics(@RequestParam(value = "start", defaultValue = "-1") int start,
+	public List<MetricsCollection> getMetrics(@RequestParam(value = "page", defaultValue = "-1") int page,
 			@RequestParam(value = "size", defaultValue = "-1") int size,
 			@RequestParam(value = "startDate", defaultValue = "1000-01-01") String startDate,
 			@RequestParam(value = "endDate", defaultValue = "1000-01-01") String endDate,
@@ -133,11 +133,11 @@ public class MetricsController {
 
 		// Applying filter of pagination and applying order by ascendant
 
-		if (start != -1 && size != -1) {
+		if (page != -1 && size != -1) {
 			MetricsApplication.logger.info("Applying filter of pagination and applying order by ascendant");
 			MetricsApplication.logger.info("Setting true variable withFilters in the pagination");
 			withFilters = true;
-			ListMetric = service.getAllMetricsPaginated(start, size, ListMetric, orderBy);
+			ListMetric = service.getAllMetricsPaginated(page, size, ListMetric, orderBy);
 		}
 		if (orderBy == 1) {
 			MetricsApplication.logger.info("Applying Descending filter");
