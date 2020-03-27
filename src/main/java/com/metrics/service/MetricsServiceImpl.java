@@ -96,21 +96,29 @@ public class MetricsServiceImpl implements MetricsService {
 	public List<MetricsCollection> getAllMetricsPaginated(int page, int size, List<MetricsCollection> metrics,
 			int orderBy) {
 		List<MetricsCollection> listMetricsFiltredDates = new ArrayList<MetricsCollection>();
+		
 		if (size <= 0) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "invalid size: " + size);
 		}
 		if (page <= 0) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "invalid page size: " + page);
 		}
-		MetricsApplication.logger.info("Starting variables with size per page and number of pages");
+		MetricsApplication.logger.info("Starting variables with size per page and number of pages " + page + " and size " + size);
 		int pages = metrics.size() / size;
-		int lastElements = metrics.size() % size;
+		if( metrics.size() / size == 1) {
+			pages++;
+		}
+		int lastElements =  metrics.size() % size;
+		MetricsApplication.logger.info("Starting size in " + size);
 		
 		if (pages < page) {
 			MetricsApplication.logger.info(
 					"Return empty list");
 			return listMetricsFiltredDates;
 		}
+		
+		MetricsApplication.logger.info("Starting variables with size per page and number of pages " + pages);
+		
 		if (page == pages && size > lastElements) {
 			size = lastElements;
 			MetricsApplication.logger.info(
@@ -127,16 +135,17 @@ public class MetricsServiceImpl implements MetricsService {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
 					"Has been found problems with range of metric list ");
 		}
-
+		MetricsApplication.logger.info(
+				"index " + index + " final " + Math.min(index + size, metrics.size()));
 		listMetricsFiltredDates = metrics.subList(index, Math.min(index + size, metrics.size()));
 
 		if (orderBy == 0 && listMetricsFiltredDates.size() > 1) {
 			MetricsApplication.logger
-					.info("Applying filter selected to " + listMetricsFiltredDates.size() + " elements");
+					.info("Applying filter By Ascending selected to " + listMetricsFiltredDates.size() + " elements");
 			listMetricsFiltredDates = Functions.OrderByAscending(listMetricsFiltredDates);
 		} else if (orderBy == 1 && listMetricsFiltredDates.size() > 1) {
 			MetricsApplication.logger
-					.info("Applying filter selected to " + listMetricsFiltredDates.size() + " elements");
+					.info("Applying filter By Descending selected to " + listMetricsFiltredDates.size() + " elements");
 			listMetricsFiltredDates = Functions.OrderByDescending(listMetricsFiltredDates);
 		}
 

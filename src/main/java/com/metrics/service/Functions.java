@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -33,18 +34,32 @@ public class Functions {
 		return listIncoming;
 	}
 
-	public static void VerifyingUUID(String uuid)  {
+	public static void VerifyingUUID(String uuid) {
 		try {
 			MetricsApplication.logger.info(uuid);
 			if (uuid.length() == 24) {
 				ObjectId.isValid(uuid);
-			}else{
+			} else {
 				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The UUID has incorrect Format");
 			}
-				
+
 		} catch (IllegalArgumentException error) {
-			
+
 		}
+	}
+
+	public static List<MetricsCollection> filteringEmptyDates(List<MetricsCollection> listIncoming) {
+
+		List<MetricsCollection> newList = new ArrayList<MetricsCollection>();
+
+		for (MetricsCollection metric : listIncoming) {
+
+			if (metric.getDate() != null) {
+				if(VerifyingTimeStampValid(metric.getDate()))
+					newList.add(metric);
+			}
+		}
+		return newList;
 	}
 
 	public static void IsDBEmpty(List<MetricsCollection> metrics) {
@@ -75,7 +90,7 @@ public class Functions {
 	public static Timestamp stringToTimestamp(String date) throws ParseException {
 
 		DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-			Timestamp ts = new Timestamp(((java.util.Date) df.parse(date)).getTime());
+		Timestamp ts = new Timestamp(((java.util.Date) df.parse(date)).getTime());
 		return ts;
 	}
 
@@ -145,22 +160,73 @@ public class Functions {
 		Collections.sort(listOrder, new Comparator<MetricsCollection>() {
 			@Override
 			public int compare(MetricsCollection o1, MetricsCollection o2) {
-				return o1.getDate().compareTo(o2.getDate());
+				Timestamp date1 = Timestamp.valueOf("1000-01-01 00:00:00.0");
+				Timestamp date2 = Timestamp.valueOf("1000-01-01 00:00:00.0");
+				int result;
+				
+				
+				try {
+					date1 = Functions.stringToTimestamp(o1.getDate());
+					date2 = Functions.stringToTimestamp(o2.getDate());
+					MetricsApplication.logger.info(date1 + "         " + date2);
+					MetricsApplication.logger.info(date1.after(date2));
+					MetricsApplication.logger.info(date1.before(date2));
+				} catch (Exception e) {
+				}
+				if (date1.equals(date2)) {
+					result = 0;
+				}
+
+				if (date1.after(date2)) {
+					result = 1;
+				} else {
+					result = -1;
+				}
+				MetricsApplication.logger.info(result);
+				return result;
+
 			}
+
 		});
 		return listOrder;
 	}
 
 	public static List<MetricsCollection> OrderByDescending(List<MetricsCollection> listMetric) {
 		List<MetricsCollection> listOrder = listMetric;
+		try {
 		Collections.sort(listOrder, new Comparator<MetricsCollection>() {
-
+			
 			@Override
 			public int compare(MetricsCollection o1, MetricsCollection o2) {
-				return o2.getDate().compareTo(o1.getDate());
+				Timestamp date1 = Timestamp.valueOf("1000-01-01 00:00:00.0");
+				Timestamp date2 = Timestamp.valueOf("1000-01-01 00:00:00.0");
+				int result;
+				
+				
+				try {
+					date1 = Functions.stringToTimestamp(o1.getDate());
+					date2 = Functions.stringToTimestamp(o2.getDate());
+					MetricsApplication.logger.info(date1 + "         " + date2);
+				} catch (Exception e) {
+				}
+				if (date1.equals(date2)) {
+					result = 0;
+				}
+
+				if (date1.after(date2)) {
+					result = -1;
+				} else {
+					result = 1;
+				}
+				MetricsApplication.logger.info(result);
+				return result;
+
 			}
 
 		});
+		}catch(Exception e) {
+			
+		}
 		return listOrder;
 	}
 }

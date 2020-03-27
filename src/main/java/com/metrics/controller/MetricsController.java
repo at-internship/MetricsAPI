@@ -54,7 +54,7 @@ public class MetricsController {
 
 		MetricsApplication.logger.info("Getting list of metrics");
 
-		List<MetricsCollection> ListMetric = service.getMetrics();
+		List<MetricsCollection> ListMetric = Functions.filteringEmptyDates(service.getMetrics());
 
 		MetricsApplication.logger.info("Verifying if DB is empty");
 		Functions.IsDBEmpty(ListMetric);
@@ -123,27 +123,29 @@ public class MetricsController {
 			if (startDateLocal.compareTo(defaultValueDate) > 0 && endDateLocal.compareTo(defaultValueDate) > 0) {
 				MetricsApplication.logger.info("Applying filter by date range and applying order by ascendant");
 				MetricsApplication.logger.info("Setting true variable withFilters in range dates");
+				if (startDateLocal.after(endDateLocal)) {
+					throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+				}
 				withFilters = true;
 				ListMetric = service.getItemsFromDateRange(startDateLocal, endDateLocal, ListMetric, orderBy);
 
 			}
 		} catch (Exception e) {
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Error to try parse date to Timestamp");
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "endDate is bigger than startDate");
 		}
 
 		// Applying filter of pagination and applying order by ascendant
 
 		if (page != -1 && size != -1) {
-			MetricsApplication.logger.info("Applying filter of pagination and applying order by ascendant");
 			MetricsApplication.logger.info("Setting true variable withFilters in the pagination");
 			withFilters = true;
 			ListMetric = service.getAllMetricsPaginated(page, size, ListMetric, orderBy);
 		}
-		if (orderBy == 1) {
+		if (orderBy == 1  && !withFilters) {
 			MetricsApplication.logger.info("Applying Descending filter");
 			withFilters = true;
 			ListMetric = Functions.OrderByDescending(ListMetric);
-		} else if (orderBy == 0) {
+		} else if (orderBy == 0 && !withFilters) {
 			MetricsApplication.logger.info("Applying Ascending filter");
 			withFilters = true;
 			ListMetric = Functions.OrderByAscending(ListMetric);
