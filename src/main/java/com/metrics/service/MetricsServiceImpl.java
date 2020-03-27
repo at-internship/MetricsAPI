@@ -104,6 +104,10 @@ public class MetricsServiceImpl implements MetricsService {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "invalid page size: " + page);
 		}
 		MetricsApplication.logger.info("Starting variables with size per page and number of pages " + page + " and size " + size);
+		MetricsApplication.logger.info("size "	+ size + " metric size " + metrics.size());
+		if (page == 1 && size > metrics.size() && metrics.size() == 1) {
+			size = 1;
+		}
 		int pages = metrics.size() / size;
 		if( metrics.size() / size == 1) {
 			pages++;
@@ -125,6 +129,7 @@ public class MetricsServiceImpl implements MetricsService {
 					"The elements is out range of numbers of elements in List and assigning the last numbers elements to size "
 							+ size);
 		}
+		
 
 		int index = 0;
 		if (page != 0) {

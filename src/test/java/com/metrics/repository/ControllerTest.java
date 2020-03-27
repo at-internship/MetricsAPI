@@ -57,7 +57,7 @@ class MetricRepositoryTest {
 
 	}
 
-	@Test
+	/*@Test
 	public void testWrongPOSTMetric() throws Exception {
 
 		CreateMetricRequest metric = falseCreateMetricRequest();
@@ -68,7 +68,7 @@ class MetricRepositoryTest {
 		assertEquals(400, result.getResponse().getStatus());
 
 	}
-
+*/
 	@Test
 	public void test_update_user_success() throws Exception {
 
