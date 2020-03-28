@@ -33,10 +33,13 @@ public class MetricsController {
 	public MetricsCollection updateMetric(@RequestBody CreateMetricRequest request, @PathVariable String id) {
 		MetricsApplication.logger.info("Creating container");
 		MetricsCollection resultMetric = new MetricsCollection();
+		
+		if(Functions.SprintsIdVerification(request) && Functions.EvaluatorsIdVerification(request)) {
+			MetricsApplication.logger.info("calling update service");
+			resultMetric = service.updateMetric(request, id);
+			MetricsApplication.logger.info("update successfull, returning updated object..");
+		}
 
-		MetricsApplication.logger.info("calling update service");
-		resultMetric = service.updateMetric(request, id);
-		MetricsApplication.logger.info("update successfull, returning updated object..");
 		return resultMetric;
 	}
 
@@ -174,8 +177,10 @@ public class MetricsController {
 	@PostMapping("/metrics")
 	public String newMetric(@RequestBody CreateMetricRequest request) {
 		String id = "";
-		MetricsApplication.logger.info("Calling the data validation method");
-		if (Functions.MappingTestMetric(request)) {
+		MetricsApplication.logger.info("Calling the data validation method and ID Validation for Evaluator and Evaluated ID");
+		MappingTest test = new MappingTest();
+    
+		if (test.MappingTestMetric(request) && Functions.SprintsIdVerification(request) && Functions.EvaluatorsIdVerification(request)) {
 			MetricsApplication.logger.info("data validation successfull,calling the newMetric service");
 			id = service.newMetric(request).getId();
 			MetricsApplication.logger.info("saving id into String to return");
@@ -190,5 +195,6 @@ public class MetricsController {
 		MetricsApplication.logger.info("Calling deleteMetric service");
 		service.deleteMetric(id);
 	}
+	
 
 }

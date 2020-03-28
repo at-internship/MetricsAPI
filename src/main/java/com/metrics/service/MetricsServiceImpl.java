@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import com.metrics.model.MetricsCollection;
+import com.metrics.model.UsersCollection;
 import com.metrics.repository.MetricRepository;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.metrics.MetricsApplication;
@@ -45,8 +46,9 @@ public class MetricsServiceImpl implements MetricsService {
 		}
 		MetricsApplication.logger.info("Returning metric");
 		return repository.findById(id);
-	}
 
+    }
+    
 	@Override
 	public MetricsCollection newMetric(CreateMetricRequest request) {
 		MetricsApplication.logger.info("Generating container");
