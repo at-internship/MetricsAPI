@@ -15,6 +15,7 @@ import com.metrics.MetricsApplication;
 import com.metrics.domain.CreateMetricRequest;
 import com.metrics.model.MetricsCollection;
 import com.metrics.service.Functions;
+import com.metrics.service.MappingTest;
 import com.metrics.service.MetricsServiceImpl;
 
 import java.util.Date;
