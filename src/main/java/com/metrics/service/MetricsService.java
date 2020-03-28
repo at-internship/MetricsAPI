@@ -1,6 +1,7 @@
 package com.metrics.service;
 
 import java.sql.Timestamp;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,6 +24,5 @@ public interface MetricsService {
 
 	List<MetricsCollection> getItemsFromIdFilter(String id, List<MetricsCollection> metrics, int typeId, int orderBy);
 
-	List<MetricsCollection> getItemsFromDateRange(Timestamp startDate, Timestamp endDate,
-			List<MetricsCollection> metrics, int orderBy);
+	List<MetricsCollection> getItemsFromDateRange(Date startDate, Date endDate, List<MetricsCollection> metrics, int orderBy);
 }

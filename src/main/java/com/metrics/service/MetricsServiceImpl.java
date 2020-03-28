@@ -2,6 +2,7 @@ package com.metrics.service;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -77,8 +78,7 @@ public class MetricsServiceImpl implements MetricsService {
 		MetricsApplication.logger.info("Creating metric object");
 		MetricsCollection metric = new MetricsCollection();
 		MetricsApplication.logger.info("calling data validation method");
-		MappingTest test = new MappingTest();
-		if (test.MappingTestMetric(request)) {
+		if (Functions.MappingTestMetric(request)) {
 			MetricsApplication.logger.info("data validation test passed, saving new object");
 			metric = orikaMapperFacade.map(request, MetricsCollection.class);
 			MetricsApplication.logger.info("object created succesfully");
@@ -107,6 +107,8 @@ public class MetricsServiceImpl implements MetricsService {
 		MetricsApplication.logger.info("size "	+ size + " metric size " + metrics.size());
 		if (page == 1 && size > metrics.size() && metrics.size() == 1) {
 			size = 1;
+		}else if (page == 1 && size > metrics.size() && metrics.size() > 1) {
+			size = metrics.size();
 		}
 		int pages = metrics.size() / size;
 		if( metrics.size() / size == 1) {
@@ -159,7 +161,7 @@ public class MetricsServiceImpl implements MetricsService {
 	}
 
 	@Override
-	public List<MetricsCollection> getItemsFromDateRange(Timestamp startDate, Timestamp endDate,
+	public List<MetricsCollection> getItemsFromDateRange(Date startDate, Date endDate,
 			List<MetricsCollection> metrics, int orderBy) {
 
 		MetricsApplication.logger.info("Creating list to save filter by range date");
@@ -168,10 +170,10 @@ public class MetricsServiceImpl implements MetricsService {
 		for (MetricsCollection metric : metrics) {
 			try {
 
-				if ((Functions.stringToTimestamp(metric.getDate()).after(startDate)
-						|| Functions.stringToTimestamp(metric.getDate()).equals(startDate))
-						&& Functions.stringToTimestamp(metric.getDate()).before(endDate)
-						|| Functions.stringToTimestamp(metric.getDate()).equals(endDate)) {
+				if ((Functions.stringToDate(metric.getDate()).after(startDate)
+						|| Functions.stringToDate(metric.getDate()).equals(startDate))
+						&& Functions.stringToDate(metric.getDate()).before(endDate)
+						|| Functions.stringToDate(metric.getDate()).equals(endDate)) {
 					listMetricsFiltredDates.add(metric);
 				}
 
@@ -218,7 +220,6 @@ public class MetricsServiceImpl implements MetricsService {
 		case 0: {
 			MetricsApplication.logger.info("Comparing evaluator_id in list whit value id provided by user");
 			for (MetricsCollection metric : metrics) {
-				MetricsApplication.logger.info("Parsing Evaluator_id to ObjectId");
 				// ObjectId idDB = new ObjectId(metric.getEvaluator_id());
 				if (metric.getEvaluator_id() != null)
 					if (metric.getEvaluator_id().compareTo(id) == 0) {
@@ -232,12 +233,12 @@ public class MetricsServiceImpl implements MetricsService {
 			break;
 		}
 		case 1: {
-			MetricsApplication.logger.info("Comparing evaluated_id in list whit value id provided by user");
+			MetricsApplication.logger.info("Comparing evaluated_id in list whit value id provided by user " + id);
 			for (MetricsCollection metric : metrics) {
-				MetricsApplication.logger.info("Parsing getEvaluated_id to ObjectId");
 				// ObjectId idDB = new ObjectId(metric.getEvaluated_id());
 				if (metric.getEvaluated_id() != null)
-					if (metric.getEvaluated_id().equals(id)) {
+					MetricsApplication.logger.info("Comparing " + metric.getEvaluated_id() + " with " + id);
+					if (metric.getEvaluated_id().compareTo(id) == 0) {
 
 						listMetricsFiltredDates.add(metric);
 					}
@@ -250,7 +251,6 @@ public class MetricsServiceImpl implements MetricsService {
 		case 2: {
 			MetricsApplication.logger.info("Comparing sprint_id in list whit value id provided by user");
 			for (MetricsCollection metric : metrics) {
-				MetricsApplication.logger.info("Parsing getSprint_id to ObjectId");
 				// ObjectId idDB = new ObjectId(metric.getSprint_id());
 				if (metric.getSprint_id() != null)
 					if (metric.getSprint_id().compareTo(id) == 0) {

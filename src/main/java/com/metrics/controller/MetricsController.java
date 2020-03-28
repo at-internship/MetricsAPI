@@ -15,10 +15,9 @@ import com.metrics.MetricsApplication;
 import com.metrics.domain.CreateMetricRequest;
 import com.metrics.model.MetricsCollection;
 import com.metrics.service.Functions;
-import com.metrics.service.MappingTest;
 import com.metrics.service.MetricsServiceImpl;
 
-import java.sql.Timestamp;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -54,13 +53,13 @@ public class MetricsController {
 
 		MetricsApplication.logger.info("Getting list of metrics");
 
-		List<MetricsCollection> ListMetric = Functions.filteringEmptyDates(service.getMetrics());
+		List<MetricsCollection> ListMetric = service.getMetrics();
 
 		MetricsApplication.logger.info("Verifying if DB is empty");
 		Functions.IsDBEmpty(ListMetric);
 
 		MetricsApplication.logger.info("Verifying all types datas into DB");
-		// Functions.VerifyingAllTypesDatasIntoDB(ListMetric);
+		Functions.VerifyingAllTypesDatasIntoDB(ListMetric);
 
 		MetricsApplication.logger.info("Setting false the variable withFilters");
 		boolean withFilters = false;
@@ -108,16 +107,16 @@ public class MetricsController {
 		// Applying filter by date range and applying order by ascendant
 		try {
 			MetricsApplication.logger.info("Creating default value and parse to type date");
-			Timestamp defaultValueDate = Functions.stringToTimestamp("1000-01-01");
+			Date defaultValueDate = Functions.stringToDate("1000-01-01");
 
 			MetricsApplication.logger.info("Parse to type date the content of the incoming variable startDate");
 			MetricsApplication.logger.info(startDate);
-			Timestamp startDateLocal = Functions.stringToTimestamp(startDate);
+			Date startDateLocal = Functions.stringToDate(startDate);
 			MetricsApplication.logger.info(startDateLocal);
 
 			MetricsApplication.logger.info("Parse to type date the content of the incoming variable endtDate");
 			MetricsApplication.logger.info(endDate);
-			Timestamp endDateLocal = Functions.stringToTimestamp(endDate);
+			Date endDateLocal = Functions.stringToDate(endDate);
 			MetricsApplication.logger.info(endDateLocal);
 
 			if (startDateLocal.compareTo(defaultValueDate) > 0 && endDateLocal.compareTo(defaultValueDate) > 0) {
@@ -176,8 +175,7 @@ public class MetricsController {
 	public String newMetric(@RequestBody CreateMetricRequest request) {
 		String id = "";
 		MetricsApplication.logger.info("Calling the data validation method");
-		MappingTest test = new MappingTest();
-		if (test.MappingTestMetric(request)) {
+		if (Functions.MappingTestMetric(request)) {
 			MetricsApplication.logger.info("data validation successfull,calling the newMetric service");
 			id = service.newMetric(request).getId();
 			MetricsApplication.logger.info("saving id into String to return");

@@ -8,6 +8,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 
 import org.bson.types.ObjectId;
@@ -55,7 +56,7 @@ public class Functions {
 		for (MetricsCollection metric : listIncoming) {
 
 			if (metric.getDate() != null) {
-				if(VerifyingTimeStampValid(metric.getDate()))
+				if (VerifyingTimeStampValid(metric.getDate()))
 					newList.add(metric);
 			}
 		}
@@ -69,10 +70,9 @@ public class Functions {
 	}
 
 	public static void VerifyingAllTypesDatasIntoDB(List<MetricsCollection> metrics) {
-		MappingTest testingList = new MappingTest();
 		MetricsApplication.logger.info("Verifying records and validating type data");
 		for (MetricsCollection metric : metrics) {
-			if (!testingList.MappingTestMetric(Functions.MetricsCollectionToCreateMetricRequest(metric)))
+			if (!MappingTestMetric(MetricsCollectionToCreateMetricRequest(metric)))
 				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid structure metric " + metric.getId());
 		}
 	}
@@ -87,11 +87,14 @@ public class Functions {
 		}
 	}
 
-	public static Timestamp stringToTimestamp(String date) throws ParseException {
-
-		DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-		Timestamp ts = new Timestamp(((java.util.Date) df.parse(date)).getTime());
-		return ts;
+	public static Date stringToDate(String dateIncoming) throws ParseException {
+		Date date = null;
+		try {
+			date = new SimpleDateFormat("yyyy-MM-dd").parse(dateIncoming);
+		} catch (ParseException error) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid structure date incoming ");
+		}
+		return date;
 	}
 
 	public static String mapToJson(Object obj) throws JsonProcessingException {
@@ -106,7 +109,97 @@ public class Functions {
 		return objectMapper.readValue(json, clazz);
 	}
 
-	public static CreateMetricRequest SetDefaultDataEmptyField(CreateMetricRequest metric) {
+	public static boolean MappingTestMetric(CreateMetricRequest metric) {
+		boolean statusTest = false;
+		String json = "";
+		ObjectMapper mapper = new ObjectMapper();
+		try {
+			MetricsApplication.logger.info("Starting date validation format");
+			json = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(testMetricIntegrity(metric));
+
+			MetricsApplication.logger.info("Validation integrity of the json");
+			mapper.readValue(json, MetricsCollection.class);
+
+			MetricsApplication.logger.info("Validating the date format");
+			Functions.VerifyingTimeStampValid(metric.getDate());
+
+			MetricsApplication.logger.info("Validating the ids formats");
+			MetricsApplication.logger.info(metric.getEvaluator_id());
+			Functions.VerifyingUUID(metric.getEvaluator_id());
+			MetricsApplication.logger.info(metric.getEvaluated_id());
+			Functions.VerifyingUUID(metric.getEvaluated_id());
+			Functions.VerifyingUUID(metric.getSprint_id());
+
+			MetricsApplication.logger.info("Data validation test passed..");
+			statusTest = true;
+
+		} catch (Exception e) {
+		}
+		MetricsApplication.logger.info("Return status.." + statusTest);
+		return statusTest;
+	}
+
+	public static List<MetricsCollection> OrderByAscending(List<MetricsCollection> listMetric) {
+		List<MetricsCollection> listOrder = listMetric;
+		Collections.sort(listOrder, new Comparator<MetricsCollection>() {
+			@Override
+			public int compare(MetricsCollection o1, MetricsCollection o2) {
+				Date date1 = null;
+				Date date2 = null;
+				int result;
+				try {
+					date1 = Functions.stringToDate(o1.getDate());
+					date2 = Functions.stringToDate(o2.getDate());
+				} catch (Exception e) {
+				}
+				if (date1.equals(date2)) {
+					result = 0;
+				}
+
+				if (date1.after(date2)) {
+					result = 1;
+				} else {
+					result = -1;
+				}
+				return result;
+
+			}
+
+		});
+		return listOrder;
+	}
+
+	public static List<MetricsCollection> OrderByDescending(List<MetricsCollection> listMetric) {
+		List<MetricsCollection> listOrder = listMetric;
+		Collections.sort(listOrder, new Comparator<MetricsCollection>() {
+			@Override
+			public int compare(MetricsCollection o1, MetricsCollection o2) {
+				Date date1 = null;
+				Date date2 = null;
+				int result;
+				try {
+					date1 = Functions.stringToDate(o1.getDate());
+					date2 = Functions.stringToDate(o2.getDate());
+				} catch (Exception e) {
+				}
+				if (date1.equals(date2)) {
+					result = 0;
+				}
+
+				if (date1.after(date2)) {
+					result = -1;
+				} else {
+					result = 1;
+				}
+				return result;
+
+			}
+
+		});
+		return listOrder;
+	}
+
+	private static CreateMetricRequest testMetricIntegrity(CreateMetricRequest metric) {
 		CreateMetricRequest collection = metric;
 
 		if (collection.getMetrics() == null) {
@@ -153,80 +246,5 @@ public class Functions {
 		}
 
 		return collection;
-	}
-
-	public static List<MetricsCollection> OrderByAscending(List<MetricsCollection> listMetric) {
-		List<MetricsCollection> listOrder = listMetric;
-		Collections.sort(listOrder, new Comparator<MetricsCollection>() {
-			@Override
-			public int compare(MetricsCollection o1, MetricsCollection o2) {
-				Timestamp date1 = Timestamp.valueOf("1000-01-01 00:00:00.0");
-				Timestamp date2 = Timestamp.valueOf("1000-01-01 00:00:00.0");
-				int result;
-				
-				
-				try {
-					date1 = Functions.stringToTimestamp(o1.getDate());
-					date2 = Functions.stringToTimestamp(o2.getDate());
-					MetricsApplication.logger.info(date1 + "         " + date2);
-					MetricsApplication.logger.info(date1.after(date2));
-					MetricsApplication.logger.info(date1.before(date2));
-				} catch (Exception e) {
-				}
-				if (date1.equals(date2)) {
-					result = 0;
-				}
-
-				if (date1.after(date2)) {
-					result = 1;
-				} else {
-					result = -1;
-				}
-				MetricsApplication.logger.info(result);
-				return result;
-
-			}
-
-		});
-		return listOrder;
-	}
-
-	public static List<MetricsCollection> OrderByDescending(List<MetricsCollection> listMetric) {
-		List<MetricsCollection> listOrder = listMetric;
-		try {
-		Collections.sort(listOrder, new Comparator<MetricsCollection>() {
-			
-			@Override
-			public int compare(MetricsCollection o1, MetricsCollection o2) {
-				Timestamp date1 = Timestamp.valueOf("1000-01-01 00:00:00.0");
-				Timestamp date2 = Timestamp.valueOf("1000-01-01 00:00:00.0");
-				int result;
-				
-				
-				try {
-					date1 = Functions.stringToTimestamp(o1.getDate());
-					date2 = Functions.stringToTimestamp(o2.getDate());
-					MetricsApplication.logger.info(date1 + "         " + date2);
-				} catch (Exception e) {
-				}
-				if (date1.equals(date2)) {
-					result = 0;
-				}
-
-				if (date1.after(date2)) {
-					result = -1;
-				} else {
-					result = 1;
-				}
-				MetricsApplication.logger.info(result);
-				return result;
-
-			}
-
-		});
-		}catch(Exception e) {
-			
-		}
-		return listOrder;
 	}
 }
