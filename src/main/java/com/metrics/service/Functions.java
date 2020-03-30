@@ -57,38 +57,72 @@ public class Functions {
 		try {
 			MetricsApplication.logger.info("Starting date format validation..");
 			String[] date = inputString.split("-");
-			if(date[0].length()==4) {
-				if(Integer.parseInt(date[2])>31) {
+			if (date[0].length() == 4) {
+				if (Integer.parseInt(date[2]) > 31) {
+					MetricsApplication.logger.error("Incorrect day");
 					throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Date has incorrect Format");
 				}
-				if(Integer.parseInt(date[1])>12) {
+				if (Integer.parseInt(date[1]) > 12) {
+					MetricsApplication.logger.error("Incorrect month");
 					throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Date has incorrect Format");
+				}
+				if (Integer.parseInt(date[0]) % 4 > 0) {
+					MetricsApplication.logger.error("year inst leap");
+					MetricsApplication.logger.error(Integer.parseInt(date[1]) == 2);
+					MetricsApplication.logger.error(Integer.parseInt(date[2]) >= 29);
+					if (Integer.parseInt(date[1]) == 2 && Integer.parseInt(date[2]) >= 29) {
+						throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "This year isn't leap");
+					}
 				}
 				format.parse(inputString);
 			}
-			else if(date[2].length()==4) {
-				
+
+			else if (date[2].length() == 4) {
+				MetricsApplication.logger.info("Current date format is " + inputString);
+				MetricsApplication.logger.info("Correction data formart dd-MM-YYYY");
 				String[] fixedDate = date;
-				fixedDate[0] = date[2];
-				fixedDate[2] = date[0];
-				if(Integer.parseInt(date[1])>12) {
-					fixedDate[1] = date[0];
-					fixedDate[0] = date[1];
+				int day = Integer.parseInt(date[0]);
+				int month = Integer.parseInt(date[1]);
+				int year = Integer.parseInt(date[2]);
+
+				fixedDate[2] = String.valueOf(day);
+				fixedDate[0] = String.valueOf(year);
+				fixedDate[1] = String.valueOf(month);
+
+				if (month > 12) {
+					MetricsApplication.logger.info("Correction data formart MM-dd-YYYY");
+					fixedDate[2] = String.valueOf(month);
+					fixedDate[1] = String.valueOf(day);
+					fixedDate[0] = String.valueOf(year);
+					MetricsApplication.logger
+							.info("Current date format is " + fixedDate[0] + "-" + fixedDate[1] + "-" + fixedDate[2]);
+
 				}
-				if(Integer.parseInt(date[0])>31) {
+
+				MetricsApplication.logger.info("Correction data formart done the fixed date is " + fixedDate[0] + "-"
+						+ fixedDate[1] + "-" + fixedDate[2]);
+				if (Integer.parseInt(fixedDate[2]) > 31) {
+					MetricsApplication.logger.error("Error day overflow");
 					throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Date has incorrect Format");
 				}
-				if(Integer.parseInt(date[1])>12) {
+				if (Integer.parseInt(fixedDate[1]) > 12) {
+					MetricsApplication.logger.error("Error month overflow");
 					throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Date has incorrect Format");
 				}
-				format.parse(fixedDate[0]+"-"+fixedDate[1]+"-"+fixedDate[2]);
+				if (Integer.parseInt(fixedDate[0]) % 4 != 0) {
+
+					if (Integer.parseInt(fixedDate[1]) == 2 && Integer.parseInt(fixedDate[2]) >= 29) {
+						throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "This year isn't leap");
+					}
+				}
+				format.parse(fixedDate[0] + "-" + fixedDate[1] + "-" + fixedDate[2]);
 			}
-			
+
 		} catch (ParseException e) {
 			MetricsApplication.logger.error("Date format validation failed!");
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Date has incorrect Format");
 		}
-		
+
 	}
 
 	public static void VerifyingUUID(String uuid) {
@@ -102,7 +136,7 @@ public class Functions {
 	public static Date stringToDate(String dateIncoming) throws ParseException {
 		Date date = null;
 		try {
-			
+
 			date = new SimpleDateFormat("yyyy-MM-dd").parse(dateIncoming);
 		} catch (ParseException error) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid structure date incoming ");
@@ -183,17 +217,18 @@ public class Functions {
 	}
 
 	public static MetricsCollection datePUT;
-	
+
 	public static CreateMetricRequest testMetricIntegrity(CreateMetricRequest metric, int typeRequest) {
 
 		if (metric.getId() != null && typeRequest != 2) {
 			MetricsApplication.logger.info("id field must be null");
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "id field must be null");
 		}
-		
-		if(typeRequest !=2 && (metric.getEvaluated_id().equals(metric.getEvaluator_id()))) {
+
+		if (typeRequest != 2 && (metric.getEvaluated_id().equals(metric.getEvaluator_id()))) {
 			MetricsApplication.logger.info("Evaluator and Evaluated ID are the same");
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Evaluator and Evaluated ID are the same must not be equals.");
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+					"Evaluator and Evaluated ID are the same must not be equals.");
 		}
 
 		CreateMetricRequest collection = metric;
@@ -269,7 +304,7 @@ public class Functions {
 				MetricsApplication.logger.info("Verifying integrity of date field");
 				VerifyingDateValid(metric.getDate());
 			}
-		}else {
+		} else {
 			metric.setDate(datePUT.getDate());
 		}
 
