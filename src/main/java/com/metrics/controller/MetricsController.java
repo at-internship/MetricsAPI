@@ -15,7 +15,6 @@ import com.metrics.MetricsApplication;
 import com.metrics.domain.CreateMetricRequest;
 import com.metrics.model.MetricsCollection;
 import com.metrics.service.Functions;
-import com.metrics.service.MappingTest;
 import com.metrics.service.MetricsServiceImpl;
 
 import java.util.Date;
@@ -179,9 +178,8 @@ public class MetricsController {
 	public String newMetric(@RequestBody CreateMetricRequest request) {
 		String id = "";
 		MetricsApplication.logger.info("Calling the data validation method and ID Validation for Evaluator and Evaluated ID");
-		MappingTest test = new MappingTest();
     
-		if (test.MappingTestMetric(request) && Functions.SprintsIdVerification(request) && Functions.EvaluatorsIdVerification(request)) {
+		if (Functions.testMetricIntegrity(request, 0) != null && Functions.SprintsIdVerification(request) && Functions.EvaluatorsIdVerification(request)) {
 			MetricsApplication.logger.info("data validation successfull,calling the newMetric service");
 			id = service.newMetric(request).getId();
 			MetricsApplication.logger.info("saving id into String to return");
