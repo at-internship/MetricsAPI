@@ -55,10 +55,40 @@ public class Functions {
 	public static void VerifyingDateValid(String inputString) {
 		SimpleDateFormat format = new java.text.SimpleDateFormat("yyyy-MM-dd");
 		try {
-			format.parse(inputString);
+			MetricsApplication.logger.info("Starting date format validation..");
+			String[] date = inputString.split("-");
+			if(date[0].length()==4) {
+				if(Integer.parseInt(date[2])>31) {
+					throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Date has incorrect Format");
+				}
+				if(Integer.parseInt(date[1])>12) {
+					throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Date has incorrect Format");
+				}
+				format.parse(inputString);
+			}
+			else if(date[2].length()==4) {
+				
+				String[] fixedDate = date;
+				fixedDate[0] = date[2];
+				fixedDate[2] = date[0];
+				if(Integer.parseInt(date[1])>12) {
+					fixedDate[1] = date[0];
+					fixedDate[0] = date[1];
+				}
+				if(Integer.parseInt(date[0])>31) {
+					throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Date has incorrect Format");
+				}
+				if(Integer.parseInt(date[1])>12) {
+					throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Date has incorrect Format");
+				}
+				format.parse(fixedDate[0]+"-"+fixedDate[1]+"-"+fixedDate[2]);
+			}
+			
 		} catch (ParseException e) {
+			MetricsApplication.logger.error("Date format validation failed!");
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Date has incorrect Format");
 		}
+		
 	}
 
 	public static void VerifyingUUID(String uuid) {
@@ -72,6 +102,7 @@ public class Functions {
 	public static Date stringToDate(String dateIncoming) throws ParseException {
 		Date date = null;
 		try {
+			
 			date = new SimpleDateFormat("yyyy-MM-dd").parse(dateIncoming);
 		} catch (ParseException error) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid structure date incoming ");
@@ -224,7 +255,7 @@ public class Functions {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Type field should not be null");
 		}
 		if (collection.getDate() != null) {
-			if ((collection.getDate().isEmpty() && typeRequest == 0) || collection.getDate() == null) {
+			if (collection.getDate().isEmpty() && typeRequest == 0) {
 				Date date = new Date();
 				DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 				metric.setDate(dateFormat.format(date));
