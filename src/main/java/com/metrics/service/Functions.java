@@ -235,8 +235,8 @@ public class Functions {
 				MetricsApplication.logger.info("Verifying integrity of date field");
 				VerifyingDateValid(metric.getDate());
 			} else if (!collection.getDate().isEmpty() && typeRequest == 1) {
-				MetricsApplication.logger.info("Date field can not be update");
-				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Date field can not be update");
+				MetricsApplication.logger.info("Verifying integrity of date field");
+				VerifyingDateValid(metric.getDate());
 			}
 		}else {
 			metric.setDate(datePUT.getDate());
