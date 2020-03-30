@@ -56,6 +56,8 @@ public class Functions {
 		SimpleDateFormat format = new java.text.SimpleDateFormat("yyyy-MM-dd");
 		try {
 			MetricsApplication.logger.info("Starting date format validation..");
+			if(inputString.split("-").length!=3)
+				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Date has incorrect Format");
 			String[] date = inputString.split("-");
 			if (date[0].length() == 4) {
 				if (Integer.parseInt(date[2]) > 31) {
