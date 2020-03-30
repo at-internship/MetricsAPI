@@ -159,6 +159,11 @@ public class Functions {
 			MetricsApplication.logger.info("id field must be null");
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "id field must be null");
 		}
+		
+		if(typeRequest !=2 && (metric.getEvaluated_id().equals(metric.getEvaluator_id()))) {
+			MetricsApplication.logger.info("Evaluator and Evaluated ID are the same");
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Evaluator and Evaluated ID are the same must not be equals.");
+		}
 
 		CreateMetricRequest collection = metric;
 		ObjectMapper mapper = new ObjectMapper();
