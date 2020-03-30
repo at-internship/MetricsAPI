@@ -16,7 +16,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import com.metrics.MetricsApplication;
@@ -256,16 +255,4 @@ private CreateMetricRequest falseCreateMetricRequest () {
     	}
    }
 
-private CreateMetricRequest falseUpdateMetricRequest () {
-	try {
-		
-		return new CreateMetricRequest("5e7a600a3b09d6412bb16663","5e6bbc854244ac0cbc8df65d","5e6bbc924244ac0cbc8df65e","Empty","2020-03-17","5e78f5e792675632e42d1a96",new metrics(false,false,
-                new blockers(false,"Empty"),
-                new proactive(false, false,false,false),
-                new retroactive(false,"Empty")));
-	}catch(Exception e)
-	{
-		return null;
-	}
-}
 }
