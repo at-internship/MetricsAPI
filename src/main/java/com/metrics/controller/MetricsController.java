@@ -45,8 +45,8 @@ public class MetricsController {
 
 	@ResponseStatus(value = HttpStatus.OK)
 	@GetMapping("/metrics")
-	public List<MetricsCollection> getMetrics(@RequestParam(value = "page", defaultValue = "-1") int page,
-			@RequestParam(value = "size", defaultValue = "-1") int size,
+	public List<MetricsCollection> getMetrics(@RequestParam(value = "page", defaultValue = "10000") int page,
+			@RequestParam(value = "size", defaultValue = "10000") int size,
 			@RequestParam(value = "startDate", defaultValue = "1000-01-01") String startDate,
 			@RequestParam(value = "endDate", defaultValue = "1000-01-01") String endDate,
 			@RequestParam(value = "evaluator_id", defaultValue = "") String evaluator_id,
@@ -55,7 +55,9 @@ public class MetricsController {
 			@RequestParam(value = "orderBy", defaultValue = "-1") int orderBy) {
 
 		MetricsApplication.logger.info("Getting list of metrics");
-
+		boolean pagination = true;
+		if(page == 10000 && size == 10000)
+			pagination = false;
 		List<MetricsCollection> ListMetric = service.getMetrics();
 
 		MetricsApplication.logger.info("Verifying if DB is empty");
@@ -109,39 +111,42 @@ public class MetricsController {
 		}
 		// Applying filter by date range and applying order by ascendant
 		try {
+			withFilters = true;
 			MetricsApplication.logger.info("Creating default value and parse to type date");
 			Date defaultValueDate = Functions.stringToDate("1000-01-01");
 
 			MetricsApplication.logger.info("Parse to type date the content of the incoming variable startDate");
-			MetricsApplication.logger.info(startDate);
 			Date startDateLocal = Functions.stringToDate(startDate);
 			MetricsApplication.logger.info(startDateLocal);
 
 			MetricsApplication.logger.info("Parse to type date the content of the incoming variable endtDate");
-			MetricsApplication.logger.info(endDate);
 			Date endDateLocal = Functions.stringToDate(endDate);
 			MetricsApplication.logger.info(endDateLocal);
-
+			
 			if (startDateLocal.compareTo(defaultValueDate) > 0 && endDateLocal.compareTo(defaultValueDate) > 0) {
 				MetricsApplication.logger.info("Applying filter by date range and applying order by ascendant");
 				MetricsApplication.logger.info("Setting true variable withFilters in range dates");
+				
 				if (startDateLocal.after(endDateLocal)) {
 					throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
 				}
-				withFilters = true;
+				
 				ListMetric = service.getItemsFromDateRange(startDateLocal, endDateLocal, ListMetric, orderBy);
 
 			}
 		} catch (Exception e) {
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "endDate is bigger than startDate");
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "the start page is bigger than endPage");
 		}
 
 		// Applying filter of pagination and applying order by ascendant
 
-		if (page != -1 && size != -1) {
+		if (page > 0 && size > 0 && pagination) {
 			MetricsApplication.logger.info("Setting true variable withFilters in the pagination");
 			withFilters = true;
 			ListMetric = service.getAllMetricsPaginated(page, size, ListMetric, orderBy);
+		}
+		else if (pagination){
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "page or size have invalid number");
 		}
 		if (orderBy == 1  && !withFilters) {
 			MetricsApplication.logger.info("Applying Descending filter");
@@ -156,8 +161,6 @@ public class MetricsController {
 		// Not applying anything filter
 		if (!withFilters)
 			MetricsApplication.logger.info("Not applying anything filter");
-
-		MetricsApplication.logger.info("Return list with all metrics");
 		return ListMetric;
 	}
 

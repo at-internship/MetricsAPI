@@ -151,25 +151,7 @@ public class Functions {
 		Collections.sort(listOrder, new Comparator<MetricsCollection>() {
 			@Override
 			public int compare(MetricsCollection o1, MetricsCollection o2) {
-				Date date1 = null;
-				Date date2 = null;
-				int result;
-				try {
-					date1 = Functions.stringToDate(o1.getDate());
-					date2 = Functions.stringToDate(o2.getDate());
-				} catch (Exception e) {
-				}
-				if (date1.equals(date2)) {
-					result = 0;
-				}
-
-				if (date1.after(date2)) {
-					result = 1;
-				} else {
-					result = -1;
-				}
-				return result;
-
+				return o1.getDate().compareTo(o2.getDate());
 			}
 
 		});
@@ -181,24 +163,8 @@ public class Functions {
 		Collections.sort(listOrder, new Comparator<MetricsCollection>() {
 			@Override
 			public int compare(MetricsCollection o1, MetricsCollection o2) {
-				Date date1 = null;
-				Date date2 = null;
-				int result;
-				try {
-					date1 = Functions.stringToDate(o1.getDate());
-					date2 = Functions.stringToDate(o2.getDate());
-				} catch (Exception e) {
-				}
-				if (date1.equals(date2)) {
-					result = 0;
-				}
-
-				if (date1.after(date2)) {
-					result = -1;
-				} else {
-					result = 1;
-				}
-				return result;
+				
+				return o2.getDate().compareTo(o1.getDate());
 
 			}
 

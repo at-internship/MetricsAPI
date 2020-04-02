@@ -95,13 +95,6 @@ public class MetricsServiceImpl implements MetricsService {
 	public List<MetricsCollection> getAllMetricsPaginated(int page, int size, List<MetricsCollection> metrics,
 			int orderBy) {
 		List<MetricsCollection> listMetricsFiltredDates = new ArrayList<MetricsCollection>();
-		
-		if (size <= 0) {
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "invalid size: " + size);
-		}
-		if (page <= 0) {
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "invalid page size: " + page);
-		}
 		MetricsApplication.logger.info("Starting variables with size per page and number of pages " + page + " and size " + size);
 		MetricsApplication.logger.info("size "	+ size + " metric size " + metrics.size());
 		if (page == 1 && size > metrics.size() && metrics.size() == 1) {
