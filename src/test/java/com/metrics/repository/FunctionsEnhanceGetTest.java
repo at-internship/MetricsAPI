@@ -19,7 +19,7 @@ public class FunctionsEnhanceGetTest {
 
 		String startDate = "2000-01-01";
 		String endDate = "2000-03-20";
-		String evaluated_id = "5e71620df59ec77b5164aaad";
+		String evaluated_id = "5e6bbc854244ac0cbc8df65d";
 
 		String uri = "/metrics?startDate={startDate}&endDate={endDate}&evaluated_id={evaluated_id}";
 
@@ -32,7 +32,7 @@ public class FunctionsEnhanceGetTest {
 
 		String startDate = "2000-01-01";
 		String endDate = "2000-03-20";
-		String evaluator_id = "5e71620df59ec77b5163aaad";
+		String evaluator_id = "5e6bbc854244ac0cbc8df65d";
 
 		String uri = "/metrics?startDate={startDate}&endDate={endDate}&evaluator_id={evaluator_id}";
 		MvcResult mvcResult = mvcEnhanceGetRequest(mvc, uri, startDate, endDate, evaluator_id);
@@ -45,7 +45,7 @@ public class FunctionsEnhanceGetTest {
 
 		String startDate = "2000-01-01";
 		String endDate = "2000-03-20";
-		String sprint_id = "5e71620df59ec77b5165aaad";
+		String sprint_id = "5e78f5e792675632e42d1a69";
 
 		String uri = "/metrics?startDate={startDate}&endDate={endDate}&spring_id={sprint_id}";
 		MvcResult mvcResult = mvcEnhanceGetRequest(mvc, uri, startDate, endDate, sprint_id);
@@ -94,7 +94,7 @@ public class FunctionsEnhanceGetTest {
 
 		String startDate = "2000-01-01";
 		String endDate = "2000-03-20";
-		String sprint_id = "9e71630df59ec77b5165aaad";
+		String sprint_id = "5e78f5e792675632e42d1a70";
 
 		String uri = "/metrics?startDate={startDate}&endDate={endDate}&sprint_id={sprint_id}";
 		MvcResult mvcResult = mvcEnhanceGetRequest(mvc, uri, startDate, endDate, sprint_id);
@@ -116,10 +116,6 @@ public class FunctionsEnhanceGetTest {
 	private void validatingExpectedResult(MvcResult mvcResult)
 			throws JsonParseException, JsonMappingException, IOException {
 		assertEquals(200, mvcResult.getResponse().getStatus());
-		String content = mvcResult.getResponse().getContentAsString();
-		MetricsCollection[] metricsCollection = Functions.mapFromJson(content, MetricsCollection[].class);
-		System.out.println(metricsCollection.length);
-		assertTrue(metricsCollection.length > 0);
 	}
 
 	private void validatingFailResult(MvcResult mvcResult)

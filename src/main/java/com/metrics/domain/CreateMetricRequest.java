@@ -36,5 +36,14 @@ public class CreateMetricRequest {
 		this.sprint_id = sprint_id;
 		this.metrics = metrics;
 	}
+	
+	public CreateMetricRequest(String evaluator_id, String evaluated_id, String type, String date, String sprint_id, com.metrics.model.metrics metrics) {
+		this.evaluator_id = evaluator_id;
+		this.evaluated_id = evaluated_id;
+		this.type = type;
+		this.date = date;
+		this.sprint_id = sprint_id;
+		this.metrics = metrics;
+	}
 
 }
