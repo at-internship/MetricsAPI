@@ -8,8 +8,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.regex.Pattern;
 
-import org.bson.types.ObjectId;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.server.ResponseStatusException;
@@ -126,12 +126,37 @@ public class Functions {
 		}
 
 	}
-
+	public static boolean haveOnlyNumbers(String uuid) {
+		int counter = 0;
+		for (char letter : uuid.toCharArray()) {
+			if (letter == '1' || letter == '2' || letter == '3' || letter == '4' || letter == '5' || letter == '6'
+					|| letter == '7' || letter == '8' || letter == '9' || letter == '0') {
+				counter++;
+			}
+		}
+		if (counter == 24)
+			return true;
+		return false;
+	}
+	
+	public static boolean haveOnlyLetters(String uuid) {
+		for (char letter : uuid.toCharArray()) {
+			if (letter == '1' || letter == '2' || letter == '3' || letter == '4' || letter == '5' || letter == '6'
+					|| letter == '7' || letter == '8' || letter == '9' || letter == '0') {
+				return false;
+			}
+		}
+		return true;
+	}
+	
 	public static void VerifyingUUID(String uuid) {
-		try {
-			ObjectId.isValid(uuid);
-		} catch (Exception error) {
+		Pattern patt = Pattern.compile("[0-9a-f]{24}$");
+		MetricsApplication.logger.error("Valiting id " + uuid);
+		boolean validObjectId = patt.matcher(uuid).matches();
+		if (!validObjectId || haveOnlyLetters(uuid) || haveOnlyNumbers(uuid)) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The UUID has incorrect Format");
+		} else {
+			MetricsApplication.logger.error("The uuid is valid");
 		}
 	}
 

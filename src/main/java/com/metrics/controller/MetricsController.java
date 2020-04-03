@@ -178,7 +178,7 @@ public class MetricsController {
 	public String newMetric(@RequestBody CreateMetricRequest request) {
 		String id = "";
 		MetricsApplication.logger.info("Calling the data validation method and ID Validation for Evaluator and Evaluated ID");
-    
+		
 		if (Functions.testMetricIntegrity(request, 0) != null && Functions.SprintsIdVerification(request) && Functions.EvaluatorsIdVerification(request)) {
 			MetricsApplication.logger.info("data validation successfull,calling the newMetric service");
 			id = service.newMetric(request).getId();
