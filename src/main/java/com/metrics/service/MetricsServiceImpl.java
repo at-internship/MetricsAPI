@@ -40,7 +40,7 @@ public class MetricsServiceImpl implements MetricsService {
 	public Optional<MetricsCollection> findById(String id) {
 		if (!repository.existsById(id)) {
 			MetricsApplication.logger.error("trying to find a metric but  did not found an ID");
-			throw new HttpClientErrorException(HttpStatus.NOT_FOUND, "The given ID does not match with any metric");
+			throw new HttpClientErrorException(HttpStatus.NOT_FOUND, HttpExceptions.findById404);
 		}
 		MetricsApplication.logger.info("Returning metric");
 		return repository.findById(id);
@@ -65,7 +65,7 @@ public class MetricsServiceImpl implements MetricsService {
 			repository.deleteById(id);
 		} else {
 			MetricsApplication.logger.error("tried to delete metric but couldnt find an ID");
-			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "The given ID does not match with any metric");
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND, HttpExceptions.deleteMetric404);
 		}
 	}
 
@@ -73,7 +73,7 @@ public class MetricsServiceImpl implements MetricsService {
 	public MetricsCollection updateMetric(CreateMetricRequest request, String id) {
 		if (!repository.existsById(id)) {
 			MetricsApplication.logger.error("Tried to update metric but couldnt find the ID given");
-			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "The given ID does not match with any metric");
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND, HttpExceptions.updateMetric404);
 		}
 		if (findById(id).isPresent()) {
 			Functions.datePUT = repository.findById(id).get();
@@ -97,10 +97,10 @@ public class MetricsServiceImpl implements MetricsService {
 		List<MetricsCollection> listMetricsFiltredDates = new ArrayList<MetricsCollection>();
 		
 		if (size <= 0) {
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid size: " + size);
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, HttpExceptions.getMetricsPaginationSize400);
 		}
 		if (page <= 0) {
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid page size: " + page);
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, HttpExceptions.getMetricsPaginationPage400);
 		}
 		MetricsApplication.logger.info("Starting variables with size per page and number of pages " + page + " and size " + size);
 		MetricsApplication.logger.info("size "	+ size + " metric size " + metrics.size());
@@ -139,7 +139,7 @@ public class MetricsServiceImpl implements MetricsService {
 		}
 		if (metrics == null || metrics.size() < index) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-					"There are problems with the range of metric list ");
+					HttpExceptions.getMetricsPaginationRange400);
 		}
 		MetricsApplication.logger.info(
 				"index " + index + " final " + Math.min(index + size, metrics.size()));
@@ -228,7 +228,7 @@ public class MetricsServiceImpl implements MetricsService {
 			}
 			if (listMetricsFiltredDates.size() == 0)
 				throw new ResponseStatusException(HttpStatus.NOT_FOUND,
-						"The given evaluator_id does not match with any user");
+						HttpExceptions.evaluatorId404);
 			break;
 		}
 		case 1: {
@@ -244,7 +244,7 @@ public class MetricsServiceImpl implements MetricsService {
 			}
 			if (listMetricsFiltredDates.size() == 0)
 				throw new ResponseStatusException(HttpStatus.NOT_FOUND,
-						"The given evaluated_id does not match with any user");
+						HttpExceptions.evaluatedId404);
 			break;
 		}
 		case 2: {
@@ -258,7 +258,7 @@ public class MetricsServiceImpl implements MetricsService {
 					}
 			}
 			if (listMetricsFiltredDates.size() == 0)
-				throw new ResponseStatusException(HttpStatus.NOT_FOUND, "The given sprint_id does not match with any sprint");
+				throw new ResponseStatusException(HttpStatus.NOT_FOUND, HttpExceptions.sprintId404);
 			break;
 		}
 

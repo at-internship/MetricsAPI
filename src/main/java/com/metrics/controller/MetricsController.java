@@ -15,6 +15,7 @@ import com.metrics.MetricsApplication;
 import com.metrics.domain.CreateMetricRequest;
 import com.metrics.model.MetricsCollection;
 import com.metrics.service.Functions;
+import com.metrics.service.HttpExceptions;
 import com.metrics.service.MetricsServiceImpl;
 
 import java.util.Date;
@@ -133,7 +134,7 @@ public class MetricsController {
 
 			}
 		} catch (Exception e) {
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "endDate is bigger than startDate");
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, HttpExceptions.getMetricsDate400);
 		}
 
 		// Applying filter of pagination and applying order by ascendant
@@ -169,7 +170,7 @@ public class MetricsController {
 			return service.findById(id);
 		} catch (Exception error) {
 			MetricsApplication.logger.error("trying to call findById service but couldnt find the given ID");
-			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Metric not found", error);
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND, HttpExceptions.findById404, error);
 		}
 	}
 
