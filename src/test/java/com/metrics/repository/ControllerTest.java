@@ -32,11 +32,11 @@ import com.metrics.service.Functions;
 @SpringBootTest(classes = MetricsApplication.class)
 @AutoConfigureMockMvc
 class MetricRepositoryTest {
-	
+
 	FunctionsEnhanceGetPaginationTests testEnhanceGetPagination = new FunctionsEnhanceGetPaginationTests();
 	FunctionsEnhanceGetTest testEnhanceGet = new FunctionsEnhanceGetTest();
 	MockMvc mvc;
-	
+
 	@Autowired
 	WebApplicationContext webApplicationContext;
 
@@ -44,10 +44,9 @@ class MetricRepositoryTest {
 	protected void setUp() {
 		mvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
 	}
-   
+
 	@Test
-	public void testPOSTMetric() throws Exception
-	{
+	public void testPOSTMetric() throws Exception {
 		CreateMetricRequest metric = newCreateMetricPOSTRequest();
 
 		MvcResult result = mvc
@@ -57,7 +56,7 @@ class MetricRepositoryTest {
 		assertEquals(201, result.getResponse().getStatus());
 
 	}
-	
+
 	@Test
 	public void test_update_user_success() throws Exception {
 
@@ -73,7 +72,7 @@ class MetricRepositoryTest {
 		assertEquals(200, mvcResult.getResponse().getStatus());
 		String jsonResponse = mvcResult.getResponse().getContentAsString();
 		assertEquals(jsonResponse, Functions.mapToJson(metric));
-		
+
 	}
 
 	@Test
@@ -208,51 +207,47 @@ class MetricRepositoryTest {
 		assertEquals(404, status);
 	}
 
+	private CreateMetricRequest newCreateMetricRequest() {
 
-    
-    private CreateMetricRequest newCreateMetricRequest () {
-    	
-    	try {
-    		
-    		return new CreateMetricRequest("5e7a699a3b09d6412bb1e573","5e6bbc854244ac0cbc8df65d","5e6bbc924244ac0cbc8df65e","Empty","2020-03-17","5e78f5e792675632e42d1a96",new metrics(false,false,
-                    new blockers(false,"POST TESTV2 2020-03-17"),
-                    new proactive(false, false,false,false),
-                    new retroactive(false,"Empty")));
-    	}catch(Exception e)
-    	{
-    		
-    		System.out.println("FALLO PARSEO");
-    		return null;
-    	}
-        
-    }
- 
- private CreateMetricRequest newCreateMetricPOSTRequest () {
-    	
-    	try {
-    		
-    		return new CreateMetricRequest("","5e6bbc854244ac0cbc8df65d","5e6bbc924244ac0cbc8df65e","Empty","2020-03-17","5e78f5e792675632e42d1a96",new metrics(false,false,
-                    new blockers(false,"POST TESTV2 2020-03-17"),
-                    new proactive(false, false,false,false),
-                    new retroactive(false,"Empty")));
-    	}catch(Exception e)
-    	{
-    		
-    		System.out.println("FALLO PARSEO");
-    		return null;
-    	}
- }
-private CreateMetricRequest falseCreateMetricRequest () {
-    	try {
-    		
-    		return new CreateMetricRequest("5e7a600a3b09d6412bb1e663","5e6bbc854244ac0cbc8df65d","5e6bbc924244ac0cbc8df65e","Empty","2020-03-17","5e78f5e792675632e42d1a69",new metrics(false,false,
-                    new blockers(false,"Empty"),
-                    new proactive(false, false,false,false),
-                    new retroactive(false,"Empty")));
-    	}catch(Exception e)
-    	{
-    		return null;
-    	}
-   }
+		try {
+
+			return new CreateMetricRequest("5e7ec4825cd36c58dccf08e4", "5e6bbc854244ac0cbc8df65d",
+					"5e6bbc924244ac0cbc8df65e", "Empty", "2020-03-17", "5e78f5e792675632e42d1a96",
+					new metrics(false, false, new blockers(false, "POST TESTV2 2020-03-17"),
+							new proactive(false, false, false, false), new retroactive(false, "Empty")));
+		} catch (Exception e) {
+
+			System.out.println("FALLO PARSEO");
+			return null;
+		}
+
+	}
+
+	private CreateMetricRequest newCreateMetricPOSTRequest() {
+
+		try {
+
+			return new CreateMetricRequest("", "5e6bbc854244ac0cbc8df65d", "5e6bbc924244ac0cbc8df65e", "Empty",
+					"2020-03-17", "5e78f5e792675632e42d1a96",
+					new metrics(false, false, new blockers(false, "POST TESTV2 2020-03-17"),
+							new proactive(false, false, false, false), new retroactive(false, "Empty")));
+		} catch (Exception e) {
+
+			System.out.println("FALLO PARSEO");
+			return null;
+		}
+	}
+
+	private CreateMetricRequest falseCreateMetricRequest() {
+		try {
+
+			return new CreateMetricRequest("5e7a600a3b09d6412bb1e663", "5e6bbc854244ac0cbc8df65d",
+					"5e6bbc924244ac0cbc8df65e", "Empty", "2020-03-17", "5e78f5e792675632e42d1a69",
+					new metrics(false, false, new blockers(false, "Empty"), new proactive(false, false, false, false),
+							new retroactive(false, "Empty")));
+		} catch (Exception e) {
+			return null;
+		}
+	}
 
 }

@@ -8,8 +8,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.regex.Pattern;
 
-import org.bson.types.ObjectId;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.server.ResponseStatusException;
@@ -56,7 +56,7 @@ public class Functions {
 		SimpleDateFormat format = new java.text.SimpleDateFormat("yyyy-MM-dd");
 		try {
 			MetricsApplication.logger.info("Starting date format validation..");
-			if(inputString.split("-").length!=3)
+			if (inputString.split("-").length != 3)
 				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Date has incorrect Format");
 			String[] date = inputString.split("-");
 			if (date[0].length() == 4) {
@@ -127,11 +127,37 @@ public class Functions {
 
 	}
 
+	public static boolean haveOnlyLetters(String uuid) {
+		for (char letter : uuid.toCharArray()) {
+			if (letter == '1' || letter == '2' || letter == '3' || letter == '4' || letter == '5' || letter == '6'
+					|| letter == '7' || letter == '8' || letter == '9' || letter == '0') {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	public static boolean haveOnlyNumbers(String uuid) {
+		int counter = 0;
+		for (char letter : uuid.toCharArray()) {
+			if (letter == '1' || letter == '2' || letter == '3' || letter == '4' || letter == '5' || letter == '6'
+					|| letter == '7' || letter == '8' || letter == '9' || letter == '0') {
+				counter++;
+			}
+		}
+		if (counter == 24)
+			return true;
+		return false;
+	}
+
 	public static void VerifyingUUID(String uuid) {
-		try {
-			ObjectId.isValid(uuid);
-		} catch (Exception error) {
+		Pattern patt = Pattern.compile("[0-9a-f]{24}$");
+		MetricsApplication.logger.error("Valiting id " + uuid);
+		boolean validObjectId = patt.matcher(uuid).matches();
+		if (!validObjectId || haveOnlyLetters(uuid) || haveOnlyNumbers(uuid)) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The UUID has incorrect Format");
+		} else {
+			MetricsApplication.logger.error("The uuid is valid");
 		}
 	}
 
@@ -163,7 +189,7 @@ public class Functions {
 		Collections.sort(listOrder, new Comparator<MetricsCollection>() {
 			@Override
 			public int compare(MetricsCollection o1, MetricsCollection o2) {
-				
+
 				return o2.getDate().compareTo(o1.getDate());
 
 			}
@@ -361,7 +387,6 @@ public class Functions {
 		MetricsApplication.logger.info("Generating container");
 		try {
 			String UsersList = Functions.getUsersList();
-			MetricsApplication.logger.info(UsersList);
 			UsersCollection[] Users = Functions.mapFromJson(UsersList, UsersCollection[].class);
 			for (UsersCollection user : Users) {
 				if (user.getUserId().equals(request.getEvaluated_id())) {
