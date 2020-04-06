@@ -45,8 +45,8 @@ public class MetricsController {
 
 	@ResponseStatus(value = HttpStatus.OK)
 	@GetMapping("/metrics")
-	public List<MetricsCollection> getMetrics(@RequestParam(value = "page", defaultValue = "10000") int page,
-			@RequestParam(value = "size", defaultValue = "10000") int size,
+	public List<MetricsCollection> getMetrics(@RequestParam(value = "page", defaultValue = "1") int page,
+			@RequestParam(value = "size", defaultValue = "1") int size,
 			@RequestParam(value = "startDate", defaultValue = "1000-01-01") String startDate,
 			@RequestParam(value = "endDate", defaultValue = "1000-01-01") String endDate,
 			@RequestParam(value = "evaluator_id", defaultValue = "") String evaluator_id,
@@ -55,9 +55,8 @@ public class MetricsController {
 			@RequestParam(value = "orderBy", defaultValue = "-1") int orderBy) {
 
 		MetricsApplication.logger.info("Getting list of metrics");
-		boolean pagination = true;
-		if (page == 10000 && size == 10000)
-			pagination = false;
+		
+			
 		List<MetricsCollection> ListMetric = service.getMetrics();
 
 		MetricsApplication.logger.info("Verifying if DB is empty");
@@ -68,13 +67,6 @@ public class MetricsController {
 
 		MetricsApplication.logger.info("Setting false the variable withFilters");
 		boolean withFilters = false;
-
-		// The method use the next numbers to apply order by
-		// 0 = Filter by id
-		// 1 = Filter by evaluator_id
-		// 2 = Filter by evaluated_id
-		// 3 = Filter by sprint_id;
-		// The filter order is ascendant
 
 		// Verifying orderBy size
 		if (orderBy > 1)
@@ -140,11 +132,11 @@ public class MetricsController {
 
 		// Applying filter of pagination and applying order by ascendant
 
-		if (page > 0 && size > 0 && pagination) {
+		if (page > 0 && size > 0) {
 			MetricsApplication.logger.info("Setting true variable withFilters in the pagination");
 			withFilters = true;
 			ListMetric = service.getAllMetricsPaginated(page, size, ListMetric, orderBy);
-		} else if (pagination) {
+		}else {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "page or size have invalid number");
 		}
 		if (orderBy == 1 && !withFilters) {
