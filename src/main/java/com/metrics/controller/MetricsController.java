@@ -33,7 +33,7 @@ public class MetricsController {
 	public MetricsCollection updateMetric(@RequestBody CreateMetricRequest request, @PathVariable String id) {
 		MetricsApplication.logger.info("Creating container");
 		MetricsCollection resultMetric = new MetricsCollection();
-		
+		Functions.VerifyingUUID(id);
 		if(Functions.SprintsIdVerification(request) && Functions.EvaluatorsIdVerification(request)) {
 			MetricsApplication.logger.info("calling update service");
 			resultMetric = service.updateMetric(request, id);
@@ -178,7 +178,7 @@ public class MetricsController {
 	public String newMetric(@RequestBody CreateMetricRequest request) {
 		String id = "";
 		MetricsApplication.logger.info("Calling the data validation method and ID Validation for Evaluator and Evaluated ID");
-		
+		Functions.VerifyingUUID(request.getEvaluated_id());
 		if (Functions.testMetricIntegrity(request, 0) != null && Functions.SprintsIdVerification(request) && Functions.EvaluatorsIdVerification(request)) {
 			MetricsApplication.logger.info("data validation successfull,calling the newMetric service");
 			id = service.newMetric(request).getId();
