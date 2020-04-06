@@ -164,6 +164,7 @@ public class MetricsController {
 	@ResponseStatus(value = HttpStatus.OK)
 	@GetMapping("/metrics/{id}")
 	public Optional<MetricsCollection> findById(@PathVariable String id) {
+		Functions.VerifyingUUID(id);
 		try {
 			MetricsApplication.logger.info("Calling findById service");
 			return service.findById(id);
@@ -191,6 +192,7 @@ public class MetricsController {
 	@ResponseStatus(value = HttpStatus.NO_CONTENT)
 	@DeleteMapping("/metrics/{id}")
 	public void deleteMetric(@PathVariable String id) {
+		Functions.VerifyingUUID(id);
 		MetricsApplication.logger.info("Calling deleteMetric service");
 		service.deleteMetric(id);
 	}
