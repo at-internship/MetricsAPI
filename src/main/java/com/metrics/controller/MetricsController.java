@@ -55,8 +55,7 @@ public class MetricsController {
 			@RequestParam(value = "orderBy", defaultValue = "-1") int orderBy) {
 
 		MetricsApplication.logger.info("Getting list of metrics");
-		
-			
+
 		List<MetricsCollection> ListMetric = service.getMetrics();
 
 		MetricsApplication.logger.info("Verifying if DB is empty");
@@ -72,6 +71,17 @@ public class MetricsController {
 		if (orderBy > 1)
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "use 0 ascend or 1 to descend");
 
+		// Applying filter of pagination and applying order by ascendant
+		if (orderBy == 1 && !withFilters) {
+			MetricsApplication.logger.info("Applying Descending filter");
+			withFilters = true;
+			ListMetric = Functions.OrderByDescending(ListMetric);
+		} else if (orderBy == 0 && !withFilters) {
+			MetricsApplication.logger.info("Applying Ascending filter");
+			withFilters = true;
+			ListMetric = Functions.OrderByAscending(ListMetric);
+		}
+
 		// Applying filter by evaluator_id and applying order by ascendant
 
 		if (evaluator_id.compareTo("") > 0) {
@@ -79,7 +89,7 @@ public class MetricsController {
 			MetricsApplication.logger.info("Setting true variable withFilters in evaluator_id");
 			withFilters = true;
 			MetricsApplication.logger.info("Running metodh getItemsFromIdFilter with evaluator_id");
-			ListMetric = service.getItemsFromIdFilter(evaluator_id, ListMetric, 0, orderBy);
+			ListMetric = service.getItemsFromIdFilter(evaluator_id, ListMetric, 0);
 
 		}
 		// Applying filter by evaluated_id and applying order by ascendant
@@ -89,7 +99,7 @@ public class MetricsController {
 			MetricsApplication.logger.info("Setting true variable withFilters in evaluated_id");
 			withFilters = true;
 			MetricsApplication.logger.info("Running metodh getItemsFromIdFilter with evaluated_id");
-			ListMetric = service.getItemsFromIdFilter(evaluated_id, ListMetric, 1, orderBy);
+			ListMetric = service.getItemsFromIdFilter(evaluated_id, ListMetric, 1);
 
 		}
 		// Applying filter by sprint_id and applying order by ascendant
@@ -98,7 +108,7 @@ public class MetricsController {
 			MetricsApplication.logger.info("Setting true variable withFilters in sprint_id");
 			withFilters = true;
 			MetricsApplication.logger.info("Running metodh getItemsFromIdFilter with sprint_id");
-			ListMetric = service.getItemsFromIdFilter(sprint_id, ListMetric, 2, orderBy);
+			ListMetric = service.getItemsFromIdFilter(sprint_id, ListMetric, 2);
 
 		}
 		// Applying filter by date range and applying order by ascendant
@@ -123,30 +133,19 @@ public class MetricsController {
 					throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
 				}
 
-				ListMetric = service.getItemsFromDateRange(startDateLocal, endDateLocal, ListMetric, orderBy);
+				ListMetric = service.getItemsFromDateRange(startDateLocal, endDateLocal, ListMetric);
 
 			}
 		} catch (Exception e) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "the start page is bigger than endPage");
 		}
 
-		// Applying filter of pagination and applying order by ascendant
-
 		if (page > 0 && size > 0) {
 			MetricsApplication.logger.info("Setting true variable withFilters in the pagination");
 			withFilters = true;
-			ListMetric = service.getAllMetricsPaginated(page, size, ListMetric, orderBy);
-		}else {
+			ListMetric = service.getAllMetricsPaginated(page, size, ListMetric);
+		} else {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "page or size have invalid number");
-		}
-		if (orderBy == 1 && !withFilters) {
-			MetricsApplication.logger.info("Applying Descending filter");
-			withFilters = true;
-			ListMetric = Functions.OrderByDescending(ListMetric);
-		} else if (orderBy == 0 && !withFilters) {
-			MetricsApplication.logger.info("Applying Ascending filter");
-			withFilters = true;
-			ListMetric = Functions.OrderByAscending(ListMetric);
 		}
 
 		// Not applying anything filter
