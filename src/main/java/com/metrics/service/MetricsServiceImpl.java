@@ -100,6 +100,8 @@ public class MetricsServiceImpl implements MetricsService {
 			size = 1;
 		}else if (page == 1 && size > metrics.size() && metrics.size() > 1) {
 			size = metrics.size();
+		}else if(page == 1 && size==1) {
+			size = metrics.size();
 		}
 		int pages = metrics.size() / size;
 		if( metrics.size() / size == 1) {
