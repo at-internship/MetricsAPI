@@ -8,6 +8,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Data
 public class retroactive {
-	private boolean delayed_looking_help;
+	private Boolean delayed_looking_help;
 	private String comments;
 }

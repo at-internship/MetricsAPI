@@ -75,9 +75,7 @@ public class MetricsServiceImpl implements MetricsService {
 			MetricsApplication.logger.error("Tried to update metric but couldnt find the ID given");
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Metric not found");
 		}
-		if (findById(id).isPresent()) {
-			Functions.datePUT = repository.findById(id).get();
-		}
+		
 		MetricsApplication.logger.info("Creating metric object");
 		MetricsCollection metric = new MetricsCollection();
 		MetricsApplication.logger.info("calling data validation method");

@@ -9,8 +9,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class proactive {
-	private boolean looked_for_help;
-	private boolean provided_help;
-	private boolean worked_ahead;
-	private boolean shared_resources;
+	private Boolean looked_for_help;
+	private Boolean provided_help;
+	private Boolean worked_ahead;
+	private Boolean shared_resources;
 }

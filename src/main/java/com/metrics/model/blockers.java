@@ -9,6 +9,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class blockers {
 
-	private boolean blocked;
+	private Boolean blocked;
 	private String comments;
 }

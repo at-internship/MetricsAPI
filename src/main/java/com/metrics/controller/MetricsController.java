@@ -33,7 +33,11 @@ public class MetricsController {
 	public MetricsCollection updateMetric(@RequestBody CreateMetricRequest request, @PathVariable String id) {
 		MetricsApplication.logger.info("Creating container");
 		MetricsCollection resultMetric = new MetricsCollection();
-
+		if (findById(id) != null) {
+			Functions.datePUT = service.findById(id).get();
+		}
+		Functions.VerifyingUUID(id);
+		Functions.testMetricIntegrity(request, 1);
 		if (Functions.SprintsIdVerification(request) && Functions.EvaluatorsIdVerification(request)) {
 			MetricsApplication.logger.info("calling update service");
 			resultMetric = service.updateMetric(request, id);
@@ -49,9 +53,9 @@ public class MetricsController {
 			@RequestParam(value = "size", defaultValue = "1") int size,
 			@RequestParam(value = "startDate", defaultValue = "1000-01-01") String startDate,
 			@RequestParam(value = "endDate", defaultValue = "1000-01-01") String endDate,
-			@RequestParam(value = "evaluator_id", defaultValue = "") String evaluator_id,
-			@RequestParam(value = "evaluated_id", defaultValue = "") String evaluated_id,
-			@RequestParam(value = "sprint_id", defaultValue = "") String sprint_id,
+			@RequestParam(value = "evaluator_id", defaultValue = "@%") String evaluator_id,
+			@RequestParam(value = "evaluated_id", defaultValue = "@%") String evaluated_id,
+			@RequestParam(value = "sprint_id", defaultValue = "@%") String sprint_id,
 			@RequestParam(value = "orderBy", defaultValue = "-1") int orderBy) {
 
 		MetricsApplication.logger.info("Getting list of metrics");
@@ -64,8 +68,14 @@ public class MetricsController {
 		MetricsApplication.logger.info("Verifying all types datas into DB");
 		Functions.VerifyingAllTypesDatasIntoDB(ListMetric);
 
-		MetricsApplication.logger.info("Setting false the variable withFilters");
+		MetricsApplication.logger.info("Setting false the variables withFilters");
 		boolean withFilters = false;
+		boolean withFiltersIds = false;
+		boolean withFiltersIdEvaluator = false;
+		boolean withFiltersIdEvaluated = false;
+		boolean withFiltersIdSprint = false;
+		boolean withFiltersDate = false;
+		boolean withFiltersPagination = false;
 
 		// Verifying orderBy size
 		if (orderBy > 1)
@@ -81,76 +91,117 @@ public class MetricsController {
 			withFilters = true;
 			ListMetric = Functions.OrderByAscending(ListMetric);
 		}
-
+		if (!evaluator_id.equals("@%") || !evaluated_id.equals("@%") || !sprint_id.equals("@%")) {
+			MetricsApplication.logger.info("Setting filter by Id's true");
+			withFiltersIds = true;
+		}
+		if (!startDate.equals("1000-01-01") && !endDate.equals("1000-01-01")) {
+			MetricsApplication.logger.info("Setting filter by date true");
+			withFiltersDate = true;
+		}
+		if (page != 1 || size != 1) {
+			MetricsApplication.logger.info("Setting filter by pagination true");
+			withFiltersPagination = true;
+		}
 		// Applying filter by evaluator_id and applying order by ascendant
-
-		if (evaluator_id.compareTo("") > 0) {
-			MetricsApplication.logger.info("Applying filter by evaluator_id and applying order by ascendant");
-			MetricsApplication.logger.info("Setting true variable withFilters in evaluator_id");
-			withFilters = true;
-			MetricsApplication.logger.info("Running metodh getItemsFromIdFilter with evaluator_id");
-			ListMetric = service.getItemsFromIdFilter(evaluator_id, ListMetric, 0);
-
-		}
-		// Applying filter by evaluated_id and applying order by ascendant
-
-		if (evaluated_id.compareTo("") > 0) {
-			MetricsApplication.logger.info("Applying filter by evaluated_id and applying order by ascendant");
-			MetricsApplication.logger.info("Setting true variable withFilters in evaluated_id");
-			withFilters = true;
-			MetricsApplication.logger.info("Running metodh getItemsFromIdFilter with evaluated_id");
-			ListMetric = service.getItemsFromIdFilter(evaluated_id, ListMetric, 1);
-
-		}
-		// Applying filter by sprint_id and applying order by ascendant
-		if (sprint_id.compareTo("") > 0) {
-			MetricsApplication.logger.info("Applying filter by sprint_id and applying order by ascendant");
-			MetricsApplication.logger.info("Setting true variable withFilters in sprint_id");
-			withFilters = true;
-			MetricsApplication.logger.info("Running metodh getItemsFromIdFilter with sprint_id");
-			ListMetric = service.getItemsFromIdFilter(sprint_id, ListMetric, 2);
-
+		if (withFiltersIds) {
+			if (!evaluator_id.equals("")) {
+				if (Functions.VerifyingID(evaluator_id)) {
+					MetricsApplication.logger.info("Applying filter by evaluator_id and applying order by ascendant");
+					MetricsApplication.logger.info("Setting true variable withFilters in evaluator_id");
+					withFilters = true;
+					MetricsApplication.logger.info("Running metodh getItemsFromIdFilter with evaluator_id");
+					ListMetric = service.getItemsFromIdFilter(evaluator_id, ListMetric, 0);
+					withFiltersIdEvaluator =  true;
+				}
+			} else if (!withFiltersIdEvaluator && !withFiltersIdEvaluated && !withFiltersIdSprint){
+				MetricsApplication.logger.info("Clearing list because evaluator id is wrong or missing");
+				ListMetric.clear();
+				return ListMetric;
+			}
+			// Applying filter by evaluated_id and applying order by ascendant
+			if (!evaluated_id.equals("")) {
+				if (Functions.VerifyingID(evaluated_id)) {
+					MetricsApplication.logger.info("Applying filter by evaluated_id and applying order by ascendant");
+					MetricsApplication.logger.info("Setting true variable withFilters in evaluated_id");
+					withFilters = true;
+					MetricsApplication.logger.info("Running metodh getItemsFromIdFilter with evaluated_id");
+					ListMetric = service.getItemsFromIdFilter(evaluated_id, ListMetric, 1);
+					withFiltersIdEvaluated = true;
+				}
+			} else if (!withFiltersIdEvaluator && !withFiltersIdEvaluated && !withFiltersIdSprint){
+				MetricsApplication.logger.info("Clearing list because evaluated id is wrong or missing");
+				ListMetric.clear();
+				return ListMetric;
+			}
+			// Applying filter by sprint_id and applying order by ascendant
+			if (!sprint_id.equals("")) {
+				if (Functions.VerifyingID(sprint_id)) {
+					MetricsApplication.logger.info("Applying filter by sprint_id and applying order by ascendant");
+					MetricsApplication.logger.info("Setting true variable withFilters in sprint_id");
+					withFilters = true;
+					MetricsApplication.logger.info("Running metodh getItemsFromIdFilter with sprint_id");
+					ListMetric = service.getItemsFromIdFilter(sprint_id, ListMetric, 2);
+					withFiltersIdSprint = true;
+				}
+			} else if (!withFiltersIdEvaluator && !withFiltersIdEvaluated && !withFiltersIdSprint){
+				MetricsApplication.logger.info("Clearing list because sprint id is wrong or missing");
+				ListMetric.clear();
+				return ListMetric;
+			}
 		}
 		// Applying filter by date range and applying order by ascendant
-		try {
-			withFilters = true;
-			MetricsApplication.logger.info("Creating default value and parse to type date");
-			Date defaultValueDate = Functions.stringToDate("1000-01-01");
+		if (withFiltersDate) {
+			try {
 
-			MetricsApplication.logger.info("Parse to type date the content of the incoming variable startDate");
-			Date startDateLocal = Functions.stringToDate(startDate);
-			MetricsApplication.logger.info(startDateLocal);
+				withFilters = true;
 
-			MetricsApplication.logger.info("Parse to type date the content of the incoming variable endtDate");
-			Date endDateLocal = Functions.stringToDate(endDate);
-			MetricsApplication.logger.info(endDateLocal);
+				Functions.VerifyingDateValid(startDate);
+				Functions.VerifyingDateValid(endDate);
 
-			if (startDateLocal.compareTo(defaultValueDate) > 0 && endDateLocal.compareTo(defaultValueDate) > 0) {
-				MetricsApplication.logger.info("Applying filter by date range and applying order by ascendant");
-				MetricsApplication.logger.info("Setting true variable withFilters in range dates");
+				MetricsApplication.logger.info("Creating default value and parse to type date");
+				Date defaultValueDate = Functions.stringToDate("1000-01-01");
 
-				if (startDateLocal.after(endDateLocal)) {
-					throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+				MetricsApplication.logger.info("Parse to type date the content of the incoming variable startDate");
+				Date startDateLocal = Functions.stringToDate(startDate);
+				MetricsApplication.logger.info(startDateLocal);
+
+				MetricsApplication.logger.info("Parse to type date the content of the incoming variable endtDate");
+				Date endDateLocal = Functions.stringToDate(endDate);
+				MetricsApplication.logger.info(endDateLocal);
+
+				if (startDateLocal.compareTo(defaultValueDate) > 0 && endDateLocal.compareTo(defaultValueDate) > 0) {
+					MetricsApplication.logger.info("Applying filter by date range and applying order by ascendant");
+					MetricsApplication.logger.info("Setting true variable withFilters in range dates");
+
+					if (startDateLocal.after(endDateLocal)) {
+						throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+					}
+
+					ListMetric = service.getItemsFromDateRange(startDateLocal, endDateLocal, ListMetric);
+
 				}
 
-				ListMetric = service.getItemsFromDateRange(startDateLocal, endDateLocal, ListMetric);
-
+			} catch (Exception e) {
+				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "the start page is bigger than endPage");
 			}
-		} catch (Exception e) {
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "the start page is bigger than endPage");
 		}
-
-		if (page > 0 && size > 0) {
-			MetricsApplication.logger.info("Setting true variable withFilters in the pagination");
-			withFilters = true;
-			ListMetric = service.getAllMetricsPaginated(page, size, ListMetric);
-		} else {
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "page or size have invalid number");
+		if (withFiltersPagination) {
+			if (page > 0 && size > 0) {
+				MetricsApplication.logger.info("Setting true variable withFilters in the pagination");
+				withFilters = true;
+				ListMetric = service.getAllMetricsPaginated(page, size, ListMetric);
+			} else {
+				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "page or size have invalid number");
+			}
 		}
 
 		// Not applying anything filter
-		if (!withFilters)
+		if (!withFilters) {
 			MetricsApplication.logger.info("Not applying anything filter");
+			MetricsApplication.logger.info("Returning list without any filters");
+		}
+		
 		return ListMetric;
 	}
 
