@@ -53,9 +53,9 @@ public class MetricsController {
 			@RequestParam(value = "size", defaultValue = "1") int size,
 			@RequestParam(value = "startDate", defaultValue = "1000-01-01") String startDate,
 			@RequestParam(value = "endDate", defaultValue = "1000-01-01") String endDate,
-			@RequestParam(value = "evaluator_id", defaultValue = "@%") String evaluator_id,
-			@RequestParam(value = "evaluated_id", defaultValue = "@%") String evaluated_id,
-			@RequestParam(value = "sprint_id", defaultValue = "@%") String sprint_id,
+			@RequestParam(value = "evaluator_id", defaultValue = "") String evaluator_id,
+			@RequestParam(value = "evaluated_id", defaultValue = "") String evaluated_id,
+			@RequestParam(value = "sprint_id", defaultValue = "") String sprint_id,
 			@RequestParam(value = "orderBy", defaultValue = "-1") int orderBy) {
 
 		MetricsApplication.logger.info("Getting list of metrics");
@@ -91,7 +91,7 @@ public class MetricsController {
 			withFilters = true;
 			ListMetric = Functions.OrderByAscending(ListMetric);
 		}
-		if (!evaluator_id.equals("@%") || !evaluated_id.equals("@%") || !sprint_id.equals("@%")) {
+		if (!evaluator_id.equals("") || !evaluated_id.equals("") || !sprint_id.equals("")) {
 			MetricsApplication.logger.info("Setting filter by Id's true");
 			withFiltersIds = true;
 		}

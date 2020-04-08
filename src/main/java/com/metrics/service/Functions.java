@@ -126,10 +126,13 @@ public class Functions {
 		}
 	}
 	public static boolean VerifyingID(String uuid) {
-		Pattern patt = Pattern.compile("[0-9a-f]{24}$");
+		Pattern patt = Pattern.compile("^[a-zA-Z0-9]+$");
 		MetricsApplication.logger.error("Valiting id " + uuid);
 		
 		boolean validObjectId = patt.matcher(uuid).matches();
+		MetricsApplication.logger.error(validObjectId);
+		if(!validObjectId)
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Special characters are not allowed");
 		if (haveOnlyLetters(uuid) || haveOnlyNumbers(uuid)) {
 			return false;
 		} else {
