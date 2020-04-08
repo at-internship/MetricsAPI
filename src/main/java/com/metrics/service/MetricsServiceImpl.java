@@ -75,9 +75,7 @@ public class MetricsServiceImpl implements MetricsService {
 			MetricsApplication.logger.error("Tried to update metric but couldnt find the ID given");
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Metric not found");
 		}
-		if (findById(id).isPresent()) {
-			Functions.datePUT = repository.findById(id).get();
-		}
+		
 		MetricsApplication.logger.info("Creating metric object");
 		MetricsCollection metric = new MetricsCollection();
 		MetricsApplication.logger.info("calling data validation method");
@@ -92,21 +90,15 @@ public class MetricsServiceImpl implements MetricsService {
 	}
 
 	@Override
-	public List<MetricsCollection> getAllMetricsPaginated(int page, int size, List<MetricsCollection> metrics,
-			int orderBy) {
+	public List<MetricsCollection> getAllMetricsPaginated(int page, int size, List<MetricsCollection> metrics) {
 		List<MetricsCollection> listMetricsFiltredDates = new ArrayList<MetricsCollection>();
-		
-		if (size <= 0) {
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "invalid size: " + size);
-		}
-		if (page <= 0) {
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "invalid page size: " + page);
-		}
 		MetricsApplication.logger.info("Starting variables with size per page and number of pages " + page + " and size " + size);
 		MetricsApplication.logger.info("size "	+ size + " metric size " + metrics.size());
 		if (page == 1 && size > metrics.size() && metrics.size() == 1) {
 			size = 1;
 		}else if (page == 1 && size > metrics.size() && metrics.size() > 1) {
+			size = metrics.size();
+		}else if(page == 1 && size==1) {
 			size = metrics.size();
 		}
 		int pages = metrics.size() / size;
@@ -145,23 +137,14 @@ public class MetricsServiceImpl implements MetricsService {
 				"index " + index + " final " + Math.min(index + size, metrics.size()));
 		listMetricsFiltredDates = metrics.subList(index, Math.min(index + size, metrics.size()));
 
-		if (orderBy == 0 && listMetricsFiltredDates.size() > 1) {
-			MetricsApplication.logger
-					.info("Applying filter By Ascending selected to " + listMetricsFiltredDates.size() + " elements");
-			listMetricsFiltredDates = Functions.OrderByAscending(listMetricsFiltredDates);
-		} else if (orderBy == 1 && listMetricsFiltredDates.size() > 1) {
-			MetricsApplication.logger
-					.info("Applying filter By Descending selected to " + listMetricsFiltredDates.size() + " elements");
-			listMetricsFiltredDates = Functions.OrderByDescending(listMetricsFiltredDates);
-		}
-
+		
 		MetricsApplication.logger.info("Return the page and size elements per page");
 		return listMetricsFiltredDates;
 	}
 
 	@Override
 	public List<MetricsCollection> getItemsFromDateRange(Date startDate, Date endDate,
-			List<MetricsCollection> metrics, int orderBy) {
+			List<MetricsCollection> metrics) {
 
 		MetricsApplication.logger.info("Creating list to save filter by range date");
 		List<MetricsCollection> listMetricsFiltredDates = new ArrayList<MetricsCollection>();
@@ -185,15 +168,7 @@ public class MetricsServiceImpl implements MetricsService {
 		// 2 = evaluated_id
 		// 3 = date;
 		// 4 = sprint_id;
-		if (orderBy == 0) {
-			MetricsApplication.logger
-					.info("Applying filter selected to " + listMetricsFiltredDates.size() + " elements");
-			listMetricsFiltredDates = Functions.OrderByAscending(listMetricsFiltredDates);
-		} else if (orderBy == 1) {
-			MetricsApplication.logger
-					.info("Applying filter selected to " + listMetricsFiltredDates.size() + " elements");
-			listMetricsFiltredDates = Functions.OrderByDescending(listMetricsFiltredDates);
-		}
+		
 
 		MetricsApplication.logger
 				.info("Return new list with the metric matches with " + listMetricsFiltredDates.size() + " elements");
@@ -201,8 +176,7 @@ public class MetricsServiceImpl implements MetricsService {
 	}
 
 	@Override
-	public List<MetricsCollection> getItemsFromIdFilter(String id, List<MetricsCollection> metrics, int typeId,
-			int orderBy) {
+	public List<MetricsCollection> getItemsFromIdFilter(String id, List<MetricsCollection> metrics, int typeId) {
 
 		MetricsApplication.logger.info("Parsing id to ObjectId");
 		// ObjectId idIncoming = new ObjectId(id);
@@ -264,15 +238,7 @@ public class MetricsServiceImpl implements MetricsService {
 
 		}
 		MetricsApplication.logger.info(listMetricsFiltredDates.size());
-		if (orderBy == 0) {
-			MetricsApplication.logger
-					.info("Applying filter selected to " + listMetricsFiltredDates.size() + " elements");
-			listMetricsFiltredDates = Functions.OrderByAscending(listMetricsFiltredDates);
-		} else if (orderBy == 1) {
-			MetricsApplication.logger
-					.info("Applying filter selected to " + listMetricsFiltredDates.size() + " elements");
-			listMetricsFiltredDates = Functions.OrderByDescending(listMetricsFiltredDates);
-		}
+		
 		MetricsApplication.logger
 				.info("Return new list with the metric matches with " + listMetricsFiltredDates.size() + " elements");
 		return listMetricsFiltredDates;

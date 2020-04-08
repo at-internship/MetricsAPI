@@ -18,20 +18,20 @@ public class FunctionsEnhanceGetPaginationTests {
 	}
 
 	public void getMetricsPaginationFailSize(MockMvc mvc) throws Exception {
-		int size = 1000;
-		int start = 1;
+		int size = 0;
+		int page = 0;
 		String uri = "/metrics?start={start}&size={size}";
-		MvcResult mvcResult = mvcGetPaginationRequest(mvc, uri, start, size);
+		MvcResult mvcResult = mvcGetPaginationRequest(mvc, uri, page, size);
 
 		int status = mvcResult.getResponse().getStatus();
 		assertEquals(400, status);
 	}
 
 	public void getMetricsPaginationFailStart(MockMvc mvc) throws Exception {
-		int size = 2;
-		int start = 1000;
+		int size = 0;
+		int page = 0;
 		String uri = "/metrics?start={start}&size={size}";
-		MvcResult mvcResult = mvcGetPaginationRequest(mvc, uri, start, size);
+		MvcResult mvcResult = mvcGetPaginationRequest(mvc, uri, page, size);
 
 		int status = mvcResult.getResponse().getStatus();
 		assertEquals(400, status);
