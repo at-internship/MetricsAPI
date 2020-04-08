@@ -92,16 +92,6 @@ public class Functions {
 
 	}
 
-	public static boolean haveOnlyLetters(String uuid) {
-		for (char letter : uuid.toCharArray()) {
-			if (letter == '1' || letter == '2' || letter == '3' || letter == '4' || letter == '5' || letter == '6'
-					|| letter == '7' || letter == '8' || letter == '9' || letter == '0') {
-				return false;
-			}
-		}
-		return true;
-	}
-
 	public static boolean haveOnlyNumbers(String uuid) {
 		int counter = 0;
 		for (char letter : uuid.toCharArray()) {
@@ -114,7 +104,17 @@ public class Functions {
 			return true;
 		return false;
 	}
-
+	
+	public static boolean haveOnlyLetters(String uuid) {
+		for (char letter : uuid.toCharArray()) {
+			if (letter == '1' || letter == '2' || letter == '3' || letter == '4' || letter == '5' || letter == '6'
+					|| letter == '7' || letter == '8' || letter == '9' || letter == '0') {
+				return false;
+			}
+		}
+		return true;
+	}
+	
 	public static void VerifyingUUID(String uuid) {
 		Pattern patt = Pattern.compile("[0-9a-f]{24}$");
 		MetricsApplication.logger.error("Valiting id " + uuid);

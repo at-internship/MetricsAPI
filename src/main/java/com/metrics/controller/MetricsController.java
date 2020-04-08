@@ -208,6 +208,7 @@ public class MetricsController {
 	@ResponseStatus(value = HttpStatus.OK)
 	@GetMapping("/metrics/{id}")
 	public Optional<MetricsCollection> findById(@PathVariable String id) {
+		Functions.VerifyingUUID(id);
 		try {
 			MetricsApplication.logger.info("Calling findById service");
 			return service.findById(id);
@@ -221,10 +222,9 @@ public class MetricsController {
 	@PostMapping("/metrics")
 	public String newMetric(@RequestBody CreateMetricRequest request) {
 		String id = "";
-		MetricsApplication.logger
-				.info("Calling the data validation method and ID Validation for Evaluator and Evaluated ID");
-		if (Functions.testMetricIntegrity(request, 0) != null && Functions.SprintsIdVerification(request)
-				&& Functions.EvaluatorsIdVerification(request)) {
+		MetricsApplication.logger.info("Calling the data validation method and ID Validation for Evaluator and Evaluated ID");
+		Functions.VerifyingUUID(request.getEvaluated_id());
+		if (Functions.testMetricIntegrity(request, 0) != null && Functions.SprintsIdVerification(request) && Functions.EvaluatorsIdVerification(request)) {
 			MetricsApplication.logger.info("data validation successfull,calling the newMetric service");
 			id = service.newMetric(request).getId();
 			MetricsApplication.logger.info("saving id into String to return");
@@ -236,6 +236,7 @@ public class MetricsController {
 	@ResponseStatus(value = HttpStatus.NO_CONTENT)
 	@DeleteMapping("/metrics/{id}")
 	public void deleteMetric(@PathVariable String id) {
+		Functions.VerifyingUUID(id);
 		MetricsApplication.logger.info("Calling deleteMetric service");
 		service.deleteMetric(id);
 	}
