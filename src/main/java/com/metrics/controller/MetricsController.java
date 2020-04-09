@@ -114,11 +114,7 @@ public class MetricsController {
 					ListMetric = service.getItemsFromIdFilter(evaluator_id, ListMetric, 0);
 					withFiltersIdEvaluator =  true;
 				}
-			} else if (!withFiltersIdEvaluator && !withFiltersIdEvaluated && !withFiltersIdSprint){
-				MetricsApplication.logger.info("Clearing list because evaluator id is wrong or missing");
-				ListMetric.clear();
-				return ListMetric;
-			}
+			} 
 			// Applying filter by evaluated_id and applying order by ascendant
 			if (!evaluated_id.equals("")) {
 				if (Functions.VerifyingID(evaluated_id)) {
@@ -129,12 +125,8 @@ public class MetricsController {
 					ListMetric = service.getItemsFromIdFilter(evaluated_id, ListMetric, 1);
 					withFiltersIdEvaluated = true;
 				}
-			} else if (!withFiltersIdEvaluator && !withFiltersIdEvaluated && !withFiltersIdSprint){
-				MetricsApplication.logger.info("Clearing list because evaluated id is wrong or missing");
-				ListMetric.clear();
-				return ListMetric;
-			}
-			// Applying filter by sprint_id and applying order by ascendant
+			} 
+			//Applying filter by sprint_id and applying order by ascendant
 			if (!sprint_id.equals("")) {
 				if (Functions.VerifyingID(sprint_id)) {
 					MetricsApplication.logger.info("Applying filter by sprint_id and applying order by ascendant");
@@ -144,8 +136,10 @@ public class MetricsController {
 					ListMetric = service.getItemsFromIdFilter(sprint_id, ListMetric, 2);
 					withFiltersIdSprint = true;
 				}
-			} else if (!withFiltersIdEvaluator && !withFiltersIdEvaluated && !withFiltersIdSprint){
-				MetricsApplication.logger.info("Clearing list because sprint id is wrong or missing");
+			} 
+			
+			if (!withFiltersIdEvaluator && !withFiltersIdEvaluated && !withFiltersIdSprint){
+				MetricsApplication.logger.info("Clearing list because evaluator id is wrong or missing");
 				ListMetric.clear();
 				return ListMetric;
 			}

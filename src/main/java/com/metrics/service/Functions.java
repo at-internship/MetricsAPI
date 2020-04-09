@@ -110,7 +110,7 @@ public class Functions {
 				counter++;
 			}
 		}
-		if (counter == 24)
+		if (counter ==uuid.length())
 			return true;
 		return false;
 	}
