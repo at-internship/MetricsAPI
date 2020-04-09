@@ -96,14 +96,17 @@ public class MetricsController {
 			MetricsApplication.logger.info("Setting filter by Id's true");
 			withFiltersIds = true;
 		}
+		
 		if (!startDate.equals("1000-01-01") && !endDate.equals("1000-01-01")) {
 			MetricsApplication.logger.info("Setting filter by date true");
 			withFiltersDate = true;
 		}
+		
 		if (page != 1 || size != 1) {
 			MetricsApplication.logger.info("Setting filter by pagination true");
 			withFiltersPagination = true;
 		}
+		
 		// Applying filter by evaluator_id and applying order by ascendant
 		if (withFiltersIds) {
 			if (!evaluator_id.equals("")) {
@@ -150,9 +153,8 @@ public class MetricsController {
 				ListMetric.clear();
 				return ListMetric;
 			}
-		} catch (Exception e) {
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, HttpExceptions.getMetricsDate400);
-		}
+		} 
+		
 		// Applying filter by date range and applying order by ascendant
 		if (withFiltersDate) {
 			try {
