@@ -8,8 +8,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class metrics {
-	private boolean attendance;
-	private boolean carried_over;
+	private Boolean attendance;
+	private Boolean carried_over;
 	private blockers blockers;
 	private proactive proactive;
 	private retroactive retroactive;

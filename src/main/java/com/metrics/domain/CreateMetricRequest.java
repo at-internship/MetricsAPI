@@ -1,6 +1,7 @@
 package com.metrics.domain;
 
 import javax.persistence.Id;
+
 import com.metrics.model.metrics;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
