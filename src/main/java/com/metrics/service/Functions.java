@@ -44,7 +44,7 @@ public class Functions {
 	public static void IsDBEmpty(List<MetricsCollection> metrics) {
 		MetricsApplication.logger.info("The method found " + metrics.size() + " records");
 		if (metrics.size() == 0)
-			throw new ResponseStatusException(HttpStatus.NO_CONTENT, "The DB have not records");
+			throw new ResponseStatusException(HttpStatus.NO_CONTENT, HttpExceptions.isDBEmpty204);
 	}
 
 	public static void VerifyingAllTypesDatasIntoDB(List<MetricsCollection> metrics) {
@@ -59,35 +59,35 @@ public class Functions {
 		try {
 			MetricsApplication.logger.info("Starting date format validation..");
 			if (inputString.split("-").length != 3)
-				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Date has incorrect Format");
+				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, HttpExceptions.VerifyingDateValid400);
 			String[] date = inputString.split("-");
 			if (date[0].length() == 4 && date[1].length() == 2 && date[2].length() == 2) {
 				if (!isWithinRange(stringToDate(inputString)))
-					throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Date is out range");
+					throw new ResponseStatusException(HttpStatus.BAD_REQUEST, HttpExceptions.VerifyingDateValid400);
 				if (Integer.parseInt(date[2]) > 31) {
 					MetricsApplication.logger.error("Incorrect day");
-					throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Date has incorrect Format");
+					throw new ResponseStatusException(HttpStatus.BAD_REQUEST, HttpExceptions.VerifyingDateValid400);
 				}
 				if (Integer.parseInt(date[1]) > 12) {
 					MetricsApplication.logger.error("Incorrect month");
-					throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Date has incorrect Format");
+					throw new ResponseStatusException(HttpStatus.BAD_REQUEST, HttpExceptions.VerifyingDateValid400);
 				}
 				if (Integer.parseInt(date[0]) % 4 > 0) {
 					MetricsApplication.logger.error("year inst leap");
 					MetricsApplication.logger.error(Integer.parseInt(date[1]) == 2);
 					MetricsApplication.logger.error(Integer.parseInt(date[2]) >= 29);
 					if (Integer.parseInt(date[1]) == 2 && Integer.parseInt(date[2]) >= 29) {
-						throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "This year isn't leap");
+						throw new ResponseStatusException(HttpStatus.BAD_REQUEST, HttpExceptions.VerifyingDateValid400);
 					}
 				}
 				format.parse(inputString);
 			} else {
-				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Date has incorrect Format");
+				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, HttpExceptions.VerifyingDateValid400);
 			}
 
 		} catch (ParseException e) {
 			MetricsApplication.logger.error("Date format validation failed!");
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Date has incorrect Format");
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, HttpExceptions.VerifyingDateValid400);
 		}
 
 	}
@@ -120,7 +120,7 @@ public class Functions {
 		MetricsApplication.logger.error("Valiting id " + uuid);
 		boolean validObjectId = patt.matcher(uuid).matches();
 		if (!validObjectId || haveOnlyLetters(uuid) || haveOnlyNumbers(uuid)) {
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The UUID has incorrect Format");
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, HttpExceptions.VerifyingUUID400);
 		} else {
 			MetricsApplication.logger.error("The uuid is valid");
 		}
@@ -156,7 +156,7 @@ public class Functions {
 
 			date = new SimpleDateFormat("yyyy-MM-dd").parse(dateIncoming);
 		} catch (ParseException error) {
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid structure date incoming ");
+						throw new ResponseStatusException(HttpStatus.BAD_REQUEST, HttpExceptions.VerifyingDateValid400);
 		}
 		return date;
 	}
@@ -205,13 +205,14 @@ public class Functions {
 
 		if (metric.getId() != null && typeRequest != 2) {
 			MetricsApplication.logger.info("id field must be null");
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "id field must be null");
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, HttpExceptions.testMetricIntegrityId400);
 		}
 		if (metric.getEvaluated_id() != null && metric.getEvaluator_id() != null) {
 			if (typeRequest != 2 && (metric.getEvaluated_id().equals(metric.getEvaluator_id()))) {
 				MetricsApplication.logger.info("Evaluator and Evaluated ID are the same");
-				throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-						"Evaluator and Evaluated ID are the same must not be equals.");
+		throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+					HttpExceptions.testMetricIntegrityIdUsers400);
+
 			}
 		}
 
@@ -427,7 +428,7 @@ public class Functions {
 			}
 		} catch (Exception e) {
 			MetricsApplication.logger.error("Could not create object from API SPRINTS COLLECTIONS");
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No SPRINT ID found");
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, HttpExceptions.sprintId404);
 		}
 
 		return result;
@@ -462,7 +463,7 @@ public class Functions {
 			}
 		} catch (Exception e) {
 			MetricsApplication.logger.error("Could not create object from API USERS COLLECTIONS");
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No evaluated or evaluator ID's found");
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, HttpExceptions.userId404);
 		}
 
 		return result;
