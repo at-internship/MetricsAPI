@@ -9,8 +9,11 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import java.util.TimeZone;
 import java.util.regex.Pattern;
+
+import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.client.RestTemplate;
@@ -275,8 +278,10 @@ public class Functions {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
 					"The Delayed_looking_help field should not be null");
 		}
-		if (metric.getMetrics().getRetroactive().getComments() == null)
-			metric.getMetrics().getBlockers().setComments("");
+		if (metric.getMetrics().getRetroactive().getComments() == null) {
+			metric.getMetrics().getRetroactive().setComments("");
+		}
+			
 
 		CreateMetricRequest collection = metric;
 		ObjectMapper mapper = new ObjectMapper();
@@ -466,5 +471,14 @@ public class Functions {
 		}
 
 		return result;
+	}
+	
+	public static void checkParams(HttpServletRequest request, Set<String> allowedParams) {
+        request.getParameterMap().entrySet().forEach(entry -> {
+            String param = entry.getKey();
+            if (!allowedParams.contains(param)) {
+            	throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "An invalid request param  called "+ param +" has been entered");
+            }
+        });
 	}
 }

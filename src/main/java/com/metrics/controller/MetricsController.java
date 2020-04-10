@@ -18,8 +18,13 @@ import com.metrics.service.Functions;
 import com.metrics.service.MetricsServiceImpl;
 
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
 
@@ -47,20 +52,37 @@ public class MetricsController {
 		return resultMetric;
 	}
 
+	
 	@ResponseStatus(value = HttpStatus.OK)
 	@GetMapping("/metrics")
-	public List<MetricsCollection> getMetrics(@RequestParam(value = "page", defaultValue = "1") int page,
+	public List<MetricsCollection> getMetrics(
+			HttpServletRequest request,
+			@RequestParam(value = "page", defaultValue = "1") int page,
 			@RequestParam(value = "size", defaultValue = "1") int size,
 			@RequestParam(value = "startDate", defaultValue = "1000-01-01") String startDate,
 			@RequestParam(value = "endDate", defaultValue = "1000-01-01") String endDate,
 			@RequestParam(value = "evaluator_id", defaultValue = "") String evaluator_id,
 			@RequestParam(value = "evaluated_id", defaultValue = "") String evaluated_id,
 			@RequestParam(value = "sprint_id", defaultValue = "") String sprint_id,
-			@RequestParam(value = "orderBy", defaultValue = "-1") int orderBy) {
-
+			@RequestParam(value = "orderBy", defaultValue = "-1") int orderBy
+			)
+	{
+		
+		MetricsApplication.logger.info(request.getQueryString());
+		Set<String> allowedParams = new HashSet<String>();
+		allowedParams.add("size");
+		allowedParams.add("page"); 
+		allowedParams.add("startDate"); 
+		allowedParams.add("endDate"); 
+		allowedParams.add("evaluator_id"); 
+		allowedParams.add("evaluated_id");
+		allowedParams.add("sprint_id");
+		allowedParams.add("orderBy");
+		Functions.checkParams(request,allowedParams);
 		MetricsApplication.logger.info("Getting list of metrics");
 
 		List<MetricsCollection> ListMetric = service.getMetrics();
+		
 
 		MetricsApplication.logger.info("Verifying if DB is empty");
 		Functions.IsDBEmpty(ListMetric);
@@ -203,6 +225,7 @@ public class MetricsController {
 	@GetMapping("/metrics/{id}")
 	public Optional<MetricsCollection> findById(@PathVariable String id) {
 		try {
+			
 			MetricsApplication.logger.info("Calling findById service");
 			return service.findById(id);
 		} catch (Exception error) {
