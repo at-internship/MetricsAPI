@@ -79,6 +79,7 @@ public class MetricsController {
 		allowedParams.add("sprint_id");
 		allowedParams.add("orderBy");
 		Functions.checkParams(request,allowedParams);
+		
 		MetricsApplication.logger.info("Getting list of metrics");
 
 		List<MetricsCollection> ListMetric = service.getMetrics();

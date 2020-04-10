@@ -476,9 +476,18 @@ public class Functions {
 	public static void checkParams(HttpServletRequest request, Set<String> allowedParams) {
         request.getParameterMap().entrySet().forEach(entry -> {
             String param = entry.getKey();
+            String paramValue = request.getParameter(param);
             if (!allowedParams.contains(param)) {
             	throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "An invalid request param  called "+ param +" has been entered");
             }
+            else if((param.contains("evaluated_id")||param.contains("sprint_id")||param.contains("evaluator_id")))
+            		{
+            			if(paramValue == "")
+            			{
+            				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The id key  "+ param +" can not be null or empty");
+            			}
+            		}
+            
         });
 	}
 }
