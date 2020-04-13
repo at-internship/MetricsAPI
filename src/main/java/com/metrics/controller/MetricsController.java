@@ -10,21 +10,17 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
-
 import com.metrics.MetricsApplication;
 import com.metrics.domain.CreateMetricRequest;
 import com.metrics.model.MetricsCollection;
 import com.metrics.service.Functions;
 import com.metrics.service.MetricsServiceImpl;
-
 import java.util.Date;
-import java.util.HashSet;
+//import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
-
-import javax.servlet.http.HttpServletRequest;
-
+//import java.util.Set;
+//import javax.servlet.http.HttpServletRequest;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
 
@@ -56,7 +52,7 @@ public class MetricsController {
 	@ResponseStatus(value = HttpStatus.OK)
 	@GetMapping("/metrics")
 	public List<MetricsCollection> getMetrics(
-			HttpServletRequest request,
+			//HttpServletRequest request,
 			@RequestParam(value = "page", defaultValue = "1") int page,
 			@RequestParam(value = "size", defaultValue = "1") int size,
 			@RequestParam(value = "startDate", defaultValue = "1000-01-01") String startDate,
@@ -67,7 +63,7 @@ public class MetricsController {
 			@RequestParam(value = "orderBy", defaultValue = "-1") int orderBy
 			)
 	{
-		
+		/*
 		MetricsApplication.logger.info(request.getQueryString());
 		Set<String> allowedParams = new HashSet<String>();
 		allowedParams.add("size");
@@ -79,6 +75,7 @@ public class MetricsController {
 		allowedParams.add("sprint_id");
 		allowedParams.add("orderBy");
 		Functions.checkParams(request,allowedParams);
+		*/
 		
 		MetricsApplication.logger.info("Getting list of metrics");
 
