@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.regex.Pattern;
@@ -113,7 +114,7 @@ public class Functions {
 				counter++;
 			}
 		}
-		if (counter ==uuid.length())
+		if (counter == uuid.length())
 			return true;
 		return false;
 	}
@@ -128,13 +129,14 @@ public class Functions {
 			MetricsApplication.logger.error("The uuid is valid");
 		}
 	}
+
 	public static boolean VerifyingID(String uuid) {
 		Pattern patt = Pattern.compile("^[a-zA-Z0-9]+$");
 		MetricsApplication.logger.error("Valiting id " + uuid);
-		
+
 		boolean validObjectId = patt.matcher(uuid).matches();
 		MetricsApplication.logger.error(validObjectId);
-		if(!validObjectId)
+		if (!validObjectId)
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Special characters are not allowed");
 		if (haveOnlyLetters(uuid) || haveOnlyNumbers(uuid)) {
 			return false;
@@ -281,7 +283,6 @@ public class Functions {
 		if (metric.getMetrics().getRetroactive().getComments() == null) {
 			metric.getMetrics().getRetroactive().setComments("");
 		}
-			
 
 		CreateMetricRequest collection = metric;
 		ObjectMapper mapper = new ObjectMapper();
@@ -406,88 +407,122 @@ public class Functions {
 		return collection;
 	}
 
-	private static String getSprint() {
-		final String uri = "http://sprints-qa.us-east-2.elasticbeanstalk.com/sprints/";
+	public static boolean ifSprintExist(String id) {
+		boolean response = false;
+		final String uri = "http://sprints-qa.us-east-2.elasticbeanstalk.com/sprints/" + id;
 		RestTemplate restTemplate = new RestTemplate();
-		return restTemplate.getForObject(uri, String.class);
-	}
-
-	public static boolean SprintsIdVerification(CreateMetricRequest request) {
-		boolean sprint_id = false;
-		boolean result = false;
-		MetricsApplication.logger.info("Generating container");
 		try {
-			String SprintsList = Functions.getSprint();
-			MetricsApplication.logger.info(SprintsList);
-			SprintsCollection[] Sprints = Functions.mapFromJson(SprintsList, SprintsCollection[].class);
-			for (SprintsCollection sprint : Sprints) {
-				if (sprint.getId().equals(request.getSprint_id())) {
-					sprint_id = true;
-				}
-			}
-			if (sprint_id) {
-				result = true;
-			} else {
-				throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-			}
+			if (!restTemplate.getForObject(uri, String.class).isEmpty())
+				response = true;
 		} catch (Exception e) {
-			MetricsApplication.logger.error("Could not create object from API SPRINTS COLLECTIONS");
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No SPRINT ID found");
+			throw new ResponseStatusException(HttpStatus.CONFLICT, "sprint_id given does not found");
 		}
-
-		return result;
+		return response;
 	}
 
-	private static String getUsersList() {
-		final String uri = "http://sourcescusersapi-test.us-west-1.elasticbeanstalk.com/api/users/";
+	public static boolean ifUserExist(String id) {
+		boolean response = false;
+		final String uri = "http://sourcescusersapi-test.us-west-1.elasticbeanstalk.com/api/users/" + id;
 		RestTemplate restTemplate = new RestTemplate();
-
-		return restTemplate.getForObject(uri, String.class);
-	}
-
-	public static boolean EvaluatorsIdVerification(CreateMetricRequest request) {
-		boolean evaluated_id = false, evaluator_id = false;
-		boolean result = false;
-		MetricsApplication.logger.info("Generating container");
 		try {
-			String UsersList = Functions.getUsersList();
-			UsersCollection[] Users = Functions.mapFromJson(UsersList, UsersCollection[].class);
-			for (UsersCollection user : Users) {
-				if (user.getUserId().equals(request.getEvaluated_id())) {
-					evaluated_id = true;
-				}
-				if (user.getUserId().equals(request.getEvaluator_id())) {
-					evaluator_id = true;
-				}
-			}
-			if (evaluated_id && evaluator_id) {
-				result = true;
-			} else {
-				throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-			}
+			if (!restTemplate.getForObject(uri, String.class).isEmpty())
+				response = true;
 		} catch (Exception e) {
-			MetricsApplication.logger.error("Could not create object from API USERS COLLECTIONS");
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No evaluated or evaluator ID's found");
+			throw new ResponseStatusException(HttpStatus.CONFLICT, "user_id given does not found");
 		}
-
-		return result;
+		return response;
 	}
-	
+
+	static boolean userSendPage;
+	static boolean userSendSize;
+	static boolean userSendStartDate;
+	static boolean userSendEndDate;
+
+	public static void checkPaginationParams(HttpServletRequest request) {
+		userSendPage = false;
+		userSendSize = false;
+		request.getParameterMap().entrySet().forEach(entry -> {
+			String param = entry.getKey();
+			String paramValue = request.getParameter(param);
+			if ((param.contains("page"))) {
+				if (paramValue != "") {
+
+					userSendPage = true;
+				}
+			} else if ((param.contains("size"))) {
+				if (paramValue != "") {
+
+					userSendSize = true;
+				}
+			}
+
+		});
+		if (userSendPage && !userSendSize) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+					"size value field is required when page is given");
+		}
+		if (!userSendPage && userSendSize) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+					"page value field is required when size is given");
+		}
+	}
+
+	public static void checkDateParams(HttpServletRequest request) {
+		userSendStartDate = false;
+		userSendEndDate = false;
+		request.getParameterMap().entrySet().forEach(entry -> {
+			String param = entry.getKey();
+			String paramValue = request.getParameter(param);
+			if ((param.contains("startDate"))) {
+				if (paramValue != "") {
+
+					userSendStartDate = true;
+				}
+			} else if ((param.contains("endDate"))) {
+				if (paramValue != "") {
+
+					userSendEndDate = true;
+				}
+			}
+
+		});
+		if (userSendStartDate && !userSendEndDate) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+					"endDate value field is required when startDate is given");
+		}
+		if (!userSendStartDate && userSendEndDate) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+					"startDate value field is required when endDate is given");
+		}
+	}
+
+	static boolean isOnlyGet;
+
+	public static boolean checkIsOnlyGet(HttpServletRequest request) {
+		MetricsApplication.logger.info("Checking if is only a get");
+		isOnlyGet = false;
+		if (request.getParameterMap().entrySet().isEmpty()) {
+			isOnlyGet = true;
+		}
+		MetricsApplication.logger.info("is a only get..> " + isOnlyGet);
+		return isOnlyGet;
+	}
+
 	public static void checkParams(HttpServletRequest request, Set<String> allowedParams) {
-        request.getParameterMap().entrySet().forEach(entry -> {
-            String param = entry.getKey();
-            String paramValue = request.getParameter(param);
-            if (!allowedParams.contains(param)) {
-            	throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "An invalid request param  called "+ param +" has been entered");
-            }
-            else if((param.contains("evaluated_id")||param.contains("sprint_id")||param.contains("evaluator_id")))
-            		{
-            			if(paramValue == "")
-            			{
-            				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The id key  "+ param +" can not be null or empty");
-            			}
-            		}
-            
-        });
+		request.getParameterMap().entrySet().forEach(entry -> {
+			String param = entry.getKey();
+			String paramValue = request.getParameter(param);
+			if (!allowedParams.contains(param)) {
+				throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+						"An invalid request param  called " + param + " has been entered");
+			} else if ((param.contains("evaluated_id") || param.contains("sprint_id")
+					|| param.contains("evaluator_id"))) {
+				if (paramValue == "") {
+					throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+							"The id key  " + param + " can not be null or empty");
+				}
+			}
+
+		});
 	}
 }

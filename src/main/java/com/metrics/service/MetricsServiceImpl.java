@@ -45,8 +45,8 @@ public class MetricsServiceImpl implements MetricsService {
 		MetricsApplication.logger.info("Returning metric");
 		return repository.findById(id);
 
-    }
-    
+	}
+
 	@Override
 	public MetricsCollection newMetric(CreateMetricRequest request) {
 		MetricsApplication.logger.info("Generating container");
@@ -75,15 +75,15 @@ public class MetricsServiceImpl implements MetricsService {
 			MetricsApplication.logger.error("Tried to update metric but couldnt find the ID given");
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Metric not found");
 		}
-		
+
 		MetricsApplication.logger.info("Creating metric object");
 		MetricsCollection metric = new MetricsCollection();
 		MetricsApplication.logger.info("calling data validation method");
 		metric = Functions.CreateMetricRequestToMetricsCollection(Functions.testMetricIntegrity(request, 1));
-			MetricsApplication.logger.info("data validation test passed, saving new object");
-			metric = orikaMapperFacade.map(request, MetricsCollection.class);
-			MetricsApplication.logger.info("object created succesfully");
-			metric.setId(id);
+		MetricsApplication.logger.info("data validation test passed, saving new object");
+		metric = orikaMapperFacade.map(request, MetricsCollection.class);
+		MetricsApplication.logger.info("object created succesfully");
+		metric.setId(id);
 		MetricsApplication.logger
 				.info("Object created and validated successfully, saving into the database and returning the object");
 		return repository.save(metric);
@@ -92,38 +92,30 @@ public class MetricsServiceImpl implements MetricsService {
 	@Override
 	public List<MetricsCollection> getAllMetricsPaginated(int page, int size, List<MetricsCollection> metrics) {
 		List<MetricsCollection> listMetricsFiltredDates = new ArrayList<MetricsCollection>();
-		MetricsApplication.logger.info("Starting variables with size per page and number of pages " + page + " and size " + size);
-		MetricsApplication.logger.info("size "	+ size + " metric size " + metrics.size());
+		MetricsApplication.logger
+				.info("Starting variables with size per page and number of pages " + page + " and size " + size);
+		MetricsApplication.logger.info("size " + size + " metric size " + metrics.size());
 		if (page == 1 && size > metrics.size() && metrics.size() == 1) {
 			size = 1;
-		}else if (page == 1 && size > metrics.size() && metrics.size() > 1) {
-			size = metrics.size();
-		}else if(page == 1 && size==1) {
+		} else if (page == 1 && size > metrics.size() && metrics.size() > 1) {
 			size = metrics.size();
 		}
 		int pages = metrics.size() / size;
-		if( metrics.size() / size == 1) {
+		if ((metrics.size() / size) == 1) {
 			pages++;
 		}
-		int lastElements =  metrics.size() % size;
+		int lastElements = metrics.size() % size;
 		MetricsApplication.logger.info("Starting size in " + size);
-		
+		MetricsApplication.logger.info("Last elements of list " + lastElements);
+		if (lastElements > 0) {
+			pages++;
+		}
+
 		if (pages < page) {
-			MetricsApplication.logger.info(
-					"Return empty list");
+			MetricsApplication.logger.info("Return empty list");
 			return listMetricsFiltredDates;
 		}
 		
-		MetricsApplication.logger.info("Starting variables with size per page and number of pages " + pages);
-		
-		if (page == pages && size > lastElements) {
-			size = lastElements;
-			MetricsApplication.logger.info(
-					"The elements is out range of numbers of elements in List and assigning the last numbers elements to size "
-							+ size);
-		}
-		
-
 		int index = 0;
 		if (page != 0) {
 
@@ -133,11 +125,9 @@ public class MetricsServiceImpl implements MetricsService {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
 					"Has been found problems with range of metric list ");
 		}
-		MetricsApplication.logger.info(
-				"index " + index + " final " + Math.min(index + size, metrics.size()));
+		MetricsApplication.logger.info("index " + index + " final " + Math.min(index + size, metrics.size()));
 		listMetricsFiltredDates = metrics.subList(index, Math.min(index + size, metrics.size()));
 
-		
 		MetricsApplication.logger.info("Return the page and size elements per page");
 		return listMetricsFiltredDates;
 	}
@@ -168,7 +158,6 @@ public class MetricsServiceImpl implements MetricsService {
 		// 2 = evaluated_id
 		// 3 = date;
 		// 4 = sprint_id;
-		
 
 		MetricsApplication.logger
 				.info("Return new list with the metric matches with " + listMetricsFiltredDates.size() + " elements");
@@ -201,7 +190,7 @@ public class MetricsServiceImpl implements MetricsService {
 					}
 			}
 			if (listMetricsFiltredDates.size() == 0)
-				throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+				throw new ResponseStatusException(HttpStatus.CONFLICT,
 						"were not found with the getEvaluator_id specified");
 			break;
 		}
@@ -211,13 +200,13 @@ public class MetricsServiceImpl implements MetricsService {
 				// ObjectId idDB = new ObjectId(metric.getEvaluated_id());
 				if (metric.getEvaluated_id() != null)
 					MetricsApplication.logger.info("Comparing " + metric.getEvaluated_id() + " with " + id);
-					if (metric.getEvaluated_id().compareTo(id) == 0) {
+				if (metric.getEvaluated_id().compareTo(id) == 0) {
 
-						listMetricsFiltredDates.add(metric);
-					}
+					listMetricsFiltredDates.add(metric);
+				}
 			}
 			if (listMetricsFiltredDates.size() == 0)
-				throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+				throw new ResponseStatusException(HttpStatus.CONFLICT,
 						"were not found with the evaluated_id specified");
 			break;
 		}
@@ -232,13 +221,13 @@ public class MetricsServiceImpl implements MetricsService {
 					}
 			}
 			if (listMetricsFiltredDates.size() == 0)
-				throw new ResponseStatusException(HttpStatus.NOT_FOUND, "were not found with the sprint_id specified");
+				throw new ResponseStatusException(HttpStatus.CONFLICT, "were not found with the sprint_id specified");
 			break;
 		}
 
 		}
 		MetricsApplication.logger.info(listMetricsFiltredDates.size());
-		
+
 		MetricsApplication.logger
 				.info("Return new list with the metric matches with " + listMetricsFiltredDates.size() + " elements");
 		return listMetricsFiltredDates;

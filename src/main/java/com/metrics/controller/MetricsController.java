@@ -16,11 +16,11 @@ import com.metrics.model.MetricsCollection;
 import com.metrics.service.Functions;
 import com.metrics.service.MetricsServiceImpl;
 import java.util.Date;
-//import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-//import java.util.Set;
-//import javax.servlet.http.HttpServletRequest;
+
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
 
@@ -39,7 +39,7 @@ public class MetricsController {
 		}
 		Functions.VerifyingUUID(id);
 		Functions.testMetricIntegrity(request, 1);
-		if (Functions.SprintsIdVerification(request) && Functions.EvaluatorsIdVerification(request)) {
+		if (Functions.ifSprintExist(request.getSprint_id()) && Functions.ifUserExist(request.getEvaluated_id()) && Functions.ifUserExist(request.getEvaluator_id())) {
 			MetricsApplication.logger.info("calling update service");
 			resultMetric = service.updateMetric(request, id);
 			MetricsApplication.logger.info("update successfull, returning updated object..");
@@ -48,39 +48,36 @@ public class MetricsController {
 		return resultMetric;
 	}
 
-	
 	@ResponseStatus(value = HttpStatus.OK)
 	@GetMapping("/metrics")
-	public List<MetricsCollection> getMetrics(
-			//HttpServletRequest request,
-			@RequestParam(value = "page", defaultValue = "1") int page,
-			@RequestParam(value = "size", defaultValue = "1") int size,
+	public List<MetricsCollection> getMetrics(HttpServletRequest request,
+			@RequestParam(value = "page", defaultValue = "-1") int page,
+			@RequestParam(value = "size", defaultValue = "-1") int size,
 			@RequestParam(value = "startDate", defaultValue = "1000-01-01") String startDate,
 			@RequestParam(value = "endDate", defaultValue = "1000-01-01") String endDate,
 			@RequestParam(value = "evaluator_id", defaultValue = "") String evaluator_id,
 			@RequestParam(value = "evaluated_id", defaultValue = "") String evaluated_id,
 			@RequestParam(value = "sprint_id", defaultValue = "") String sprint_id,
-			@RequestParam(value = "orderBy", defaultValue = "-1") int orderBy
-			)
-	{
+			@RequestParam(value = "orderBy", defaultValue = "-1") int orderBy) {
+
 		/*
-		MetricsApplication.logger.info(request.getQueryString());
-		Set<String> allowedParams = new HashSet<String>();
-		allowedParams.add("size");
-		allowedParams.add("page"); 
-		allowedParams.add("startDate"); 
-		allowedParams.add("endDate"); 
-		allowedParams.add("evaluator_id"); 
-		allowedParams.add("evaluated_id");
-		allowedParams.add("sprint_id");
-		allowedParams.add("orderBy");
-		Functions.checkParams(request,allowedParams);
-		*/
+		 * MetricsApplication.logger.info(request.getQueryString()); Set<String>
+		 * allowedParams = new HashSet<String>(); allowedParams.add("size");
+		 * allowedParams.add("page"); allowedParams.add("startDate");
+		 * allowedParams.add("endDate"); allowedParams.add("evaluator_id");
+		 * allowedParams.add("evaluated_id"); allowedParams.add("sprint_id");
+		 * allowedParams.add("orderBy"); Functions.checkParams(request,allowedParams);
+		 */
 		
+		if (!Functions.checkIsOnlyGet(request)) {
+			MetricsApplication.logger.info("Calling param validation");
+			Functions.checkPaginationParams(request);
+			MetricsApplication.logger.info("Calling Date validation");
+			Functions.checkDateParams(request);
+		}
 		MetricsApplication.logger.info("Getting list of metrics");
 
 		List<MetricsCollection> ListMetric = service.getMetrics();
-		
 
 		MetricsApplication.logger.info("Verifying if DB is empty");
 		Functions.IsDBEmpty(ListMetric);
@@ -119,7 +116,7 @@ public class MetricsController {
 			MetricsApplication.logger.info("Setting filter by date true");
 			withFiltersDate = true;
 		}
-		if (page != 1 || size != 1) {
+		if (page > 0 || size > 0) {
 			MetricsApplication.logger.info("Setting filter by pagination true");
 			withFiltersPagination = true;
 		}
@@ -132,9 +129,9 @@ public class MetricsController {
 					withFilters = true;
 					MetricsApplication.logger.info("Running metodh getItemsFromIdFilter with evaluator_id");
 					ListMetric = service.getItemsFromIdFilter(evaluator_id, ListMetric, 0);
-					withFiltersIdEvaluator =  true;
+					withFiltersIdEvaluator = true;
 				}
-			} 
+			}
 			// Applying filter by evaluated_id and applying order by ascendant
 			if (!evaluated_id.equals("")) {
 				if (Functions.VerifyingID(evaluated_id)) {
@@ -145,8 +142,8 @@ public class MetricsController {
 					ListMetric = service.getItemsFromIdFilter(evaluated_id, ListMetric, 1);
 					withFiltersIdEvaluated = true;
 				}
-			} 
-			//Applying filter by sprint_id and applying order by ascendant
+			}
+			// Applying filter by sprint_id and applying order by ascendant
 			if (!sprint_id.equals("")) {
 				if (Functions.VerifyingID(sprint_id)) {
 					MetricsApplication.logger.info("Applying filter by sprint_id and applying order by ascendant");
@@ -156,9 +153,9 @@ public class MetricsController {
 					ListMetric = service.getItemsFromIdFilter(sprint_id, ListMetric, 2);
 					withFiltersIdSprint = true;
 				}
-			} 
-			
-			if (!withFiltersIdEvaluator && !withFiltersIdEvaluated && !withFiltersIdSprint){
+			}
+
+			if (!withFiltersIdEvaluator && !withFiltersIdEvaluated && !withFiltersIdSprint) {
 				MetricsApplication.logger.info("Clearing list because evaluator id is wrong or missing");
 				ListMetric.clear();
 				return ListMetric;
@@ -215,7 +212,7 @@ public class MetricsController {
 			MetricsApplication.logger.info("Not applying anything filter");
 			MetricsApplication.logger.info("Returning list without any filters");
 		}
-		
+		MetricsApplication.logger.info("Calling flag before validation param");
 		return ListMetric;
 	}
 
@@ -223,7 +220,7 @@ public class MetricsController {
 	@GetMapping("/metrics/{id}")
 	public Optional<MetricsCollection> findById(@PathVariable String id) {
 		try {
-			
+
 			MetricsApplication.logger.info("Calling findById service");
 			return service.findById(id);
 		} catch (Exception error) {
@@ -238,8 +235,8 @@ public class MetricsController {
 		String id = "";
 		MetricsApplication.logger
 				.info("Calling the data validation method and ID Validation for Evaluator and Evaluated ID");
-		if (Functions.testMetricIntegrity(request, 0) != null && Functions.SprintsIdVerification(request)
-				&& Functions.EvaluatorsIdVerification(request)) {
+		if (Functions.testMetricIntegrity(request, 0) != null && Functions.ifSprintExist(request.getSprint_id())
+				&& Functions.ifUserExist(request.getEvaluated_id()) && Functions.ifUserExist(request.getEvaluator_id())) {
 			MetricsApplication.logger.info("data validation successfull,calling the newMetric service");
 			id = service.newMetric(request).getId();
 			MetricsApplication.logger.info("saving id into String to return");
