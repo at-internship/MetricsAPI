@@ -39,7 +39,7 @@ public class MetricsController {
 		}
 		Functions.VerifyingUUID(id);
 		Functions.testMetricIntegrity(request, 1);
-		if (Functions.ifSprintExist(request.getSprint_id()) && Functions.ifUserExist(request.getEvaluated_id()) && Functions.ifUserExist(request.getEvaluator_id())) {
+		if (Functions.ifSprintExist(request.getSprint_id()) && Functions.ifUserExist(request.getEvaluated_id(), 0) && Functions.ifUserExist(request.getEvaluator_id(), 1)) {
 			MetricsApplication.logger.info("calling update service");
 			resultMetric = service.updateMetric(request, id);
 			MetricsApplication.logger.info("update successfull, returning updated object..");
@@ -128,7 +128,7 @@ public class MetricsController {
 					MetricsApplication.logger.info("Setting true variable withFilters in evaluator_id");
 					withFilters = true;
 					MetricsApplication.logger.info("Running metodh getItemsFromIdFilter with evaluator_id");
-					ListMetric = service.getItemsFromIdFilter(evaluator_id, ListMetric, 0);
+					ListMetric = service.getItemsFromIdFilter(evaluator_id, ListMetric, 0, 2);
 					withFiltersIdEvaluator = true;
 				}
 			}
@@ -139,7 +139,7 @@ public class MetricsController {
 					MetricsApplication.logger.info("Setting true variable withFilters in evaluated_id");
 					withFilters = true;
 					MetricsApplication.logger.info("Running metodh getItemsFromIdFilter with evaluated_id");
-					ListMetric = service.getItemsFromIdFilter(evaluated_id, ListMetric, 1);
+					ListMetric = service.getItemsFromIdFilter(evaluated_id, ListMetric, 1, 2);
 					withFiltersIdEvaluated = true;
 				}
 			}
@@ -150,7 +150,7 @@ public class MetricsController {
 					MetricsApplication.logger.info("Setting true variable withFilters in sprint_id");
 					withFilters = true;
 					MetricsApplication.logger.info("Running metodh getItemsFromIdFilter with sprint_id");
-					ListMetric = service.getItemsFromIdFilter(sprint_id, ListMetric, 2);
+					ListMetric = service.getItemsFromIdFilter(sprint_id, ListMetric, 2, 2);
 					withFiltersIdSprint = true;
 				}
 			}
@@ -236,7 +236,7 @@ public class MetricsController {
 		MetricsApplication.logger
 				.info("Calling the data validation method and ID Validation for Evaluator and Evaluated ID");
 		if (Functions.testMetricIntegrity(request, 0) != null && Functions.ifSprintExist(request.getSprint_id())
-				&& Functions.ifUserExist(request.getEvaluated_id()) && Functions.ifUserExist(request.getEvaluator_id())) {
+				&& Functions.ifUserExist(request.getEvaluated_id(), 0) && Functions.ifUserExist(request.getEvaluator_id(), 1)) {
 			MetricsApplication.logger.info("data validation successfull,calling the newMetric service");
 			id = service.newMetric(request).getId();
 			MetricsApplication.logger.info("saving id into String to return");

@@ -9,7 +9,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.regex.Pattern;
@@ -19,8 +18,6 @@ import javax.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.server.ResponseStatusException;
-import com.metrics.model.SprintsCollection;
-import com.metrics.model.UsersCollection;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -420,7 +417,7 @@ public class Functions {
 		return response;
 	}
 
-	public static boolean ifUserExist(String id) {
+	public static boolean ifUserExist(String id, int typeId) {
 		boolean response = false;
 		final String uri = "http://sourcescusersapi-test.us-west-1.elasticbeanstalk.com/api/users/" + id;
 		RestTemplate restTemplate = new RestTemplate();
@@ -428,7 +425,12 @@ public class Functions {
 			if (!restTemplate.getForObject(uri, String.class).isEmpty())
 				response = true;
 		} catch (Exception e) {
-			throw new ResponseStatusException(HttpStatus.CONFLICT, "user_id given does not found");
+			if(typeId == 1) {
+				throw new ResponseStatusException(HttpStatus.CONFLICT, "evaluator_id given does not found");
+			}else if(typeId == 0)  {
+				throw new ResponseStatusException(HttpStatus.CONFLICT, "evaluated_id given does not found");
+			}
+				
 		}
 		return response;
 	}

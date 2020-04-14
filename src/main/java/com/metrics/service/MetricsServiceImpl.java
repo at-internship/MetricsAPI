@@ -115,7 +115,7 @@ public class MetricsServiceImpl implements MetricsService {
 			MetricsApplication.logger.info("Return empty list");
 			return listMetricsFiltredDates;
 		}
-		
+
 		int index = 0;
 		if (page != 0) {
 
@@ -165,7 +165,8 @@ public class MetricsServiceImpl implements MetricsService {
 	}
 
 	@Override
-	public List<MetricsCollection> getItemsFromIdFilter(String id, List<MetricsCollection> metrics, int typeId) {
+	public List<MetricsCollection> getItemsFromIdFilter(String id, List<MetricsCollection> metrics, int typeId,
+			int typeRequest) {
 
 		MetricsApplication.logger.info("Parsing id to ObjectId");
 		// ObjectId idIncoming = new ObjectId(id);
@@ -189,7 +190,7 @@ public class MetricsServiceImpl implements MetricsService {
 						listMetricsFiltredDates.add(metric);
 					}
 			}
-			if (listMetricsFiltredDates.size() == 0)
+			if ((listMetricsFiltredDates.size() == 0) && (typeRequest != 2))
 				throw new ResponseStatusException(HttpStatus.CONFLICT,
 						"were not found with the getEvaluator_id specified");
 			break;
@@ -205,7 +206,7 @@ public class MetricsServiceImpl implements MetricsService {
 					listMetricsFiltredDates.add(metric);
 				}
 			}
-			if (listMetricsFiltredDates.size() == 0)
+			if ((listMetricsFiltredDates.size() == 0) && (typeRequest != 2))
 				throw new ResponseStatusException(HttpStatus.CONFLICT,
 						"were not found with the evaluated_id specified");
 			break;
@@ -220,7 +221,7 @@ public class MetricsServiceImpl implements MetricsService {
 						listMetricsFiltredDates.add(metric);
 					}
 			}
-			if (listMetricsFiltredDates.size() == 0)
+			if ((listMetricsFiltredDates.size() == 0) && (typeRequest != 2))
 				throw new ResponseStatusException(HttpStatus.CONFLICT, "were not found with the sprint_id specified");
 			break;
 		}
