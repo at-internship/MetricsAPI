@@ -11,6 +11,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import com.metrics.model.MetricsCollection;
 import com.metrics.repository.MetricRepository;
+import com.metrics.service.ErrorHandler.HttpExceptionMessage;
+import com.metrics.service.ErrorHandler.PathErrorMessage;
+import com.metrics.service.ErrorHandler.TypeError;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.metrics.MetricsApplication;
 import com.metrics.domain.CreateMetricRequest;
@@ -40,7 +43,9 @@ public class MetricsServiceImpl implements MetricsService {
 	public Optional<MetricsCollection> findById(String id) {
 		if (!repository.existsById(id)) {
 			MetricsApplication.logger.error("trying to find a metric but  did not found an ID");
-			throw new HttpClientErrorException(HttpStatus.NOT_FOUND, "No metric found with the given id");
+			TypeError.httpErrorMessage(new Exception(), HttpStatus.NOT_FOUND.value(), HttpStatus.NOT_FOUND.name(),
+					HttpExceptionMessage.IdNotFound404, "/metric/" + id);
+			throw new HttpClientErrorException(HttpStatus.NOT_FOUND);
 		}
 		MetricsApplication.logger.info("Returning metric");
 		return repository.findById(id);
@@ -65,7 +70,9 @@ public class MetricsServiceImpl implements MetricsService {
 			repository.deleteById(id);
 		} else {
 			MetricsApplication.logger.error("tried to delete metric but couldnt find an ID");
-			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "The given ID does not exist");
+			TypeError.httpErrorMessage(new Exception(), HttpStatus.NOT_FOUND.value(), HttpStatus.NOT_FOUND.name(),
+					HttpExceptionMessage.IdNotFound404, "/metric/" + id);
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND);
 		}
 	}
 
@@ -73,7 +80,9 @@ public class MetricsServiceImpl implements MetricsService {
 	public MetricsCollection updateMetric(CreateMetricRequest request, String id) {
 		if (!repository.existsById(id)) {
 			MetricsApplication.logger.error("Tried to update metric but couldnt find the ID given");
-			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Metric not found");
+			TypeError.httpErrorMessage(new Exception(), HttpStatus.NOT_FOUND.value(), HttpStatus.NOT_FOUND.name(),
+					HttpExceptionMessage.IdNotFound404, "/metric/" + id);
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND);
 		}
 
 		MetricsApplication.logger.info("Creating metric object");
@@ -122,8 +131,9 @@ public class MetricsServiceImpl implements MetricsService {
 			index = (page - 1) * size;
 		}
 		if (metrics == null || metrics.size() < index) {
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-					"Has been found problems with range of metric list ");
+			TypeError.httpErrorMessage(new Exception(), HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.name(),
+					HttpExceptionMessage.PaginationInvalidRange400, PathErrorMessage.pathMetric);
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
 		}
 		MetricsApplication.logger.info("index " + index + " final " + Math.min(index + size, metrics.size()));
 		listMetricsFiltredDates = metrics.subList(index, Math.min(index + size, metrics.size()));
@@ -153,12 +163,6 @@ public class MetricsServiceImpl implements MetricsService {
 			}
 
 		}
-		// 0 = Filter by id
-		// 1 = evaluator_id
-		// 2 = evaluated_id
-		// 3 = date;
-		// 4 = sprint_id;
-
 		MetricsApplication.logger
 				.info("Return new list with the metric matches with " + listMetricsFiltredDates.size() + " elements");
 		return listMetricsFiltredDates;
@@ -167,9 +171,6 @@ public class MetricsServiceImpl implements MetricsService {
 	@Override
 	public List<MetricsCollection> getItemsFromIdFilter(String id, List<MetricsCollection> metrics, int typeId,
 			int typeRequest) {
-
-		MetricsApplication.logger.info("Parsing id to ObjectId");
-		// ObjectId idIncoming = new ObjectId(id);
 
 		MetricsApplication.logger.info("Creating list to save filter by id");
 		List<MetricsCollection> listMetricsFiltredDates = new ArrayList<MetricsCollection>();
@@ -183,46 +184,47 @@ public class MetricsServiceImpl implements MetricsService {
 		case 0: {
 			MetricsApplication.logger.info("Comparing evaluator_id in list whit value id provided by user");
 			for (MetricsCollection metric : metrics) {
-				// ObjectId idDB = new ObjectId(metric.getEvaluator_id());
 				if (metric.getEvaluator_id() != null)
 					if (metric.getEvaluator_id().compareTo(id) == 0) {
-
 						listMetricsFiltredDates.add(metric);
 					}
 			}
-			if ((listMetricsFiltredDates.size() == 0) && (typeRequest != 2))
-				throw new ResponseStatusException(HttpStatus.CONFLICT,
-						"were not found with the getEvaluator_id specified");
+			if ((listMetricsFiltredDates.size() == 0) && (typeRequest != 2)) {
+				TypeError.httpErrorMessage(new Exception(), HttpStatus.CONFLICT.value(), HttpStatus.CONFLICT.name(),
+						HttpExceptionMessage.Evaluator_IdNotFound404, "/metric/" + id);
+				throw new ResponseStatusException(HttpStatus.CONFLICT);
+			}
 			break;
 		}
 		case 1: {
 			MetricsApplication.logger.info("Comparing evaluated_id in list whit value id provided by user " + id);
 			for (MetricsCollection metric : metrics) {
-				// ObjectId idDB = new ObjectId(metric.getEvaluated_id());
-				if (metric.getEvaluated_id() != null)
-					MetricsApplication.logger.info("Comparing " + metric.getEvaluated_id() + " with " + id);
-				if (metric.getEvaluated_id().compareTo(id) == 0) {
-
-					listMetricsFiltredDates.add(metric);
+				if (metric.getEvaluated_id() != null) {
+					if (metric.getEvaluated_id().compareTo(id) == 0) {
+						listMetricsFiltredDates.add(metric);
+					}
 				}
 			}
-			if ((listMetricsFiltredDates.size() == 0) && (typeRequest != 2))
-				throw new ResponseStatusException(HttpStatus.CONFLICT,
-						"were not found with the evaluated_id specified");
+			if ((listMetricsFiltredDates.size() == 0) && (typeRequest != 2)) {
+				TypeError.httpErrorMessage(new Exception(), HttpStatus.CONFLICT.value(), HttpStatus.CONFLICT.name(),
+						HttpExceptionMessage.Evaluated_IdNotFound404, "/metric/" + id);
+				throw new ResponseStatusException(HttpStatus.CONFLICT);
+			}
 			break;
 		}
 		case 2: {
 			MetricsApplication.logger.info("Comparing sprint_id in list whit value id provided by user");
 			for (MetricsCollection metric : metrics) {
-				// ObjectId idDB = new ObjectId(metric.getSprint_id());
 				if (metric.getSprint_id() != null)
 					if (metric.getSprint_id().compareTo(id) == 0) {
-						MetricsApplication.logger.info("Adding record getSprint_id to ObjectId");
 						listMetricsFiltredDates.add(metric);
 					}
 			}
-			if ((listMetricsFiltredDates.size() == 0) && (typeRequest != 2))
-				throw new ResponseStatusException(HttpStatus.CONFLICT, "were not found with the sprint_id specified");
+			if ((listMetricsFiltredDates.size() == 0) && (typeRequest != 2)) {
+				TypeError.httpErrorMessage(new Exception(), HttpStatus.CONFLICT.value(), HttpStatus.CONFLICT.name(),
+						HttpExceptionMessage.Sprint_IdNotFound404, "/metric/" + id);
+				throw new ResponseStatusException(HttpStatus.CONFLICT);
+			}
 			break;
 		}
 
@@ -231,6 +233,7 @@ public class MetricsServiceImpl implements MetricsService {
 
 		MetricsApplication.logger
 				.info("Return new list with the metric matches with " + listMetricsFiltredDates.size() + " elements");
+
 		return listMetricsFiltredDates;
 	}
 }
