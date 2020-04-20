@@ -1,7 +1,6 @@
 package com.metrics.repository;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.io.IOException;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
@@ -10,11 +9,9 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
-import com.metrics.model.MetricsCollection;
-import com.metrics.service.Functions;
 
 public class FunctionsEnhanceGetTest {
-	
+
 	public void getMetricsEvaluated_id(MockMvc mvc) throws Exception {
 
 		String startDate = "2000-01-01";
@@ -102,10 +99,11 @@ public class FunctionsEnhanceGetTest {
 		validatingFailResult(mvcResult);
 	}
 
-	private MvcResult mvcEnhanceGetRequest(MockMvc mvc, String uri, String startDate, String endDate,
-			String id) throws Exception {
-		return mvc.perform(MockMvcRequestBuilders.get(uri, startDate, endDate, id)
-				.accept(MediaType.APPLICATION_JSON_VALUE)).andReturn();
+	private MvcResult mvcEnhanceGetRequest(MockMvc mvc, String uri, String startDate, String endDate, String id)
+			throws Exception {
+		return mvc.perform(
+				MockMvcRequestBuilders.get(uri, startDate, endDate, id).accept(MediaType.APPLICATION_JSON_VALUE))
+				.andReturn();
 	}
 
 	private MvcResult mvcEnhanceGetRequest(MockMvc mvc, String uri, String startDate, String endDate) throws Exception {
