@@ -13,9 +13,11 @@ import org.springframework.web.server.ResponseStatusException;
 import com.metrics.MetricsApplication;
 import com.metrics.domain.CreateMetricRequest;
 import com.metrics.model.MetricsCollection;
-import com.metrics.service.Functions;
-import com.metrics.service.HttpExceptions;
+import com.metrics.service.BusinessMethods;
+import com.metrics.service.ClientValidations;
 import com.metrics.service.MetricsServiceImpl;
+import com.metrics.service.SortingMethods;
+import com.metrics.service.TechnicalValidations;
 import com.metrics.service.ErrorHandler.HttpExceptionMessage;
 import com.metrics.service.ErrorHandler.PathErrorMessage;
 import com.metrics.service.ErrorHandler.TypeError;
@@ -45,10 +47,11 @@ public class MetricsController {
 			StaticVariables.datePUT = service.findById(id).get();
 			StaticVariables.id = id;
 		}
-		Functions.VerifyingUUID(id);
-		Functions.testMetricIntegrity(request, 1);
-		if (Functions.ifSprintExist(request.getSprint_id()) && Functions.ifUserExist(request.getEvaluated_id(), 0)
-				&& Functions.ifUserExist(request.getEvaluator_id(), 1)) {
+		TechnicalValidations.VerifyingUUID(id);
+		BusinessMethods.testMetricIntegrity(request, 1);
+		if (BusinessMethods.ifSprintExist(request.getSprint_id())
+				&& BusinessMethods.ifUserExist(request.getEvaluated_id(), 0)
+				&& BusinessMethods.ifUserExist(request.getEvaluator_id(), 1)) {
 			MetricsApplication.logger.info("calling update service");
 			resultMetric = service.updateMetric(request, id);
 			MetricsApplication.logger.info("update successfull, returning updated object..");
@@ -78,18 +81,18 @@ public class MetricsController {
 		 * allowedParams.add("orderBy"); Functions.checkParams(request,allowedParams);
 		 */
 
-		if (!Functions.checkIsOnlyGet(request)) {
+		if (!TechnicalValidations.checkIsOnlyGet(request)) {
 			MetricsApplication.logger.info("Calling param validation");
-			Functions.checkPaginationParams(request);
+			TechnicalValidations.checkPaginationParams(request);
 			MetricsApplication.logger.info("Calling Date validation");
-			Functions.checkDateParams(request);
+			TechnicalValidations.checkDateParams(request);
 		}
 		MetricsApplication.logger.info("Getting list of metrics");
 
 		List<MetricsCollection> ListMetric = service.getMetrics();
 
 		MetricsApplication.logger.info("Verifying if DB is empty");
-		Functions.IsDBEmpty(ListMetric);
+		TechnicalValidations.IsDBEmpty(ListMetric);
 
 		MetricsApplication.logger.info("Setting false the variables withFilters");
 		boolean withFilters = false;
@@ -110,16 +113,16 @@ public class MetricsController {
 		if (orderBy == 1 && !withFilters) {
 			MetricsApplication.logger.info("Applying Descending filter");
 			withFilters = true;
-			ListMetric = Functions.OrderByDescending(ListMetric);
+			ListMetric = SortingMethods.OrderByDescending(ListMetric);
 		} else if (orderBy == 0 && !withFilters) {
 			MetricsApplication.logger.info("Applying Ascending filter");
 			withFilters = true;
-			ListMetric = Functions.OrderByAscending(ListMetric);
+			ListMetric = SortingMethods.OrderByAscending(ListMetric);
 		}
 		if (!evaluator_id.equals("") || !evaluated_id.equals("") || !sprint_id.equals("")) {
 			withFiltersIds = true;
 		}
-		
+
 		if (!startDate.equals("1000-01-01") && !endDate.equals("1000-01-01")) {
 			MetricsApplication.logger.info("Setting filter by date true");
 			withFiltersDate = true;
@@ -129,11 +132,11 @@ public class MetricsController {
 			MetricsApplication.logger.info("Setting filter by pagination true");
 			withFiltersPagination = true;
 		}
-		
+
 		// Applying filter by evaluator_id and applying order by ascendant
 		if (withFiltersIds) {
 			if (!evaluator_id.equals("")) {
-				if (Functions.VerifyingID(evaluator_id)) {
+				if (TechnicalValidations.VerifyingID(evaluator_id)) {
 					MetricsApplication.logger.info("Applying filter by evaluator_id and applying order by ascendant");
 					MetricsApplication.logger.info("Setting true variable withFilters in evaluator_id");
 					withFilters = true;
@@ -144,7 +147,7 @@ public class MetricsController {
 			}
 			// Applying filter by evaluated_id and applying order by ascendant
 			if (!evaluated_id.equals("")) {
-				if (Functions.VerifyingID(evaluated_id)) {
+				if (TechnicalValidations.VerifyingID(evaluated_id)) {
 					MetricsApplication.logger.info("Applying filter by evaluated_id and applying order by ascendant");
 					MetricsApplication.logger.info("Setting true variable withFilters in evaluated_id");
 					withFilters = true;
@@ -155,7 +158,7 @@ public class MetricsController {
 			}
 			// Applying filter by sprint_id and applying order by ascendant
 			if (!sprint_id.equals("")) {
-				if (Functions.VerifyingID(sprint_id)) {
+				if (TechnicalValidations.VerifyingID(sprint_id)) {
 					MetricsApplication.logger.info("Applying filter by sprint_id and applying order by ascendant");
 					MetricsApplication.logger.info("Setting true variable withFilters in sprint_id");
 					withFilters = true;
@@ -170,8 +173,8 @@ public class MetricsController {
 				ListMetric.clear();
 				return ListMetric;
 			}
-		} 
-		
+		}
+
 		// Applying filter by date range and applying order by ascendant
 		if (withFiltersDate) {
 
@@ -180,18 +183,18 @@ public class MetricsController {
 			Date startDateLocal = null;
 			Date endDateLocal = null;
 
-			Functions.VerifyingDateValid(startDate);
-			Functions.VerifyingDateValid(endDate);
+			BusinessMethods.VerifyingDateValid(startDate);
+			BusinessMethods.VerifyingDateValid(endDate);
 			try {
 				MetricsApplication.logger.info("Creating default value and parse to type date");
-				defaultValueDate = Functions.stringToDate("1000-01-01");
+				defaultValueDate = TechnicalValidations.stringToDate("1000-01-01");
 
 				MetricsApplication.logger.info("Parse to type date the content of the incoming variable startDate");
-				startDateLocal = Functions.stringToDate(startDate);
+				startDateLocal = TechnicalValidations.stringToDate(startDate);
 				MetricsApplication.logger.info(startDateLocal);
 
 				MetricsApplication.logger.info("Parse to type date the content of the incoming variable endtDate");
-				endDateLocal = Functions.stringToDate(endDate);
+				endDateLocal = TechnicalValidations.stringToDate(endDate);
 				MetricsApplication.logger.info(endDateLocal);
 
 			} catch (Exception error) {
@@ -263,9 +266,10 @@ public class MetricsController {
 
 		MetricsApplication.logger
 				.info("Calling the data validation method and ID Validation for Evaluator and Evaluated ID");
-		if (Functions.testMetricIntegrity(request, 0) != null && Functions.ifSprintExist(request.getSprint_id())
-				&& Functions.ifUserExist(request.getEvaluated_id(), 0)
-				&& Functions.ifUserExist(request.getEvaluator_id(), 1)) {
+		if (BusinessMethods.testMetricIntegrity(request, 0) != null
+				&& BusinessMethods.ifSprintExist(request.getSprint_id())
+				&& BusinessMethods.ifUserExist(request.getEvaluated_id(), 0)
+				&& BusinessMethods.ifUserExist(request.getEvaluator_id(), 1)) {
 			MetricsApplication.logger.info("data validation successfull,calling the newMetric service");
 			id = service.newMetric(request).getId();
 			MetricsApplication.logger.info("saving id into String to return");
