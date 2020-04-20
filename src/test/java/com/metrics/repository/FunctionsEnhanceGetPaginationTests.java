@@ -8,8 +8,8 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 public class FunctionsEnhanceGetPaginationTests {
 	public void getMetricsPagination(MockMvc mvc) throws Exception {
-		int size = 4;
-		int start = 1;
+		int size = -1;
+		int start = -1;
 		String uri = "/metrics?start={start}&size={size}";
 		MvcResult mvcResult = mvcGetPaginationRequest(mvc, uri, start, size);
 
@@ -18,23 +18,25 @@ public class FunctionsEnhanceGetPaginationTests {
 	}
 
 	public void getMetricsPaginationFailSize(MockMvc mvc) throws Exception {
+
 		int size = 0;
 		int page = 0;
 		String uri = "/metrics?start={start}&size={size}";
 		MvcResult mvcResult = mvcGetPaginationRequest(mvc, uri, page, size);
 
 		int status = mvcResult.getResponse().getStatus();
-		assertEquals(400, status);
+		assertEquals(404, status);
 	}
 
 	public void getMetricsPaginationFailStart(MockMvc mvc) throws Exception {
+
 		int size = 0;
 		int page = 0;
 		String uri = "/metrics?start={start}&size={size}";
 		MvcResult mvcResult = mvcGetPaginationRequest(mvc, uri, page, size);
 
 		int status = mvcResult.getResponse().getStatus();
-		assertEquals(400, status);
+		assertEquals(404, status);
 	}
 
 	private MvcResult mvcGetPaginationRequest(MockMvc mvc, String uri, int start, int size) throws Exception {

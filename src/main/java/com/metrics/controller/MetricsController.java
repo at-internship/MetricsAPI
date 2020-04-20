@@ -14,6 +14,7 @@ import com.metrics.MetricsApplication;
 import com.metrics.domain.CreateMetricRequest;
 import com.metrics.model.MetricsCollection;
 import com.metrics.service.Functions;
+import com.metrics.service.HttpExceptions;
 import com.metrics.service.MetricsServiceImpl;
 import com.metrics.service.ErrorHandler.HttpExceptionMessage;
 import com.metrics.service.ErrorHandler.PathErrorMessage;
@@ -118,14 +119,17 @@ public class MetricsController {
 		if (!evaluator_id.equals("") || !evaluated_id.equals("") || !sprint_id.equals("")) {
 			withFiltersIds = true;
 		}
+		
 		if (!startDate.equals("1000-01-01") && !endDate.equals("1000-01-01")) {
 			MetricsApplication.logger.info("Setting filter by date true");
 			withFiltersDate = true;
 		}
+
 		if (page > 0 || size > 0) {
 			MetricsApplication.logger.info("Setting filter by pagination true");
 			withFiltersPagination = true;
 		}
+		
 		// Applying filter by evaluator_id and applying order by ascendant
 		if (withFiltersIds) {
 			if (!evaluator_id.equals("")) {
@@ -166,7 +170,8 @@ public class MetricsController {
 				ListMetric.clear();
 				return ListMetric;
 			}
-		}
+		} 
+		
 		// Applying filter by date range and applying order by ascendant
 		if (withFiltersDate) {
 
@@ -237,6 +242,7 @@ public class MetricsController {
 	@GetMapping("/metrics/{id}")
 	public Optional<MetricsCollection> findById(@PathVariable String id) {
 		StaticVariables.id = id;
+
 		try {
 
 			MetricsApplication.logger.info("Calling findById service");
@@ -254,6 +260,7 @@ public class MetricsController {
 	@PostMapping("/metrics")
 	public String newMetric(@RequestBody CreateMetricRequest request) {
 		String id = "";
+
 		MetricsApplication.logger
 				.info("Calling the data validation method and ID Validation for Evaluator and Evaluated ID");
 		if (Functions.testMetricIntegrity(request, 0) != null && Functions.ifSprintExist(request.getSprint_id())

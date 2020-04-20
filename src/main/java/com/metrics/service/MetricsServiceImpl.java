@@ -104,6 +104,7 @@ public class MetricsServiceImpl implements MetricsService {
 		MetricsApplication.logger
 				.info("Starting variables with size per page and number of pages " + page + " and size " + size);
 		MetricsApplication.logger.info("size " + size + " metric size " + metrics.size());
+
 		if (page == 1 && size > metrics.size() && metrics.size() == 1) {
 			size = 1;
 		} else if (page == 1 && size > metrics.size() && metrics.size() > 1) {
@@ -220,6 +221,7 @@ public class MetricsServiceImpl implements MetricsService {
 						listMetricsFiltredDates.add(metric);
 					}
 			}
+
 			if ((listMetricsFiltredDates.size() == 0) && (typeRequest != 2)) {
 				TypeError.httpErrorMessage(new Exception(), HttpStatus.CONFLICT.value(), HttpStatus.CONFLICT.name(),
 						HttpExceptionMessage.Sprint_IdNotFound404, "/metric/" + id);

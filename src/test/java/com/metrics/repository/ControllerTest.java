@@ -61,16 +61,17 @@ class MetricRepositoryTest {
 	public void test_update_user_success() throws Exception {
 
 		CreateMetricRequest metric = newCreateMetricRequest();
+		String id = "5e820c5982c2f637b4b0b5ac";
 
-		assertTrue(ObjectId.isValid(metric.getId()));
 
 		MvcResult mvcResult = mvc
-				.perform(MockMvcRequestBuilders.put("/metrics/{id}", metric.getId())
+				.perform(MockMvcRequestBuilders.put("/metrics/{id}", id)
 						.contentType(MediaType.APPLICATION_JSON_VALUE).content(Functions.mapToJson(metric)))
 				.andExpect(handler().handlerType(MetricsController.class))
 				.andExpect(handler().methodName("updateMetric")).andReturn();
 		assertEquals(200, mvcResult.getResponse().getStatus());
 		String jsonResponse = mvcResult.getResponse().getContentAsString();
+		metric.setId(id);
 		assertEquals(jsonResponse, Functions.mapToJson(metric));
 
 	}
@@ -185,7 +186,7 @@ class MetricRepositoryTest {
 						.contentType(MediaType.APPLICATION_JSON_VALUE).content(Functions.mapToJson(falseMetric)))
 				.andExpect(handler().handlerType(MetricsController.class))
 				.andExpect(handler().methodName("updateMetric")).andReturn();
-		assertEquals(404, mvcResult.getResponse().getStatus());
+		assertEquals(400, mvcResult.getResponse().getStatus());
 		String jsonResponse = mvcResult.getResponse().getContentAsString();
 		assertEquals(jsonResponse, "");
 
@@ -194,7 +195,7 @@ class MetricRepositoryTest {
 	@Test
 	public void deleteMetricCorrect() throws Exception {
 		String uri = "/metrics/{id}";
-		MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.delete(uri, "5e7132b3413b952b9d13196d")).andReturn();
+		MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.delete(uri, "5e82051fdc05ef01d20edc1d")).andReturn();
 		int status = mvcResult.getResponse().getStatus();
 		assertEquals(204, status);
 	}
@@ -208,7 +209,6 @@ class MetricRepositoryTest {
 	}
 
 	private CreateMetricRequest newCreateMetricRequest() {
-
 		try {
 
 			return new CreateMetricRequest("5e7ec4825cd36c58dccf08e4", "5e6bbc854244ac0cbc8df65d",
@@ -249,5 +249,4 @@ class MetricRepositoryTest {
 			return null;
 		}
 	}
-
 }
