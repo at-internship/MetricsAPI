@@ -23,7 +23,7 @@
                   "ref": "Console"
                },
                {
-                  "level": "TRARCE",
+                  "level": "TRACE",
                   "ref": "File"
                }
             ],

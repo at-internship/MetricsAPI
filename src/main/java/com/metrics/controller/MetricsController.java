@@ -10,17 +10,23 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
-
 import com.metrics.MetricsApplication;
 import com.metrics.domain.CreateMetricRequest;
 import com.metrics.model.MetricsCollection;
 import com.metrics.service.Functions;
 import com.metrics.service.HttpExceptions;
 import com.metrics.service.MetricsServiceImpl;
+import com.metrics.service.ErrorHandler.HttpExceptionMessage;
+import com.metrics.service.ErrorHandler.PathErrorMessage;
+import com.metrics.service.ErrorHandler.TypeError;
+import com.metrics.service.StaticFunctionsVariables.StaticVariables;
 
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
 
@@ -32,26 +38,30 @@ public class MetricsController {
 	@ResponseStatus(value = HttpStatus.OK)
 	@PutMapping("/metrics/{id}")
 	public MetricsCollection updateMetric(@RequestBody CreateMetricRequest request, @PathVariable String id) {
+		StaticVariables.id = id;
 		MetricsApplication.logger.info("Creating container");
 		MetricsCollection resultMetric = new MetricsCollection();
 		if (findById(id) != null) {
-			Functions.datePUT = service.findById(id).get();
+			StaticVariables.datePUT = service.findById(id).get();
+			StaticVariables.id = id;
 		}
 		Functions.VerifyingUUID(id);
 		Functions.testMetricIntegrity(request, 1);
-		if (Functions.SprintsIdVerification(request) && Functions.EvaluatorsIdVerification(request)) {
+		if (Functions.ifSprintExist(request.getSprint_id()) && Functions.ifUserExist(request.getEvaluated_id(), 0)
+				&& Functions.ifUserExist(request.getEvaluator_id(), 1)) {
 			MetricsApplication.logger.info("calling update service");
 			resultMetric = service.updateMetric(request, id);
 			MetricsApplication.logger.info("update successfull, returning updated object..");
 		}
-
+		StaticVariables.id = null;
 		return resultMetric;
 	}
 
 	@ResponseStatus(value = HttpStatus.OK)
 	@GetMapping("/metrics")
-	public List<MetricsCollection> getMetrics(@RequestParam(value = "page", defaultValue = "1") int page,
-			@RequestParam(value = "size", defaultValue = "1") int size,
+	public List<MetricsCollection> getMetrics(HttpServletRequest request,
+			@RequestParam(value = "page", defaultValue = "-1") int page,
+			@RequestParam(value = "size", defaultValue = "-1") int size,
 			@RequestParam(value = "startDate", defaultValue = "1000-01-01") String startDate,
 			@RequestParam(value = "endDate", defaultValue = "1000-01-01") String endDate,
 			@RequestParam(value = "evaluator_id", defaultValue = "") String evaluator_id,
@@ -59,15 +69,27 @@ public class MetricsController {
 			@RequestParam(value = "sprint_id", defaultValue = "") String sprint_id,
 			@RequestParam(value = "orderBy", defaultValue = "-1") int orderBy) {
 
+		/*
+		 * MetricsApplication.logger.info(request.getQueryString()); Set<String>
+		 * allowedParams = new HashSet<String>(); allowedParams.add("size");
+		 * allowedParams.add("page"); allowedParams.add("startDate");
+		 * allowedParams.add("endDate"); allowedParams.add("evaluator_id");
+		 * allowedParams.add("evaluated_id"); allowedParams.add("sprint_id");
+		 * allowedParams.add("orderBy"); Functions.checkParams(request,allowedParams);
+		 */
+
+		if (!Functions.checkIsOnlyGet(request)) {
+			MetricsApplication.logger.info("Calling param validation");
+			Functions.checkPaginationParams(request);
+			MetricsApplication.logger.info("Calling Date validation");
+			Functions.checkDateParams(request);
+		}
 		MetricsApplication.logger.info("Getting list of metrics");
 
 		List<MetricsCollection> ListMetric = service.getMetrics();
 
 		MetricsApplication.logger.info("Verifying if DB is empty");
 		Functions.IsDBEmpty(ListMetric);
-
-		MetricsApplication.logger.info("Verifying all types datas into DB");
-		Functions.VerifyingAllTypesDatasIntoDB(ListMetric);
 
 		MetricsApplication.logger.info("Setting false the variables withFilters");
 		boolean withFilters = false;
@@ -79,9 +101,11 @@ public class MetricsController {
 		boolean withFiltersPagination = false;
 
 		// Verifying orderBy size
-		if (orderBy > 1)
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "use 0 ascend or 1 to descend");
-
+		if (orderBy > 1) {
+			TypeError.httpErrorMessage(new Exception(), HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.name(),
+					HttpExceptionMessage.OrderByInvalidValue400, PathErrorMessage.pathMetric);
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+		}
 		// Applying filter of pagination and applying order by ascendant
 		if (orderBy == 1 && !withFilters) {
 			MetricsApplication.logger.info("Applying Descending filter");
@@ -93,7 +117,6 @@ public class MetricsController {
 			ListMetric = Functions.OrderByAscending(ListMetric);
 		}
 		if (!evaluator_id.equals("") || !evaluated_id.equals("") || !sprint_id.equals("")) {
-			MetricsApplication.logger.info("Setting filter by Id's true");
 			withFiltersIds = true;
 		}
 		
@@ -101,8 +124,8 @@ public class MetricsController {
 			MetricsApplication.logger.info("Setting filter by date true");
 			withFiltersDate = true;
 		}
-		
-		if (page != 1 || size != 1) {
+
+		if (page > 0 || size > 0) {
 			MetricsApplication.logger.info("Setting filter by pagination true");
 			withFiltersPagination = true;
 		}
@@ -115,13 +138,9 @@ public class MetricsController {
 					MetricsApplication.logger.info("Setting true variable withFilters in evaluator_id");
 					withFilters = true;
 					MetricsApplication.logger.info("Running metodh getItemsFromIdFilter with evaluator_id");
-					ListMetric = service.getItemsFromIdFilter(evaluator_id, ListMetric, 0);
-					withFiltersIdEvaluator =  true;
+					ListMetric = service.getItemsFromIdFilter(evaluator_id, ListMetric, 0, 2);
+					withFiltersIdEvaluator = true;
 				}
-			} else if (!withFiltersIdEvaluator && !withFiltersIdEvaluated && !withFiltersIdSprint){
-				MetricsApplication.logger.info("Clearing list because evaluator id is wrong or missing");
-				ListMetric.clear();
-				return ListMetric;
 			}
 			// Applying filter by evaluated_id and applying order by ascendant
 			if (!evaluated_id.equals("")) {
@@ -130,13 +149,9 @@ public class MetricsController {
 					MetricsApplication.logger.info("Setting true variable withFilters in evaluated_id");
 					withFilters = true;
 					MetricsApplication.logger.info("Running metodh getItemsFromIdFilter with evaluated_id");
-					ListMetric = service.getItemsFromIdFilter(evaluated_id, ListMetric, 1);
+					ListMetric = service.getItemsFromIdFilter(evaluated_id, ListMetric, 1, 2);
 					withFiltersIdEvaluated = true;
 				}
-			} else if (!withFiltersIdEvaluator && !withFiltersIdEvaluated && !withFiltersIdSprint){
-				MetricsApplication.logger.info("Clearing list because evaluated id is wrong or missing");
-				ListMetric.clear();
-				return ListMetric;
 			}
 			// Applying filter by sprint_id and applying order by ascendant
 			if (!sprint_id.equals("")) {
@@ -145,11 +160,13 @@ public class MetricsController {
 					MetricsApplication.logger.info("Setting true variable withFilters in sprint_id");
 					withFilters = true;
 					MetricsApplication.logger.info("Running metodh getItemsFromIdFilter with sprint_id");
-					ListMetric = service.getItemsFromIdFilter(sprint_id, ListMetric, 2);
+					ListMetric = service.getItemsFromIdFilter(sprint_id, ListMetric, 2, 2);
 					withFiltersIdSprint = true;
 				}
-			} else if (!withFiltersIdEvaluator && !withFiltersIdEvaluated && !withFiltersIdSprint){
-				MetricsApplication.logger.info("Clearing list because sprint id is wrong or missing");
+			}
+
+			if (!withFiltersIdEvaluator && !withFiltersIdEvaluated && !withFiltersIdSprint) {
+				MetricsApplication.logger.info("Clearing list because evaluator id is wrong or missing");
 				ListMetric.clear();
 				return ListMetric;
 			}
@@ -157,38 +174,46 @@ public class MetricsController {
 		
 		// Applying filter by date range and applying order by ascendant
 		if (withFiltersDate) {
+
+			withFilters = true;
+			Date defaultValueDate = null;
+			Date startDateLocal = null;
+			Date endDateLocal = null;
+
+			Functions.VerifyingDateValid(startDate);
+			Functions.VerifyingDateValid(endDate);
 			try {
-
-				withFilters = true;
-
-				Functions.VerifyingDateValid(startDate);
-				Functions.VerifyingDateValid(endDate);
-
 				MetricsApplication.logger.info("Creating default value and parse to type date");
-				Date defaultValueDate = Functions.stringToDate("1000-01-01");
+				defaultValueDate = Functions.stringToDate("1000-01-01");
 
 				MetricsApplication.logger.info("Parse to type date the content of the incoming variable startDate");
-				Date startDateLocal = Functions.stringToDate(startDate);
+				startDateLocal = Functions.stringToDate(startDate);
 				MetricsApplication.logger.info(startDateLocal);
 
 				MetricsApplication.logger.info("Parse to type date the content of the incoming variable endtDate");
-				Date endDateLocal = Functions.stringToDate(endDate);
+				endDateLocal = Functions.stringToDate(endDate);
 				MetricsApplication.logger.info(endDateLocal);
 
-				if (startDateLocal.compareTo(defaultValueDate) > 0 && endDateLocal.compareTo(defaultValueDate) > 0) {
-					MetricsApplication.logger.info("Applying filter by date range and applying order by ascendant");
-					MetricsApplication.logger.info("Setting true variable withFilters in range dates");
+			} catch (Exception error) {
+				TypeError.httpErrorMessage(new Exception(), HttpStatus.BAD_REQUEST.value(),
+						HttpStatus.BAD_REQUEST.name(), HttpExceptionMessage.DateInvalidFormat400,
+						PathErrorMessage.pathMetric);
+				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "the start page is bigger than endPage");
+			}
 
-					if (startDateLocal.after(endDateLocal)) {
-						throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-					}
+			if (startDateLocal.compareTo(defaultValueDate) > 0 && endDateLocal.compareTo(defaultValueDate) > 0) {
+				MetricsApplication.logger.info("Applying filter by date range and applying order by ascendant");
+				MetricsApplication.logger.info("Setting true variable withFilters in range dates");
 
-					ListMetric = service.getItemsFromDateRange(startDateLocal, endDateLocal, ListMetric);
-
+				if (startDateLocal.after(endDateLocal)) {
+					TypeError.httpErrorMessage(new Exception(), HttpStatus.BAD_REQUEST.value(),
+							HttpStatus.BAD_REQUEST.name(), HttpExceptionMessage.DateInvalidOrder400,
+							PathErrorMessage.pathMetric);
+					throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
 				}
 
-			} catch (Exception e) {
-				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "the start page is bigger than endPage");
+				ListMetric = service.getItemsFromDateRange(startDateLocal, endDateLocal, ListMetric);
+
 			}
 		}
 		if (withFiltersPagination) {
@@ -197,7 +222,10 @@ public class MetricsController {
 				withFilters = true;
 				ListMetric = service.getAllMetricsPaginated(page, size, ListMetric);
 			} else {
-				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "page or size have invalid number");
+				TypeError.httpErrorMessage(new Exception(), HttpStatus.BAD_REQUEST.value(),
+						HttpStatus.BAD_REQUEST.name(), HttpExceptionMessage.InvalidPageOrSizeValue400,
+						PathErrorMessage.pathMetric);
+				throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
 			}
 		}
 
@@ -206,20 +234,25 @@ public class MetricsController {
 			MetricsApplication.logger.info("Not applying anything filter");
 			MetricsApplication.logger.info("Returning list without any filters");
 		}
-		
+		MetricsApplication.logger.info("Calling flag before validation param");
 		return ListMetric;
 	}
 
 	@ResponseStatus(value = HttpStatus.OK)
 	@GetMapping("/metrics/{id}")
 	public Optional<MetricsCollection> findById(@PathVariable String id) {
-		Functions.VerifyingUUID(id);
+		StaticVariables.id = id;
+
 		try {
+
 			MetricsApplication.logger.info("Calling findById service");
 			return service.findById(id);
 		} catch (Exception error) {
 			MetricsApplication.logger.error("trying to call findById service but couldnt find the given ID");
-			throw new ResponseStatusException(HttpStatus.NOT_FOUND, HttpExceptions.findById404, error);
+			TypeError.httpErrorMessage(new Exception(), HttpStatus.NOT_FOUND.value(), HttpStatus.NOT_FOUND.name(),
+					HttpExceptionMessage.IdNotFound404, "/metric/" + id);
+			StaticVariables.id = null;
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND);
 		}
 	}
 
@@ -227,23 +260,28 @@ public class MetricsController {
 	@PostMapping("/metrics")
 	public String newMetric(@RequestBody CreateMetricRequest request) {
 		String id = "";
-		MetricsApplication.logger.info("Calling the data validation method and ID Validation for Evaluator and Evaluated ID");
-		Functions.VerifyingUUID(request.getEvaluated_id());
-		if (Functions.testMetricIntegrity(request, 0) != null && Functions.SprintsIdVerification(request) && Functions.EvaluatorsIdVerification(request)) {
+
+		MetricsApplication.logger
+				.info("Calling the data validation method and ID Validation for Evaluator and Evaluated ID");
+		if (Functions.testMetricIntegrity(request, 0) != null && Functions.ifSprintExist(request.getSprint_id())
+				&& Functions.ifUserExist(request.getEvaluated_id(), 0)
+				&& Functions.ifUserExist(request.getEvaluator_id(), 1)) {
 			MetricsApplication.logger.info("data validation successfull,calling the newMetric service");
 			id = service.newMetric(request).getId();
 			MetricsApplication.logger.info("saving id into String to return");
 		}
 		MetricsApplication.logger.info("New metric created successfully returning the ID of the new metric");
+		StaticVariables.id = null;
 		return id;
 	}
 
 	@ResponseStatus(value = HttpStatus.NO_CONTENT)
 	@DeleteMapping("/metrics/{id}")
 	public void deleteMetric(@PathVariable String id) {
-		Functions.VerifyingUUID(id);
+		StaticVariables.id = id;
 		MetricsApplication.logger.info("Calling deleteMetric service");
 		service.deleteMetric(id);
+		StaticVariables.id = null;
 	}
 
 }

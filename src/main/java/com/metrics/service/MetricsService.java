@@ -21,7 +21,8 @@ public interface MetricsService {
 
 	List<MetricsCollection> getAllMetricsPaginated(int start, int size, List<MetricsCollection> metrics);
 
-	List<MetricsCollection> getItemsFromIdFilter(String id, List<MetricsCollection> metrics, int typeId);
+	public List<MetricsCollection> getItemsFromIdFilter(String id, List<MetricsCollection> metrics, int typeId,
+			int typeRequest);
 
 	List<MetricsCollection> getItemsFromDateRange(Date startDate, Date endDate, List<MetricsCollection> metrics);
 }
