@@ -6,7 +6,7 @@ import java.util.List;
 
 import com.metrics.model.MetricsCollection;
 
-public class SortingValidations {
+public class SortingMethods {
 	public static List<MetricsCollection> OrderByAscending(List<MetricsCollection> listMetric) {
 		List<MetricsCollection> listOrder = listMetric;
 		Collections.sort(listOrder, new Comparator<MetricsCollection>() {

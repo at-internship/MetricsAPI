@@ -13,10 +13,10 @@ import org.springframework.web.server.ResponseStatusException;
 import com.metrics.MetricsApplication;
 import com.metrics.domain.CreateMetricRequest;
 import com.metrics.model.MetricsCollection;
-import com.metrics.service.BusinessValidations;
+import com.metrics.service.BusinessMethods;
 import com.metrics.service.ClientValidations;
 import com.metrics.service.MetricsServiceImpl;
-import com.metrics.service.SortingValidations;
+import com.metrics.service.SortingMethods;
 import com.metrics.service.TechnicalValidations;
 import com.metrics.service.ErrorHandler.HttpExceptionMessage;
 import com.metrics.service.ErrorHandler.PathErrorMessage;
@@ -47,11 +47,11 @@ public class MetricsController {
 			StaticVariables.datePUT = service.findById(id).get();
 			StaticVariables.id = id;
 		}
-		ClientValidations.VerifyingUUID(id);
-		ClientValidations.testMetricIntegrity(request, 1);
-		if (BusinessValidations.ifSprintExist(request.getSprint_id())
-				&& BusinessValidations.ifUserExist(request.getEvaluated_id(), 0)
-				&& BusinessValidations.ifUserExist(request.getEvaluator_id(), 1)) {
+		TechnicalValidations.VerifyingUUID(id);
+		BusinessMethods.testMetricIntegrity(request, 1);
+		if (BusinessMethods.ifSprintExist(request.getSprint_id())
+				&& BusinessMethods.ifUserExist(request.getEvaluated_id(), 0)
+				&& BusinessMethods.ifUserExist(request.getEvaluator_id(), 1)) {
 			MetricsApplication.logger.info("calling update service");
 			resultMetric = service.updateMetric(request, id);
 			MetricsApplication.logger.info("update successfull, returning updated object..");
@@ -113,11 +113,11 @@ public class MetricsController {
 		if (orderBy == 1 && !withFilters) {
 			MetricsApplication.logger.info("Applying Descending filter");
 			withFilters = true;
-			ListMetric = SortingValidations.OrderByDescending(ListMetric);
+			ListMetric = SortingMethods.OrderByDescending(ListMetric);
 		} else if (orderBy == 0 && !withFilters) {
 			MetricsApplication.logger.info("Applying Ascending filter");
 			withFilters = true;
-			ListMetric = SortingValidations.OrderByAscending(ListMetric);
+			ListMetric = SortingMethods.OrderByAscending(ListMetric);
 		}
 		if (!evaluator_id.equals("") || !evaluated_id.equals("") || !sprint_id.equals("")) {
 			withFiltersIds = true;
@@ -136,7 +136,7 @@ public class MetricsController {
 		// Applying filter by evaluator_id and applying order by ascendant
 		if (withFiltersIds) {
 			if (!evaluator_id.equals("")) {
-				if (ClientValidations.VerifyingID(evaluator_id)) {
+				if (TechnicalValidations.VerifyingID(evaluator_id)) {
 					MetricsApplication.logger.info("Applying filter by evaluator_id and applying order by ascendant");
 					MetricsApplication.logger.info("Setting true variable withFilters in evaluator_id");
 					withFilters = true;
@@ -147,7 +147,7 @@ public class MetricsController {
 			}
 			// Applying filter by evaluated_id and applying order by ascendant
 			if (!evaluated_id.equals("")) {
-				if (ClientValidations.VerifyingID(evaluated_id)) {
+				if (TechnicalValidations.VerifyingID(evaluated_id)) {
 					MetricsApplication.logger.info("Applying filter by evaluated_id and applying order by ascendant");
 					MetricsApplication.logger.info("Setting true variable withFilters in evaluated_id");
 					withFilters = true;
@@ -158,7 +158,7 @@ public class MetricsController {
 			}
 			// Applying filter by sprint_id and applying order by ascendant
 			if (!sprint_id.equals("")) {
-				if (ClientValidations.VerifyingID(sprint_id)) {
+				if (TechnicalValidations.VerifyingID(sprint_id)) {
 					MetricsApplication.logger.info("Applying filter by sprint_id and applying order by ascendant");
 					MetricsApplication.logger.info("Setting true variable withFilters in sprint_id");
 					withFilters = true;
@@ -183,8 +183,8 @@ public class MetricsController {
 			Date startDateLocal = null;
 			Date endDateLocal = null;
 
-			ClientValidations.VerifyingDateValid(startDate);
-			ClientValidations.VerifyingDateValid(endDate);
+			BusinessMethods.VerifyingDateValid(startDate);
+			BusinessMethods.VerifyingDateValid(endDate);
 			try {
 				MetricsApplication.logger.info("Creating default value and parse to type date");
 				defaultValueDate = TechnicalValidations.stringToDate("1000-01-01");
@@ -266,10 +266,10 @@ public class MetricsController {
 
 		MetricsApplication.logger
 				.info("Calling the data validation method and ID Validation for Evaluator and Evaluated ID");
-		if (ClientValidations.testMetricIntegrity(request, 0) != null
-				&& BusinessValidations.ifSprintExist(request.getSprint_id())
-				&& BusinessValidations.ifUserExist(request.getEvaluated_id(), 0)
-				&& BusinessValidations.ifUserExist(request.getEvaluator_id(), 1)) {
+		if (BusinessMethods.testMetricIntegrity(request, 0) != null
+				&& BusinessMethods.ifSprintExist(request.getSprint_id())
+				&& BusinessMethods.ifUserExist(request.getEvaluated_id(), 0)
+				&& BusinessMethods.ifUserExist(request.getEvaluator_id(), 1)) {
 			MetricsApplication.logger.info("data validation successfull,calling the newMetric service");
 			id = service.newMetric(request).getId();
 			MetricsApplication.logger.info("saving id into String to return");

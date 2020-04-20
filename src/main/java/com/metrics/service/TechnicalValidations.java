@@ -8,6 +8,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.TimeZone;
+import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -198,6 +199,38 @@ public class TechnicalValidations {
 
 		});
 	}
+	public static void VerifyingUUID(String uuid) {
+		Pattern patt = Pattern.compile("[0-9a-f]{24}$");
+		MetricsApplication.logger.error("Valiting id " + uuid);
+		boolean validObjectId = patt.matcher(uuid).matches();
+		if (!validObjectId || TechnicalValidations.haveOnlyLetters(uuid)
+				|| TechnicalValidations.haveOnlyNumbers(uuid)) {
+			TypeError.httpErrorMessage(new Exception(), HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.name(),
+					HttpExceptionMessage.IDInvalid400, "/metrics/" + uuid);
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+		} else {
+			MetricsApplication.logger.error("The id is valid");
+		}
+	}
+
+	public static boolean VerifyingID(String uuid) {
+		Pattern patt = Pattern.compile("^[a-zA-Z0-9]+$");
+		MetricsApplication.logger.error("Valiting id " + uuid);
+
+		boolean validObjectId = patt.matcher(uuid).matches();
+		MetricsApplication.logger.error(validObjectId);
+		if (!validObjectId) {
+			TypeError.httpErrorMessage(new Exception(), HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.name(),
+					HttpExceptionMessage.IdHasSpecialChar400, "/metrics/" + uuid);
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+		}
+		if (TechnicalValidations.haveOnlyLetters(uuid) || TechnicalValidations.haveOnlyNumbers(uuid)) {
+			return false;
+		} else {
+			return true;
+		}
+	}
+	
 	
 
 }
