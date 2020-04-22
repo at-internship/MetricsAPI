@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.metrics</groupId>
 	<artifactId>metrics</artifactId>
-	<version>1.0.0</version>
+	<version>1.0.1</version>
 	<name>metrics</name>
 	<description>Metrics API</description>
 
