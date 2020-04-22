@@ -25,4 +25,8 @@ public interface MetricsService {
 			int typeRequest);
 
 	List<MetricsCollection> getItemsFromDateRange(Date startDate, Date endDate, List<MetricsCollection> metrics);
+	
+	List<MetricsCollection> getMetricsFilter(String sprint_id, String evaluator_id,
+			String evaluated_id, String startDate,
+			String endDate, int page, int size, int order);
 }
