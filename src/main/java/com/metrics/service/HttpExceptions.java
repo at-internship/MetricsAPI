@@ -27,4 +27,5 @@ public class HttpExceptions {
 	public static final String testMetricIntegrityEvaluatedId400 = "The given evaluated_id fiel is invalid or null";
 	public static final String testMetricIntegrityEvaluatorId400 = "The given evaluator_id fiel is invalid or null";
 	public static final String testMetricIntegritySprintId400 = "The given sprint_id fiel is invalid or null";
+	public static final String isOnlyNumberFail400 = "OrderBy, Size and Page must be numbers";
 }

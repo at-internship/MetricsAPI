@@ -1,11 +1,14 @@
 package com.metrics.service;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
@@ -38,6 +41,66 @@ public class MetricsServiceImpl implements MetricsService {
 		MetricsApplication.logger.info("Returning lists");
 		return metricsCollection;
 	}
+	
+	public List<MetricsCollection> getMetricsFilter(String sprint_id, String evaluator_id,
+													String evaluated_id, String startDate,
+													String endDate, int page, int size, int order) 
+	{
+		MetricsApplication.logger.info("Creating list..");
+		List<MetricsCollection> metricsCollection = new ArrayList<>();
+		MetricsApplication.logger.info("Filling list with info");
+		
+		if(endDate.equals("1000-01-01")) {
+			Date date = new Date();
+			endDate= new SimpleDateFormat("yyyy-MM-dd").format(date);
+		}
+		
+		// By default size = 100 and order is descending 
+		PageRequest firstPageRequest = PageRequest.of(page, size, Sort.Direction.DESC, "date");
+		if(order == 0) {
+		firstPageRequest = PageRequest.of(page, size, Sort.Direction.ASC, "date");
+		}
+		MetricsApplication.logger.info(sprint_id);
+		
+		//Applying the correct filters
+		if(sprint_id.equals("") && evaluator_id.equals("") && evaluated_id.equals("")) {
+		MetricsApplication.logger.info("Find all");
+		MetricsApplication.logger.info(endDate);
+		metricsCollection = repository.findByDate(startDate, endDate, firstPageRequest);
+		}
+		else if(evaluator_id.equals("") && evaluated_id.equals("")) {
+		MetricsApplication.logger.info("Find by sprint_id");
+		metricsCollection = repository.findBySprintId(sprint_id, startDate, endDate, firstPageRequest);
+		}
+		else if(sprint_id.equals("") && evaluated_id.equals("")) {
+		MetricsApplication.logger.info("Find by evaluator_id");
+		metricsCollection = repository.findByEvaluatorId(evaluator_id, startDate, endDate, firstPageRequest);
+		}
+		else if(evaluator_id.equals("") && sprint_id.equals("")) {
+		MetricsApplication.logger.info("Find by evaluated_id");
+		metricsCollection = repository.findByEvaluatedId(evaluated_id, startDate, endDate, firstPageRequest);
+		}
+		else if(sprint_id.equals("")) {
+		metricsCollection = repository.findByEvaluatorIdAndEvaluatedId(evaluator_id, evaluated_id, startDate, endDate, firstPageRequest);
+		}
+		else if(evaluator_id.equals("")) {
+		metricsCollection = repository.findBySprintIdAndEvaluatedId(sprint_id, evaluated_id, startDate, endDate, firstPageRequest);
+		}
+		else if(evaluated_id.equals("")) {
+		metricsCollection = repository.findBySpritIdAndEvaluatorId(sprint_id, evaluator_id, startDate, endDate, firstPageRequest);
+		}
+		else {
+		metricsCollection = repository.findBySprintIdAndEvaluatedIdAndEvaluatorId(sprint_id, evaluated_id, evaluator_id, startDate, endDate, firstPageRequest);
+		}
+		
+	
+		MetricsApplication.logger.info("Returning lists");
+		return metricsCollection;
+}
+
+
+
+
 
 	@Override
 	public Optional<MetricsCollection> findById(String id) {

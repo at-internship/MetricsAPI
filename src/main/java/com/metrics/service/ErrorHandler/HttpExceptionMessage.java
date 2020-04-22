@@ -66,6 +66,7 @@ public class HttpExceptionMessage {
 	//Messages for method "checkPaginationParams"
 	public static final String PageNull400 = "page value field is required when size is given";
 	public static final String SizeNull400 = "size value field is required when page is given";
+	public static final String isOnlyNumberFail400 = "OrderBy, Size and Page must be numbers";
 	
 	//Messages for method "checkDateParams"
 	public static final String EndDateNull400 = "endDate value field is required when startDate is given";

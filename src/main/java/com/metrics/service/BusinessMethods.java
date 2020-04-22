@@ -60,7 +60,7 @@ public class BusinessMethods {
 		}
 	}
 	
-	public static void VerifyingDateValid(String inputString) {
+	public static void VerifyingDateValid(String inputString, int typeRequest) {
 		SimpleDateFormat format = new java.text.SimpleDateFormat("yyyy-MM-dd");
 		try {
 			MetricsApplication.logger.info("Starting date format validation.." + inputString);
@@ -72,11 +72,13 @@ public class BusinessMethods {
 			}
 			String[] date = inputString.split("-");
 			if (date[0].length() == 4 && date[1].length() == 2 && date[2].length() == 2) {
-				if (!TechnicalValidations.isWithinRange(TechnicalValidations.stringToDate(inputString))) {
-					TypeError.httpErrorMessage(new Exception(), HttpStatus.BAD_REQUEST.value(),
-							HttpStatus.BAD_REQUEST.name(), HttpExceptionMessage.DateInvalidRange400,
-							PathErrorMessage.pathMetric);
-					throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+				if(typeRequest != 2) {
+					if (!TechnicalValidations.isWithinRange(TechnicalValidations.stringToDate(inputString))) {
+						TypeError.httpErrorMessage(new Exception(), HttpStatus.BAD_REQUEST.value(),
+								HttpStatus.BAD_REQUEST.name(), HttpExceptionMessage.DateInvalidRange400,
+								PathErrorMessage.pathMetric);
+						throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+					}
 				}
 				if (Integer.parseInt(date[2]) > 31 && Integer.parseInt(date[2]) != 02) {
 					MetricsApplication.logger.error("Incorrect day");
@@ -274,10 +276,10 @@ public class BusinessMethods {
 				metric.setDate(dateFormat.format(date));
 			} else if (!metric.getDate().isEmpty() && typeRequest == 0) {
 				MetricsApplication.logger.info("Verifying integrity of date field");
-				VerifyingDateValid(metric.getDate());
+				VerifyingDateValid(metric.getDate(), 0);
 			} else if (!metric.getDate().isEmpty() && typeRequest == 1) {
 				MetricsApplication.logger.info("Verifying integrity of date field");
-				VerifyingDateValid(metric.getDate());
+				VerifyingDateValid(metric.getDate(), 1);
 			}
 		} else {
 			metric.setDate(StaticVariables.datePUT.getDate());

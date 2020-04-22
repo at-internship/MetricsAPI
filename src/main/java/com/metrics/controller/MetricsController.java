@@ -23,6 +23,7 @@ import com.metrics.service.ErrorHandler.PathErrorMessage;
 import com.metrics.service.ErrorHandler.TypeError;
 import com.metrics.service.StaticFunctionsVariables.StaticVariables;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -62,185 +63,53 @@ public class MetricsController {
 
 	@ResponseStatus(value = HttpStatus.OK)
 	@GetMapping("/metrics")
-	public List<MetricsCollection> getMetrics(HttpServletRequest request,
-			@RequestParam(value = "page", defaultValue = "-1") int page,
-			@RequestParam(value = "size", defaultValue = "-1") int size,
+	public List<MetricsCollection> getMetrics(@RequestParam(value = "page", defaultValue = "1") String pageStr,
+			@RequestParam(value = "size", defaultValue = "2147483547") String sizeStr,
 			@RequestParam(value = "startDate", defaultValue = "1000-01-01") String startDate,
 			@RequestParam(value = "endDate", defaultValue = "1000-01-01") String endDate,
 			@RequestParam(value = "evaluator_id", defaultValue = "") String evaluator_id,
 			@RequestParam(value = "evaluated_id", defaultValue = "") String evaluated_id,
 			@RequestParam(value = "sprint_id", defaultValue = "") String sprint_id,
-			@RequestParam(value = "orderBy", defaultValue = "-1") int orderBy) {
-
-		/*
-		 * MetricsApplication.logger.info(request.getQueryString()); Set<String>
-		 * allowedParams = new HashSet<String>(); allowedParams.add("size");
-		 * allowedParams.add("page"); allowedParams.add("startDate");
-		 * allowedParams.add("endDate"); allowedParams.add("evaluator_id");
-		 * allowedParams.add("evaluated_id"); allowedParams.add("sprint_id");
-		 * allowedParams.add("orderBy"); Functions.checkParams(request,allowedParams);
-		 */
-
-		if (!TechnicalValidations.checkIsOnlyGet(request)) {
-			MetricsApplication.logger.info("Calling param validation");
-			TechnicalValidations.checkPaginationParams(request);
-			MetricsApplication.logger.info("Calling Date validation");
-			TechnicalValidations.checkDateParams(request);
-		}
-		MetricsApplication.logger.info("Getting list of metrics");
-
-		List<MetricsCollection> ListMetric = service.getMetrics();
-
+			@RequestParam(value = "orderBy", defaultValue = "1") String orderByStr) {
 		MetricsApplication.logger.info("Verifying if DB is empty");
-		TechnicalValidations.IsDBEmpty(ListMetric);
-
-		MetricsApplication.logger.info("Setting false the variables withFilters");
-		boolean withFilters = false;
-		boolean withFiltersIds = false;
-		boolean withFiltersIdEvaluator = false;
-		boolean withFiltersIdEvaluated = false;
-		boolean withFiltersIdSprint = false;
-		boolean withFiltersDate = false;
-		boolean withFiltersPagination = false;
-
-		// Verifying orderBy size
-		if (orderBy > 1) {
+		BusinessMethods.VerifyingDateValid(startDate, 2);
+		BusinessMethods.VerifyingDateValid(endDate, 2);
+		
+		//Verifying only number
+		if(!TechnicalValidations.haveOnlyNumbers(sizeStr) || !TechnicalValidations.haveOnlyNumbers(pageStr) || !TechnicalValidations.haveOnlyNumbers(orderByStr)) {
+			MetricsApplication.logger.info("Not are only numbers");
+			TypeError.httpErrorMessage(new Exception(), HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.name(),
+					HttpExceptionMessage.isOnlyNumberFail400, PathErrorMessage.pathMetric);
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+		}
+			int page = Integer.parseInt(pageStr);
+			int orderBy = Integer.parseInt(orderByStr);
+			int size = Integer.parseInt(sizeStr);
+		
+		
+		//Verifying page and size
+		if (page < 1 || size < 1) {
+			TypeError.httpErrorMessage(new Exception(), HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.name(),
+					HttpExceptionMessage.InvalidPageOrSizeValue400, PathErrorMessage.pathMetric);
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+		} else {
+			page = page - 1;
+		}
+		
+		//Verifying orderBy
+		if (orderBy > 1 || orderBy < 0) {
 			TypeError.httpErrorMessage(new Exception(), HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.name(),
 					HttpExceptionMessage.OrderByInvalidValue400, PathErrorMessage.pathMetric);
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
 		}
-		// Applying filter of pagination and applying order by ascendant
-		if (orderBy == 1 && !withFilters) {
-			MetricsApplication.logger.info("Applying Descending filter");
-			withFilters = true;
-			ListMetric = SortingMethods.OrderByDescending(ListMetric);
-		} else if (orderBy == 0 && !withFilters) {
-			MetricsApplication.logger.info("Applying Ascending filter");
-			withFilters = true;
-			ListMetric = SortingMethods.OrderByAscending(ListMetric);
-		}
-		if (!evaluator_id.equals("") || !evaluated_id.equals("") || !sprint_id.equals("")) {
-			withFiltersIds = true;
-		}
+		List<MetricsCollection> ListMetric = service.getMetricsFilter(sprint_id, evaluator_id, evaluated_id, startDate,
+				endDate, page, size, orderBy);
+		TechnicalValidations.IsDBEmpty(ListMetric);
 
-		if (!startDate.equals("1000-01-01") && !endDate.equals("1000-01-01")) {
-			MetricsApplication.logger.info("Setting filter by date true");
-			withFiltersDate = true;
-		}
-
-		if (page > 0 || size > 0) {
-			MetricsApplication.logger.info("Setting filter by pagination true");
-			withFiltersPagination = true;
-		}
-
-		// Applying filter by evaluator_id and applying order by ascendant
-		if (withFiltersIds) {
-			if (!evaluator_id.equals("")) {
-				if (TechnicalValidations.VerifyingID(evaluator_id)) {
-					MetricsApplication.logger.info("Applying filter by evaluator_id and applying order by ascendant");
-					MetricsApplication.logger.info("Setting true variable withFilters in evaluator_id");
-					withFilters = true;
-					MetricsApplication.logger.info("Running metodh getItemsFromIdFilter with evaluator_id");
-					ListMetric = service.getItemsFromIdFilter(evaluator_id, ListMetric, 0, 2);
-					withFiltersIdEvaluator = true;
-				}
-			}
-			// Applying filter by evaluated_id and applying order by ascendant
-			if (!evaluated_id.equals("")) {
-				if (TechnicalValidations.VerifyingID(evaluated_id)) {
-					MetricsApplication.logger.info("Applying filter by evaluated_id and applying order by ascendant");
-					MetricsApplication.logger.info("Setting true variable withFilters in evaluated_id");
-					withFilters = true;
-					MetricsApplication.logger.info("Running metodh getItemsFromIdFilter with evaluated_id");
-					ListMetric = service.getItemsFromIdFilter(evaluated_id, ListMetric, 1, 2);
-					withFiltersIdEvaluated = true;
-				}
-			}
-			// Applying filter by sprint_id and applying order by ascendant
-			if (!sprint_id.equals("")) {
-				if (TechnicalValidations.VerifyingID(sprint_id)) {
-					MetricsApplication.logger.info("Applying filter by sprint_id and applying order by ascendant");
-					MetricsApplication.logger.info("Setting true variable withFilters in sprint_id");
-					withFilters = true;
-					MetricsApplication.logger.info("Running metodh getItemsFromIdFilter with sprint_id");
-					ListMetric = service.getItemsFromIdFilter(sprint_id, ListMetric, 2, 2);
-					withFiltersIdSprint = true;
-				}
-			}
-
-			if (!withFiltersIdEvaluator && !withFiltersIdEvaluated && !withFiltersIdSprint) {
-				MetricsApplication.logger.info("Clearing list because evaluator id is wrong or missing");
-				ListMetric.clear();
-				return ListMetric;
-			}
-		}
-
-		// Applying filter by date range and applying order by ascendant
-		if (withFiltersDate) {
-
-			withFilters = true;
-			Date defaultValueDate = null;
-			Date startDateLocal = null;
-			Date endDateLocal = null;
-
-			BusinessMethods.VerifyingDateValid(startDate);
-			BusinessMethods.VerifyingDateValid(endDate);
-			try {
-				MetricsApplication.logger.info("Creating default value and parse to type date");
-				defaultValueDate = TechnicalValidations.stringToDate("1000-01-01");
-
-				MetricsApplication.logger.info("Parse to type date the content of the incoming variable startDate");
-				startDateLocal = TechnicalValidations.stringToDate(startDate);
-				MetricsApplication.logger.info(startDateLocal);
-
-				MetricsApplication.logger.info("Parse to type date the content of the incoming variable endtDate");
-				endDateLocal = TechnicalValidations.stringToDate(endDate);
-				MetricsApplication.logger.info(endDateLocal);
-
-			} catch (Exception error) {
-				TypeError.httpErrorMessage(new Exception(), HttpStatus.BAD_REQUEST.value(),
-						HttpStatus.BAD_REQUEST.name(), HttpExceptionMessage.DateInvalidFormat400,
-						PathErrorMessage.pathMetric);
-				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "the start page is bigger than endPage");
-			}
-
-			if (startDateLocal.compareTo(defaultValueDate) > 0 && endDateLocal.compareTo(defaultValueDate) > 0) {
-				MetricsApplication.logger.info("Applying filter by date range and applying order by ascendant");
-				MetricsApplication.logger.info("Setting true variable withFilters in range dates");
-
-				if (startDateLocal.after(endDateLocal)) {
-					TypeError.httpErrorMessage(new Exception(), HttpStatus.BAD_REQUEST.value(),
-							HttpStatus.BAD_REQUEST.name(), HttpExceptionMessage.DateInvalidOrder400,
-							PathErrorMessage.pathMetric);
-					throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-				}
-
-				ListMetric = service.getItemsFromDateRange(startDateLocal, endDateLocal, ListMetric);
-
-			}
-		}
-		if (withFiltersPagination) {
-			if (page > 0 && size > 0) {
-				MetricsApplication.logger.info("Setting true variable withFilters in the pagination");
-				withFilters = true;
-				ListMetric = service.getAllMetricsPaginated(page, size, ListMetric);
-			} else {
-				TypeError.httpErrorMessage(new Exception(), HttpStatus.BAD_REQUEST.value(),
-						HttpStatus.BAD_REQUEST.name(), HttpExceptionMessage.InvalidPageOrSizeValue400,
-						PathErrorMessage.pathMetric);
-				throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-			}
-		}
-
-		// Not applying anything filter
-		if (!withFilters) {
-			MetricsApplication.logger.info("Not applying anything filter");
-			MetricsApplication.logger.info("Returning list without any filters");
-		}
-		MetricsApplication.logger.info("Calling flag before validation param");
 		return ListMetric;
 	}
 
+	
 	@ResponseStatus(value = HttpStatus.OK)
 	@GetMapping("/metrics/{id}")
 	public Optional<MetricsCollection> findById(@PathVariable String id) {
