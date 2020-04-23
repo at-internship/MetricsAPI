@@ -22,6 +22,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.metrics.MetricsApplication;
 import com.metrics.domain.CreateMetricRequest;
 import com.metrics.model.MetricsCollection;
+import com.metrics.model.blockers;
+import com.metrics.model.blockersString;
+import com.metrics.model.metrics;
+import com.metrics.model.metricsString;
+import com.metrics.model.proactive;
+import com.metrics.model.proactiveString;
+import com.metrics.model.retroactive;
+import com.metrics.model.retroactiveString;
 import com.metrics.service.ErrorHandler.HttpExceptionMessage;
 import com.metrics.service.ErrorHandler.PathErrorMessage;
 import com.metrics.service.ErrorHandler.TypeError;
@@ -29,26 +37,74 @@ import com.metrics.service.StaticFunctionsVariables.StaticVariables;
 
 public class TechnicalValidations {
 	public static CreateMetricRequest MetricsCollectionToCreateMetricRequest(MetricsCollection metric) {
+
+		blockersString blockers_string = new blockersString();
+		blockers_string.setBlocked(metric.getMetrics().getBlockers().getBlocked().toString());
+		blockers_string.setComments(metric.getMetrics().getBlockers().getComments());
+
+		proactiveString proactive_string = new proactiveString();
+		proactive_string.setLooked_for_help(metric.getMetrics().getProactive().getLooked_for_help().toString());
+		proactive_string.setProvided_help(metric.getMetrics().getProactive().getProvided_help().toString());
+		proactive_string.setShared_resources(metric.getMetrics().getProactive().getShared_resources().toString());
+		proactive_string.setWorked_ahead(metric.getMetrics().getProactive().getWorked_ahead().toString());
+
+		retroactiveString retroactive_string = new retroactiveString();
+		retroactive_string.setComments(metric.getMetrics().getRetroactive().getComments());
+		retroactive_string
+				.setDelayed_looking_help(metric.getMetrics().getRetroactive().getDelayed_looking_help().toString());
+
+		metricsString metric_string = new metricsString();
+		metric_string.setAttendance(metric.getMetrics().getAttendance().toString());
+		metric_string.setBlockers(blockers_string);
+		metric_string.setCarried_over(metric.getMetrics().getCarried_over().toString());
+		metric_string.setProactive(proactive_string);
+		metric_string.setRetroactive(retroactive_string);
+
 		CreateMetricRequest listIncoming = new CreateMetricRequest(metric.getId(), metric.getEvaluator_id(),
-				metric.getEvaluated_id(), metric.getType(), metric.getDate(), metric.getSprint_id(),
-				metric.getMetrics());
+				metric.getEvaluated_id(), metric.getType(), metric.getDate(), metric.getSprint_id(), metric_string);
 		return listIncoming;
 	}
+
 	public static MetricsCollection CreateMetricRequestToMetricsCollection(CreateMetricRequest metric) {
+
+		blockers blockers_string = new blockers();
+		blockers_string.setBlocked(Boolean.parseBoolean(metric.getMetrics().getBlockers().getBlocked()));
+		blockers_string.setComments(metric.getMetrics().getBlockers().getComments());
+
+		proactive proactive_string = new proactive();
+		proactive_string
+				.setLooked_for_help(Boolean.parseBoolean(metric.getMetrics().getProactive().getLooked_for_help()));
+		proactive_string.setProvided_help(Boolean.parseBoolean(metric.getMetrics().getProactive().getProvided_help()));
+		proactive_string
+				.setShared_resources(Boolean.parseBoolean(metric.getMetrics().getProactive().getShared_resources()));
+		proactive_string.setWorked_ahead(Boolean.parseBoolean(metric.getMetrics().getProactive().getWorked_ahead()));
+
+		retroactive retroactive_string = new retroactive();
+		retroactive_string.setComments(metric.getMetrics().getRetroactive().getComments());
+		retroactive_string.setDelayed_looking_help(
+				Boolean.parseBoolean(metric.getMetrics().getRetroactive().getDelayed_looking_help()));
+
+		metrics metric_string = new metrics();
+		metric_string.setAttendance(Boolean.parseBoolean(metric.getMetrics().getAttendance()));
+		metric_string.setBlockers(blockers_string);
+		metric_string.setCarried_over(Boolean.parseBoolean(metric.getMetrics().getCarried_over()));
+		metric_string.setProactive(proactive_string);
+		metric_string.setRetroactive(retroactive_string);
+
 		MetricsCollection listIncoming = new MetricsCollection(metric.getId(), metric.getEvaluator_id(),
-				metric.getEvaluated_id(), metric.getType(), metric.getDate(), metric.getSprint_id(),
-				metric.getMetrics());
+				metric.getEvaluated_id(), metric.getType(), metric.getDate(), metric.getSprint_id(), metric_string);
 		return listIncoming;
-	}
-	public static void IsDBEmpty(List<MetricsCollection> metrics) {
-		MetricsApplication.logger.info("The method found " + metrics.size() + " records");
-		if (metrics.size() == 0) {
-			TypeError.httpErrorMessage(new Exception(), HttpStatus.NO_CONTENT.value(), HttpStatus.NO_CONTENT.name(),
-					HttpExceptionMessage.DBIsEmpty204, PathErrorMessage.pathMetric);
-			throw new ResponseStatusException(HttpStatus.NO_CONTENT);
-		}
 	}
 	
+	public static void IsDBEmpty(List<MetricsCollection> metrics) {
+        MetricsApplication.logger.info("The method found " + metrics.size() + " records");
+        if (metrics.size() == 0) {
+            TypeError.httpErrorMessage(new Exception(), HttpStatus.NO_CONTENT.value(), HttpStatus.NO_CONTENT.name(),
+                    HttpExceptionMessage.DBIsEmpty204, PathErrorMessage.pathMetric);
+            throw new ResponseStatusException(HttpStatus.NO_CONTENT);
+        }
+    }
+
 	public static boolean haveOnlyLetters(String uuid) {
 		for (char letter : uuid.toCharArray()) {
 			if (letter == '1' || letter == '2' || letter == '3' || letter == '4' || letter == '5' || letter == '6'
@@ -71,7 +127,7 @@ public class TechnicalValidations {
 			return true;
 		return false;
 	}
-	
+
 	static boolean isWithinRange(Date testDate) {
 		Calendar cal = Calendar.getInstance();
 		cal.setTimeZone(TimeZone.getTimeZone("CT"));
@@ -81,7 +137,7 @@ public class TechnicalValidations {
 		Date futureDate = cal.getTime();
 		return !(testDate.before(pastDate) || testDate.after(futureDate));
 	}
-	
+
 	public static Date stringToDate(String dateIncoming) throws ParseException {
 		Date date = null;
 		try {
@@ -94,7 +150,7 @@ public class TechnicalValidations {
 		}
 		return date;
 	}
-	
+
 	public static String mapToJson(Object obj) throws JsonProcessingException {
 		ObjectMapper objectMapper = new ObjectMapper();
 		return objectMapper.writeValueAsString(obj);
@@ -106,7 +162,7 @@ public class TechnicalValidations {
 		ObjectMapper objectMapper = new ObjectMapper();
 		return objectMapper.readValue(json, clazz);
 	}
-	
+
 	public static void checkPaginationParams(HttpServletRequest request) {
 		StaticVariables.userSendPage = false;
 		StaticVariables.userSendSize = false;
@@ -168,6 +224,7 @@ public class TechnicalValidations {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
 		}
 	}
+
 	public static boolean checkIsOnlyGet(HttpServletRequest request) {
 		MetricsApplication.logger.info("Checking if is only a get");
 		StaticVariables.isOnlyGet = false;
@@ -177,6 +234,7 @@ public class TechnicalValidations {
 		MetricsApplication.logger.info("is a only get..> " + StaticVariables.isOnlyGet);
 		return StaticVariables.isOnlyGet;
 	}
+
 	public static void checkParams(HttpServletRequest request, Set<String> allowedParams) {
 		request.getParameterMap().entrySet().forEach(entry -> {
 			StaticVariables.parameterName = entry.getKey();
@@ -199,6 +257,7 @@ public class TechnicalValidations {
 
 		});
 	}
+
 	public static void VerifyingUUID(String uuid) {
 		Pattern patt = Pattern.compile("[0-9a-f]{24}$");
 		MetricsApplication.logger.error("Valiting id " + uuid);
@@ -230,7 +289,5 @@ public class TechnicalValidations {
 			return true;
 		}
 	}
-	
-	
 
 }

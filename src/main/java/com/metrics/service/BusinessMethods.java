@@ -167,6 +167,13 @@ public class BusinessMethods {
 			TypeError.httpErrorMessage(new Exception(), HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.name(),
 					HttpExceptionMessage.FieldAttendanceNull400, PathErrorMessage.pathMetric);
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The Attendance field should not be null");
+		}else if (!metric.getMetrics().getAttendance().equals("true")){
+			if (!metric.getMetrics().getAttendance().equals("false")) {
+				TypeError.httpErrorMessage(new Exception(), HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.name(),
+						HttpExceptionMessage.FieldAttendanceInvalid400, PathErrorMessage.pathMetric);
+				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The Blocked field should not be null");
+			}
+			
 		}
 
 		if (metric.getMetrics().getCarried_over() == null) {
@@ -174,6 +181,13 @@ public class BusinessMethods {
 			TypeError.httpErrorMessage(new Exception(), HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.name(),
 					HttpExceptionMessage.FieldCarried_OverNull400, PathErrorMessage.pathMetric);
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+		} else if (!metric.getMetrics().getCarried_over().equals("true")){
+			if (!metric.getMetrics().getCarried_over().equals("false")) {
+				TypeError.httpErrorMessage(new Exception(), HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.name(),
+						HttpExceptionMessage.FieldCarried_OverInvalid400, PathErrorMessage.pathMetric);
+				throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+			}
+			
 		}
 
 		if (metric.getMetrics().getBlockers() == null) {
@@ -187,6 +201,13 @@ public class BusinessMethods {
 			TypeError.httpErrorMessage(new Exception(), HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.name(),
 					HttpExceptionMessage.FieldBlockedNull400, PathErrorMessage.pathMetric);
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The Blocked field should not be null");
+		}else if (!metric.getMetrics().getBlockers().getBlocked().equals("true")){
+			if (!metric.getMetrics().getBlockers().getBlocked().equals("false")) {
+				TypeError.httpErrorMessage(new Exception(), HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.name(),
+						HttpExceptionMessage.FieldBlockedInvalid400, PathErrorMessage.pathMetric);
+				throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+			}
+			
 		}
 		if (metric.getMetrics().getBlockers().getComments() == null)
 			metric.getMetrics().getBlockers().setComments("");
@@ -200,26 +221,54 @@ public class BusinessMethods {
 		if (metric.getMetrics().getProactive().getLooked_for_help() == null) {
 			MetricsApplication.logger.info("The Looked_for_help field should not be null");
 			TypeError.httpErrorMessage(new Exception(), HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.name(),
-					HttpExceptionMessage.FieldLooked_for_help400, PathErrorMessage.pathMetric);
+					HttpExceptionMessage.FieldLooked_for_helpNull400, PathErrorMessage.pathMetric);
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+		}else if (!metric.getMetrics().getProactive().getLooked_for_help().equals("true")){
+			if (!metric.getMetrics().getProactive().getLooked_for_help().equals("false")) {
+				TypeError.httpErrorMessage(new Exception(), HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.name(),
+						HttpExceptionMessage.FieldLooked_for_helpInvalid400, PathErrorMessage.pathMetric);
+				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The Blocked field should not be null");
+			}
+			
 		}
 		if (metric.getMetrics().getProactive().getProvided_help() == null) {
 			MetricsApplication.logger.info("The Provided_help field should not be null");
 			TypeError.httpErrorMessage(new Exception(), HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.name(),
-					HttpExceptionMessage.FieldProvided_help400, PathErrorMessage.pathMetric);
+					HttpExceptionMessage.FieldProvided_helpNull400, PathErrorMessage.pathMetric);
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+		}else if (!metric.getMetrics().getProactive().getProvided_help().equals("true")){
+			if (!metric.getMetrics().getProactive().getProvided_help().equals("false")) {
+				TypeError.httpErrorMessage(new Exception(), HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.name(),
+						HttpExceptionMessage.FieldProvided_helpInvalid400, PathErrorMessage.pathMetric);
+				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The Blocked field should not be null");
+			}
+			
 		}
 		if (metric.getMetrics().getProactive().getWorked_ahead() == null) {
 			MetricsApplication.logger.info("The Worked_ahead field should not be null");
 			TypeError.httpErrorMessage(new Exception(), HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.name(),
-					HttpExceptionMessage.FieldWorked_ahead400, PathErrorMessage.pathMetric);
+					HttpExceptionMessage.FieldWorked_aheadNull400, PathErrorMessage.pathMetric);
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+		}else if (!metric.getMetrics().getProactive().getWorked_ahead().equals("true")){
+			if (!metric.getMetrics().getProactive().getWorked_ahead().equals("false")) {
+				TypeError.httpErrorMessage(new Exception(), HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.name(),
+						HttpExceptionMessage.FieldWorked_aheadInvalid400, PathErrorMessage.pathMetric);
+				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The Blocked field should not be null");
+			}
+			
 		}
 		if (metric.getMetrics().getProactive().getShared_resources() == null) {
 			MetricsApplication.logger.info("The Shared_resources field should not be null");
 			TypeError.httpErrorMessage(new Exception(), HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.name(),
-					HttpExceptionMessage.FieldShared_resources400, PathErrorMessage.pathMetric);
+					HttpExceptionMessage.FieldShared_resourcesNull400, PathErrorMessage.pathMetric);
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+		}else if (!metric.getMetrics().getProactive().getShared_resources().equals("true")){
+			if (!metric.getMetrics().getProactive().getShared_resources().equals("false")) {
+				TypeError.httpErrorMessage(new Exception(), HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.name(),
+						HttpExceptionMessage.FieldShared_resourcesInvalid400, PathErrorMessage.pathMetric);
+				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The Blocked field should not be null");
+			}
+			
 		}
 
 		if (metric.getMetrics().getRetroactive() == null) {
@@ -233,6 +282,13 @@ public class BusinessMethods {
 			TypeError.httpErrorMessage(new Exception(), HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.name(),
 					HttpExceptionMessage.FieldDelayed_looking_helpNull400, PathErrorMessage.pathMetric);
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+		}else if (!metric.getMetrics().getRetroactive().getDelayed_looking_help().equals("true")){
+			if (!metric.getMetrics().getRetroactive().getDelayed_looking_help().equals("false")) {
+				TypeError.httpErrorMessage(new Exception(), HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.name(),
+						HttpExceptionMessage.FieldDelayed_looking_helpInvalid400, PathErrorMessage.pathMetric);
+				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The Blocked field should not be null");
+			}
+			
 		}
 		if (metric.getMetrics().getRetroactive().getComments() == null) {
 			metric.getMetrics().getRetroactive().setComments("");

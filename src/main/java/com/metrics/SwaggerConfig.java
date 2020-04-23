@@ -6,6 +6,10 @@ import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import com.google.common.base.Predicate;
+import com.metrics.model.blockersString;
+import com.metrics.model.metricsString;
+import com.metrics.model.proactiveString;
+import com.metrics.model.retroactiveString;
 
 import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.RequestHandlerSelectors;
@@ -26,7 +30,8 @@ public class SwaggerConfig implements WebMvcConfigurer{
 				.select()
 				.apis(RequestHandlerSelectors.any())
 				.paths(userPaths())
-				.build();
+				.build().ignoredParameterTypes(
+                        blockersString.class, metricsString.class, proactiveString.class, retroactiveString.class);
 	}
 	
 	private Predicate<String> userPaths() {

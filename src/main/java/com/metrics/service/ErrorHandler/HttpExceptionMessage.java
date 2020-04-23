@@ -35,18 +35,27 @@ public class HttpExceptionMessage {
 	//Message for method "VerifyingUUID" and "VerifyingID"
 	public static final String IDInvalid400 = "The given ID has incorrect format";
 	//Messages for method "testMetricIntegrity"
+	public static final String isOnlyNumberFail400 = "orderBy, size and page must be numbers";
+	public static final String FieldAttendanceInvalid400 = "The field attendance only admits 'true' or 'false'";
 	public static final String FieldAttendanceNull400 = "The field attendance is required";
-	public static final String FieldBlockedNull400 = "The field blockers is required";
+	public static final String FieldBlockedInvalid400 = "The field blocked only admits 'true' or 'false'";
+	public static final String FieldBlockedNull400 = "The field blocked is required";
+	public static final String FieldCarried_OverInvalid400 = "The field carried_over only admits 'true' or 'false'";
 	public static final String FieldCarried_OverNull400 = "The field carried_over is required";
+	public static final String FieldDelayed_looking_helpInvalid400 = "The field delayed_looking_help_over only admits 'true' or 'false'";
 	public static final String FieldDelayed_looking_helpNull400 = "The field delayed_looking_help_over is required";
 	public static final String FieldEvaluated_idNull400 = "The field evaluated_id is required";
 	public static final String FieldEvaluator_idNull400 = "The field evaluator_id is required";
-	public static final String FieldLooked_for_help400 = "The field looked_for_help is required";
-	public static final String FieldProvided_help400 = "The field provided_help is required";
-	public static final String FieldShared_resources400 = "The field shared_resources is required";
+	public static final String FieldLooked_for_helpInvalid400 = "The field looked_for_help only admits 'true' or 'false'";
+	public static final String FieldLooked_for_helpNull400 = "The field looked_for_help is required";
+	public static final String FieldProvided_helpInvalid400 = "The field provided_help only admits 'true' or 'false'";
+	public static final String FieldProvided_helpNull400 = "The field provided_help is required";
+	public static final String FieldShared_resourcesInvalid400 = "The field shared_resources only admits 'true' or 'false'";
+	public static final String FieldShared_resourcesNull400 = "The field shared_resources is required";
 	public static final String FieldSprint_id400 = "The field sprint_id is required";
 	public static final String FieldTypeNull400 = "The field type that is required";
-	public static final String FieldWorked_ahead400 = "The field worked_ahead is required";
+	public static final String FieldWorked_aheadInvalid400 = "The field worked_ahead only admits 'true' or 'false'";
+	public static final String FieldWorked_aheadNull400 = "The field worked_ahead is required";
 	public static final String IdHasSpecialChar400 = "The given ID has invalid characters";
 	public static final String IdIsInBody400 = "The request body must not has id";
 	public static final String JsonInvalidFormat400 = "Json structure is not correct";
@@ -66,7 +75,6 @@ public class HttpExceptionMessage {
 	//Messages for method "checkPaginationParams"
 	public static final String PageNull400 = "page value field is required when size is given";
 	public static final String SizeNull400 = "size value field is required when page is given";
-	public static final String isOnlyNumberFail400 = "OrderBy, Size and Page must be numbers";
 	
 	//Messages for method "checkDateParams"
 	public static final String EndDateNull400 = "endDate value field is required when startDate is given";
