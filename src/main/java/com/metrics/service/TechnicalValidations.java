@@ -272,10 +272,10 @@ public class TechnicalValidations {
 
 	public static boolean VerifyingID(String uuid) {
 		Pattern patt = Pattern.compile("^[a-zA-Z0-9]+$");
-		MetricsApplication.logger.error("Valiting id " + uuid);
+		MetricsApplication.logger.info("Valiting id " + uuid);
 
 		boolean validObjectId = patt.matcher(uuid).matches();
-		MetricsApplication.logger.error(validObjectId);
+		MetricsApplication.logger.info(validObjectId);
 		if (!validObjectId) {
 			TypeError.httpErrorMessage(HttpStatus.BAD_REQUEST, new Exception(),
 					HttpExceptionMessage.IdHasSpecialChar400, "/metrics/" + uuid);

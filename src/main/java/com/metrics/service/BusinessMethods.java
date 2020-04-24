@@ -122,14 +122,14 @@ public class BusinessMethods {
 	public static CreateMetricRequest testMetricIntegrity(CreateMetricRequest metric, int typeRequest) {
 		// Verifying if the body request has id and it is PUT or POST
 		if (metric.getId() != null && typeRequest != 2) {
-			MetricsApplication.logger.info("id field must be null");
+			MetricsApplication.logger.error("id field must be null");
 			TypeError.httpErrorMessage(HttpStatus.BAD_REQUEST, new Exception(), HttpExceptionMessage.IdIsInBody400,
 					PathErrorMessage.pathMetric);
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
 		}
 		if (metric.getEvaluated_id() != null && metric.getEvaluator_id() != null) {
 			if (typeRequest != 2 && (metric.getEvaluated_id().equals(metric.getEvaluator_id()))) {
-				MetricsApplication.logger.info("Evaluator and Evaluated ID are the same");
+				MetricsApplication.logger.error("Evaluator and Evaluated ID are the same");
 				TypeError.httpErrorMessage(HttpStatus.BAD_REQUEST, new Exception(), HttpExceptionMessage.SameIDs400,
 						PathErrorMessage.pathMetric);
 				throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
@@ -137,25 +137,25 @@ public class BusinessMethods {
 		}
 		MetricsApplication.logger.info("Verifying integrity of metrics objects and fields");
 		if (metric.getType() == null) {
-			MetricsApplication.logger.info("The field type should not be null");
+			MetricsApplication.logger.error("The field type should not be null");
 			TypeError.httpErrorMessage(HttpStatus.BAD_REQUEST, new Exception(), HttpExceptionMessage.FieldTypeNull400,
 					PathErrorMessage.pathMetric);
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
 		} else if (metric.getType().isEmpty()) {
-			MetricsApplication.logger.info("The field type should not be null");
+			MetricsApplication.logger.error("The field type should not be null");
 			TypeError.httpErrorMessage(HttpStatus.BAD_REQUEST, new Exception(), HttpExceptionMessage.FieldTypeNull400,
 					PathErrorMessage.pathMetric);
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
 		}
 
 		if (metric.getMetrics() == null) {
-			MetricsApplication.logger.info("The Metrics Object should not be null");
+			MetricsApplication.logger.error("The Metrics Object should not be null");
 			TypeError.httpErrorMessage(HttpStatus.BAD_REQUEST, new Exception(),
 					HttpExceptionMessage.ObjectMetricNull400, PathErrorMessage.pathMetric);
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
 		}
 		if (metric.getMetrics().getAttendance() == null) {
-			MetricsApplication.logger.info("The Attendance field should not be null");
+			MetricsApplication.logger.error("The Attendance field should not be null");
 			TypeError.httpErrorMessage(HttpStatus.BAD_REQUEST, new Exception(),
 					HttpExceptionMessage.FieldAttendanceNull400, PathErrorMessage.pathMetric);
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The Attendance field should not be null");
@@ -169,7 +169,7 @@ public class BusinessMethods {
 		}
 
 		if (metric.getMetrics().getCarried_over() == null) {
-			MetricsApplication.logger.info("The Carried_over field should not be null");
+			MetricsApplication.logger.error("The Carried_over field should not be null");
 			TypeError.httpErrorMessage(HttpStatus.BAD_REQUEST, new Exception(),
 					HttpExceptionMessage.FieldCarried_OverNull400, PathErrorMessage.pathMetric);
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
@@ -183,13 +183,13 @@ public class BusinessMethods {
 		}
 
 		if (metric.getMetrics().getBlockers() == null) {
-			MetricsApplication.logger.info("The Blockers Object should not be null");
+			MetricsApplication.logger.error("The Blockers Object should not be null");
 			TypeError.httpErrorMessage(HttpStatus.BAD_REQUEST, new Exception(),
 					HttpExceptionMessage.ObjectBlockersNull400, PathErrorMessage.pathMetric);
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
 		}
 		if (metric.getMetrics().getBlockers().getBlocked() == null) {
-			MetricsApplication.logger.info("The Blocked field should not be null");
+			MetricsApplication.logger.error("The Blocked field should not be null");
 			TypeError.httpErrorMessage(HttpStatus.BAD_REQUEST, new Exception(),
 					HttpExceptionMessage.FieldBlockedNull400, PathErrorMessage.pathMetric);
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The Blocked field should not be null");
@@ -205,13 +205,13 @@ public class BusinessMethods {
 			metric.getMetrics().getBlockers().setComments("");
 
 		if (metric.getMetrics().getProactive() == null) {
-			MetricsApplication.logger.info("The Proactive Object should not be null");
+			MetricsApplication.logger.error("The Proactive Object should not be null");
 			TypeError.httpErrorMessage(HttpStatus.BAD_REQUEST, new Exception(),
 					HttpExceptionMessage.ObjectProactiveNull400, PathErrorMessage.pathMetric);
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
 		}
 		if (metric.getMetrics().getProactive().getLooked_for_help() == null) {
-			MetricsApplication.logger.info("The Looked_for_help field should not be null");
+			MetricsApplication.logger.error("The Looked_for_help field should not be null");
 			TypeError.httpErrorMessage(HttpStatus.BAD_REQUEST, new Exception(),
 					HttpExceptionMessage.FieldLooked_for_helpNull400, PathErrorMessage.pathMetric);
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
@@ -224,7 +224,7 @@ public class BusinessMethods {
 
 		}
 		if (metric.getMetrics().getProactive().getProvided_help() == null) {
-			MetricsApplication.logger.info("The Provided_help field should not be null");
+			MetricsApplication.logger.error("The Provided_help field should not be null");
 			TypeError.httpErrorMessage(HttpStatus.BAD_REQUEST, new Exception(),
 					HttpExceptionMessage.FieldProvided_helpNull400, PathErrorMessage.pathMetric);
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
@@ -237,7 +237,7 @@ public class BusinessMethods {
 
 		}
 		if (metric.getMetrics().getProactive().getWorked_ahead() == null) {
-			MetricsApplication.logger.info("The Worked_ahead field should not be null");
+			MetricsApplication.logger.error("The Worked_ahead field should not be null");
 			TypeError.httpErrorMessage(HttpStatus.BAD_REQUEST, new Exception(),
 					HttpExceptionMessage.FieldWorked_aheadNull400, PathErrorMessage.pathMetric);
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
@@ -250,7 +250,7 @@ public class BusinessMethods {
 
 		}
 		if (metric.getMetrics().getProactive().getShared_resources() == null) {
-			MetricsApplication.logger.info("The Shared_resources field should not be null");
+			MetricsApplication.logger.error("The Shared_resources field should not be null");
 			TypeError.httpErrorMessage(HttpStatus.BAD_REQUEST, new Exception(),
 					HttpExceptionMessage.FieldShared_resourcesNull400, PathErrorMessage.pathMetric);
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
@@ -264,13 +264,13 @@ public class BusinessMethods {
 		}
 
 		if (metric.getMetrics().getRetroactive() == null) {
-			MetricsApplication.logger.info("The Retroactive Object should not be null");
+			MetricsApplication.logger.error("The Retroactive Object should not be null");
 			TypeError.httpErrorMessage(HttpStatus.BAD_REQUEST, new Exception(),
 					HttpExceptionMessage.ObjectRetroactiveNull400, PathErrorMessage.pathMetric);
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
 		}
 		if (metric.getMetrics().getRetroactive().getDelayed_looking_help() == null) {
-			MetricsApplication.logger.info("The Delayed_looking_help field should not be null");
+			MetricsApplication.logger.error("The Delayed_looking_help field should not be null");
 			TypeError.httpErrorMessage(HttpStatus.BAD_REQUEST, new Exception(),
 					HttpExceptionMessage.FieldDelayed_looking_helpNull400, PathErrorMessage.pathMetric);
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
@@ -291,7 +291,7 @@ public class BusinessMethods {
 			MetricsApplication.logger.info("Validation integrity of the json");
 			mapper.readValue(TechnicalValidations.mapToJson(metric), CreateMetricRequest.class);
 		} catch (Exception error) {
-			MetricsApplication.logger.info("Json structure is not correct");
+			MetricsApplication.logger.error("Json structure is not correct");
 			TypeError.httpErrorMessage(HttpStatus.BAD_REQUEST, error, HttpExceptionMessage.JsonInvalidFormat400,
 					PathErrorMessage.pathMetric);
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
@@ -335,12 +335,12 @@ public class BusinessMethods {
 
 		MetricsApplication.logger.info("Verifying integrity of evaluated_id field");
 		if (metric.getEvaluated_id() == null) {
-			MetricsApplication.logger.info("evaluated_id field should not be null");
+			MetricsApplication.logger.error("evaluated_id field should not be null");
 			TypeError.httpErrorMessage(HttpStatus.BAD_REQUEST, new Exception(),
 					HttpExceptionMessage.FieldEvaluated_idNull400, PathErrorMessage.pathMetric);
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
 		} else if (metric.getEvaluated_id().isEmpty()) {
-			MetricsApplication.logger.info("evaluated_id field should not be null");
+			MetricsApplication.logger.error("evaluated_id field should not be null");
 			TypeError.httpErrorMessage(HttpStatus.BAD_REQUEST, new Exception(),
 					HttpExceptionMessage.FieldEvaluated_idNull400, PathErrorMessage.pathMetric);
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
@@ -349,12 +349,12 @@ public class BusinessMethods {
 		}
 		MetricsApplication.logger.info("Verifying integrity of evaluator_id field");
 		if (metric.getEvaluator_id() == null) {
-			MetricsApplication.logger.info("evaluator_id field should not be null");
+			MetricsApplication.logger.error("evaluator_id field should not be null");
 			TypeError.httpErrorMessage(HttpStatus.BAD_REQUEST, new Exception(),
 					HttpExceptionMessage.FieldEvaluator_idNull400, PathErrorMessage.pathMetric);
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
 		} else if (metric.getEvaluator_id().isEmpty()) {
-			MetricsApplication.logger.info("evaluator_id field should not be null");
+			MetricsApplication.logger.error("evaluator_id field should not be null");
 			TypeError.httpErrorMessage(HttpStatus.BAD_REQUEST, new Exception(),
 					HttpExceptionMessage.FieldEvaluator_idNull400, PathErrorMessage.pathMetric);
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
@@ -363,12 +363,12 @@ public class BusinessMethods {
 		}
 		MetricsApplication.logger.info("Verifying integrity of sprint_id field");
 		if (metric.getSprint_id() == null) {
-			MetricsApplication.logger.info("sprint_id field should not be null");
+			MetricsApplication.logger.error("sprint_id field should not be null");
 			TypeError.httpErrorMessage(HttpStatus.BAD_REQUEST, new Exception(), HttpExceptionMessage.FieldSprint_id400,
 					PathErrorMessage.pathMetric);
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
 		} else if (metric.getSprint_id().isEmpty()) {
-			MetricsApplication.logger.info("sprint_id field should not be null");
+			MetricsApplication.logger.error("sprint_id field should not be null");
 			TypeError.httpErrorMessage(HttpStatus.BAD_REQUEST, new Exception(), HttpExceptionMessage.FieldSprint_id400,
 					PathErrorMessage.pathMetric);
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST);

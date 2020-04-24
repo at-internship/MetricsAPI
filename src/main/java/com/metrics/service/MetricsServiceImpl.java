@@ -48,7 +48,7 @@ public class MetricsServiceImpl implements MetricsService {
 		List<MetricsCollection> metricsCollection = new ArrayList<>();
 		MetricsApplication.logger.info("Filling list with info");
 
-		if (endDate.equals("1000-01-01")) {
+		if (endDate.equals("1000-01-02")) {
 			Date date = new Date();
 			endDate = new SimpleDateFormat("yyyy-MM-dd").format(date);
 		}
@@ -66,26 +66,41 @@ public class MetricsServiceImpl implements MetricsService {
 			MetricsApplication.logger.info(endDate);
 			metricsCollection = repository.findByDate(startDate, endDate, firstPageRequest);
 		} else if (evaluator_id.equals("") && evaluated_id.equals("")) {
-			MetricsApplication.logger.info("Find by sprint_id");
-			metricsCollection = repository.findBySprintId(sprint_id, startDate, endDate, firstPageRequest);
+			if (TechnicalValidations.VerifyingID(sprint_id)) {
+				MetricsApplication.logger.info("Find by sprint_id");
+				metricsCollection = repository.findBySprintId(sprint_id, startDate, endDate, firstPageRequest);
+			}
 		} else if (sprint_id.equals("") && evaluated_id.equals("")) {
-			MetricsApplication.logger.info("Find by evaluator_id");
-			metricsCollection = repository.findByEvaluatorId(evaluator_id, startDate, endDate, firstPageRequest);
+			if (TechnicalValidations.VerifyingID(evaluator_id)) {
+				MetricsApplication.logger.info("Find by evaluator_id");
+				metricsCollection = repository.findByEvaluatorId(evaluator_id, startDate, endDate, firstPageRequest);
+			}
 		} else if (evaluator_id.equals("") && sprint_id.equals("")) {
-			MetricsApplication.logger.info("Find by evaluated_id");
-			metricsCollection = repository.findByEvaluatedId(evaluated_id, startDate, endDate, firstPageRequest);
+			if (TechnicalValidations.VerifyingID(evaluated_id)) {
+				MetricsApplication.logger.info("Find by evaluated_id");
+				metricsCollection = repository.findByEvaluatedId(evaluated_id, startDate, endDate, firstPageRequest);
+			}
 		} else if (sprint_id.equals("")) {
-			metricsCollection = repository.findByEvaluatorIdAndEvaluatedId(evaluator_id, evaluated_id, startDate,
-					endDate, firstPageRequest);
+			if (TechnicalValidations.VerifyingID(evaluated_id) && TechnicalValidations.VerifyingID(evaluator_id)) {
+				metricsCollection = repository.findByEvaluatorIdAndEvaluatedId(evaluator_id, evaluated_id, startDate,
+						endDate, firstPageRequest);
+			}
 		} else if (evaluator_id.equals("")) {
-			metricsCollection = repository.findBySprintIdAndEvaluatedId(sprint_id, evaluated_id, startDate, endDate,
-					firstPageRequest);
+			if (TechnicalValidations.VerifyingID(sprint_id) && TechnicalValidations.VerifyingID(evaluated_id)) {
+				metricsCollection = repository.findBySprintIdAndEvaluatedId(sprint_id, evaluated_id, startDate, endDate,
+						firstPageRequest);
+			}
 		} else if (evaluated_id.equals("")) {
-			metricsCollection = repository.findBySpritIdAndEvaluatorId(sprint_id, evaluator_id, startDate, endDate,
-					firstPageRequest);
+			if (TechnicalValidations.VerifyingID(sprint_id) && TechnicalValidations.VerifyingID(evaluator_id)) {
+				metricsCollection = repository.findBySpritIdAndEvaluatorId(sprint_id, evaluator_id, startDate, endDate,
+						firstPageRequest);
+			}
 		} else {
-			metricsCollection = repository.findBySprintIdAndEvaluatedIdAndEvaluatorId(sprint_id, evaluated_id,
-					evaluator_id, startDate, endDate, firstPageRequest);
+			if (TechnicalValidations.VerifyingID(sprint_id) && TechnicalValidations.VerifyingID(evaluator_id)
+					&& TechnicalValidations.VerifyingID(evaluated_id)) {
+				metricsCollection = repository.findBySprintIdAndEvaluatedIdAndEvaluatorId(sprint_id, evaluated_id,
+						evaluator_id, startDate, endDate, firstPageRequest);
+			}
 		}
 
 		MetricsApplication.logger.info("Returning lists");

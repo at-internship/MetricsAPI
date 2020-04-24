@@ -6,7 +6,9 @@ public class HttpExceptionMessage {
 	//Messages of class MetricControllers
 	//Massage of method "getMetrics"
 	public static final String DateInvalidOrder400 = "The given value for startDate is higger than endDate";
-	public static final String InvalidPageOrSizeValue400 = "The given value for startDate is higger than endDate";
+	public static final String InvalidPageAndSizeValue400 = "page and size are out of range";
+	public static final String InvalidPageValue400 = "page ha a invalid value";
+	public static final String InvalidSizeValue400 = "size had a invalid value";
 	public static final String OrderByInvalidValue400 = "The given value for orderBy is invalid use '1'(to use sort descending) or '0'(to use sort ascending)";
 	
 	
@@ -35,7 +37,9 @@ public class HttpExceptionMessage {
 	//Message for method "VerifyingUUID" and "VerifyingID"
 	public static final String IDInvalid400 = "The given ID has incorrect format";
 	//Messages for method "testMetricIntegrity"
-	public static final String isOnlyNumberFail400 = "orderBy, size and page must be numbers";
+	public static final String isOnlyNumberPageFail400 = "page field must only have numbers";
+	public static final String isOnlyNumberSizeFail400 = "size field must only have numbers";
+	public static final String isOnlyNumberOrderByFail400 = "orderBy field must only have numbers";
 	public static final String FieldAttendanceInvalid400 = "The field attendance only admits 'true' or 'false'";
 	public static final String FieldAttendanceNull400 = "The field attendance is required";
 	public static final String FieldBlockedInvalid400 = "The field blocked only admits 'true' or 'false'";

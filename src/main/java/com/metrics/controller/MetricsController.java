@@ -41,12 +41,13 @@ public class MetricsController {
 	@ResponseStatus(value = HttpStatus.OK)
 	@PutMapping("/metrics/{id}")
 	public MetricsCollection updateMetric(@RequestBody CreateMetricRequest request, @PathVariable String id) {
-		StaticVariables.id = id;
 		MetricsApplication.logger.info("Creating container");
 		MetricsCollection resultMetric = new MetricsCollection();
 		if (findById(id) != null) {
 			StaticVariables.datePUT = service.findById(id).get();
-			StaticVariables.id = id;
+			StaticVariables.evaluated_id = StaticVariables.datePUT.getEvaluated_id();
+			StaticVariables.evaluator_id = StaticVariables.datePUT.getEvaluator_id();
+			StaticVariables.sprint_id = StaticVariables.datePUT.getSprint_id();
 		}
 		TechnicalValidations.VerifyingUUID(id);
 		BusinessMethods.testMetricIntegrity(request, 1);
@@ -57,7 +58,6 @@ public class MetricsController {
 			resultMetric = service.updateMetric(request, id);
 			MetricsApplication.logger.info("update successfull, returning updated object..");
 		}
-		StaticVariables.id = null;
 		return resultMetric;
 	}
 
@@ -66,37 +66,69 @@ public class MetricsController {
 	public List<MetricsCollection> getMetrics(@RequestParam(value = "page", defaultValue = "1") String pageStr,
 			@RequestParam(value = "size", defaultValue = "2147483547") String sizeStr,
 			@RequestParam(value = "startDate", defaultValue = "1000-01-01") String startDate,
-			@RequestParam(value = "endDate", defaultValue = "1000-01-01") String endDate,
+			@RequestParam(value = "endDate", defaultValue = "1000-01-02") String endDate,
 			@RequestParam(value = "evaluator_id", defaultValue = "") String evaluator_id,
 			@RequestParam(value = "evaluated_id", defaultValue = "") String evaluated_id,
 			@RequestParam(value = "sprint_id", defaultValue = "") String sprint_id,
 			@RequestParam(value = "orderBy", defaultValue = "1") String orderByStr) {
-		MetricsApplication.logger.info("Verifying if DB is empty");
 		BusinessMethods.VerifyingDateValid(startDate, 2);
 		BusinessMethods.VerifyingDateValid(endDate, 2);
-
-		// Verifying only number
-		if (!TechnicalValidations.haveOnlyNumbers(sizeStr) || !TechnicalValidations.haveOnlyNumbers(pageStr)
-				|| !TechnicalValidations.haveOnlyNumbers(orderByStr)) {
-			MetricsApplication.logger.info("Not are only numbers");
+		MetricsApplication.logger.info(startDate.compareTo(endDate));
+		if(startDate.compareTo(endDate) > 0) {
+			MetricsApplication.logger.error("page or size is wrong");
 			TypeError.httpErrorMessage(HttpStatus.BAD_REQUEST, new Exception(),
-					HttpExceptionMessage.isOnlyNumberFail400, PathErrorMessage.pathMetric);
+					HttpExceptionMessage.DateInvalidOrder400, PathErrorMessage.pathMetric);
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
 		}
+
+		// Verifying only number
+		MetricsApplication.logger.info("Verifying only number");
+		if (!TechnicalValidations.haveOnlyNumbers(pageStr)) {
+			MetricsApplication.logger.error("Not are only numbers");
+			TypeError.httpErrorMessage(HttpStatus.BAD_REQUEST, new Exception(),
+					HttpExceptionMessage.isOnlyNumberPageFail400, PathErrorMessage.pathMetric);
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+		}
+		if (!TechnicalValidations.haveOnlyNumbers(sizeStr)) {
+			MetricsApplication.logger.error("Not are only numbers");
+			TypeError.httpErrorMessage(HttpStatus.BAD_REQUEST, new Exception(),
+					HttpExceptionMessage.isOnlyNumberSizeFail400, PathErrorMessage.pathMetric);
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+		}
+		if (!TechnicalValidations.haveOnlyNumbers(orderByStr)) {
+			MetricsApplication.logger.error("Not are only numbers");
+			TypeError.httpErrorMessage(HttpStatus.BAD_REQUEST, new Exception(),
+					HttpExceptionMessage.isOnlyNumberOrderByFail400, PathErrorMessage.pathMetric);
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+		}
+		MetricsApplication.logger.info("Parse to int");
 		int page = Integer.parseInt(pageStr);
 		int orderBy = Integer.parseInt(orderByStr);
 		int size = Integer.parseInt(sizeStr);
 
 		// Verifying page and size
-		if (page < 1 || size < 1) {
+		MetricsApplication.logger.info("Verifying page and size");
+		if (page < 1 && size < 1) {
+			MetricsApplication.logger.error("page and size are wrong");
 			TypeError.httpErrorMessage(HttpStatus.BAD_REQUEST, new Exception(),
-					HttpExceptionMessage.InvalidPageOrSizeValue400, PathErrorMessage.pathMetric);
+					HttpExceptionMessage.InvalidPageAndSizeValue400, PathErrorMessage.pathMetric);
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-		} else {
+		} else if (page < 1){
+			MetricsApplication.logger.error("page is wrong");
+			TypeError.httpErrorMessage(HttpStatus.BAD_REQUEST, new Exception(),
+					HttpExceptionMessage.InvalidPageValue400, PathErrorMessage.pathMetric);
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+		}else if (size < 1){
+			MetricsApplication.logger.error("size is wrong");
+			TypeError.httpErrorMessage(HttpStatus.BAD_REQUEST, new Exception(),
+					HttpExceptionMessage.InvalidSizeValue400, PathErrorMessage.pathMetric);
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+		}else {
 			page = page - 1;
 		}
 
 		// Verifying orderBy
+		MetricsApplication.logger.info("Verifying orderBy");
 		if (orderBy > 1 || orderBy < 0) {
 			TypeError.httpErrorMessage(HttpStatus.BAD_REQUEST, new Exception(),
 					HttpExceptionMessage.OrderByInvalidValue400, PathErrorMessage.pathMetric);
@@ -112,19 +144,9 @@ public class MetricsController {
 	@ResponseStatus(value = HttpStatus.OK)
 	@GetMapping("/metrics/{id}")
 	public Optional<MetricsCollection> findById(@PathVariable String id) {
-		StaticVariables.id = id;
-
-		try {
-
+			TechnicalValidations.VerifyingUUID(id);
 			MetricsApplication.logger.info("Calling findById service");
 			return service.findById(id);
-		} catch (Exception error) {
-			MetricsApplication.logger.error("trying to call findById service but couldnt find the given ID");
-			TypeError.httpErrorMessage(HttpStatus.NOT_FOUND, new Exception(), HttpExceptionMessage.IdNotFound404,
-					"/metric/" + id);
-			StaticVariables.id = null;
-			throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-		}
 	}
 
 	@ResponseStatus(value = HttpStatus.CREATED)
@@ -143,17 +165,17 @@ public class MetricsController {
 			MetricsApplication.logger.info("saving id into String to return");
 		}
 		MetricsApplication.logger.info("New metric created successfully returning the ID of the new metric");
-		StaticVariables.id = null;
+		StaticVariables.id = id;
 		return id;
 	}
 
 	@ResponseStatus(value = HttpStatus.NO_CONTENT)
 	@DeleteMapping("/metrics/{id}")
 	public void deleteMetric(@PathVariable String id) {
-		StaticVariables.id = id;
+		TechnicalValidations.VerifyingUUID(id);
 		MetricsApplication.logger.info("Calling deleteMetric service");
 		service.deleteMetric(id);
-		StaticVariables.id = null;
+		StaticVariables.id = "";
 	}
 
 }
