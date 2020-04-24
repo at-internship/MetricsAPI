@@ -2,16 +2,13 @@ package com.metrics.controller;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.handler;
 
 import org.junit.FixMethodOrder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
-import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -20,7 +17,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import com.metrics.MetricsApplication;
@@ -231,7 +227,7 @@ class MetricRepositoryTest {
 	@DisplayName("test to method DELETE by invalid ID expected 400")
 	public void m() throws Exception {
 		String uri = "/metrics/{id}";
-		MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.delete(uri, "5e7a600a3b0")).andDo(print()).andReturn();
+		MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.delete(uri, "5e7a600a3b0")).andReturn();
 		int status = mvcResult.getResponse().getStatus();
 		assertEquals(400, status);
 	}
@@ -346,60 +342,30 @@ class MetricRepositoryTest {
 		testEnhanceGet.getFailDatesWrongFormat(mvc);
 	}
 	private CreateMetricRequest newWrongCreateMetricTRequest() {
-
-		try {
-
 			return new CreateMetricRequest(StaticVariables.evaluator_id, StaticVariables.sprint_id, "Empty",
 					"2020-03-17", StaticVariables.sprint_id,
 					new metricsString("false", "false", new blockersString("false", "POST TESTV2 2020-03-17"),
 							new proactiveString("false", "false", "false", "false"), new retroactiveString("false", "Empty")));
-		} catch (Exception e) {
-
-			System.out.println("FALLO PARSEO");
-			return null;
-		}
+		
 	}
 	private CreateMetricRequest newWrongBodyCreateMetricTRequest() {
-
-		try {
-
 			return new CreateMetricRequest(StaticVariables.id,StaticVariables.evaluator_id, StaticVariables.evaluated_id, "Empty",
 					"2020-03-17", StaticVariables.sprint_id,
 					new metricsString("false", "false", new blockersString("false", "POST TESTV2 2020-03-17"),
 							new proactiveString("false", "false", "false", "false"), new retroactiveString("false", "Empty")));
-		} catch (Exception e) {
-
-			System.out.println("FALLO PARSEO");
-			return null;
-		}
 	}
 	private CreateMetricRequest newCreateMetricTRequest() {
-
-		try {
-
 			return new CreateMetricRequest(StaticVariables.evaluator_id, StaticVariables.evaluated_id, "Empty",
 					"2020-03-17", StaticVariables.sprint_id,
 					new metricsString("false", "false", new blockersString("false", "POST TESTV2 2020-03-17"),
 							new proactiveString("false", "false", "false", "false"), new retroactiveString("false", "Empty")));
-		} catch (Exception e) {
-
-			System.out.println("FALLO PARSEO");
-			return null;
-		}
 	}
 	private CreateMetricRequest newWrongIdsCreateMetricTRequest() {
-
-		try {
-
 			return new CreateMetricRequest(StaticVariables.evaluator_id, StaticVariables.evaluator_id, "Empty",
 					"2020-03-17", StaticVariables.sprint_id,
 					new metricsString("false", "false", new blockersString("false", "POST TESTV2 2020-03-17"),
 							new proactiveString("false", "false", "false", "false"), new retroactiveString("false", "Empty")));
-		} catch (Exception e) {
-
-			System.out.println("FALLO PARSEO");
-			return null;
-		}
+		
 	}
 	private MetricsCollection ResponseCreateMetricRequest() {
 

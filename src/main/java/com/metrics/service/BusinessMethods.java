@@ -59,64 +59,96 @@ public class BusinessMethods {
 		}
 	}
 
-	public static void VerifyingDateValid(String inputString, int typeRequest) {
-		SimpleDateFormat format = new java.text.SimpleDateFormat("yyyy-MM-dd");
+	public static String VerifyingDateValid(String inputString, int typeRequest) {
+		String[] date = new String[2];
 		try {
-			MetricsApplication.logger.info("Starting date format validation.." + inputString);
-			if (inputString.split("-").length != 3) {
+			MetricsApplication.logger.info("Verifying if date has only letters " + inputString.split("-").length);
+			if (TechnicalValidations.haveOnlyLetters(inputString)) {
+				MetricsApplication.logger.info("Returning default date because " + inputString + " isn't allowed ");
+				return "1000-01-01";
+			}
+			if (inputString.split("-").length < 3 || inputString.split("-").length > 3){
+				MetricsApplication.logger.info("Returning default date becasue " + inputString +" isn't a date");
+				return "1000-01-01";
+			}
+			
+			date = inputString.split("-");
+			if (date[0].length() != 4 && typeRequest != 2) {
 				TypeError.httpErrorMessage(HttpStatus.BAD_REQUEST, new Exception(),
 						HttpExceptionMessage.DateInvalidFormat400, PathErrorMessage.pathMetric);
 				throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
 			}
-			String[] date = inputString.split("-");
-			if (date[0].length() == 4 && date[1].length() == 2 && date[2].length() == 2) {
-				if (typeRequest != 2) {
-					if (!TechnicalValidations.isWithinRange(TechnicalValidations.stringToDate(inputString))) {
-						TypeError.httpErrorMessage(HttpStatus.BAD_REQUEST, new Exception(),
-								HttpExceptionMessage.DateInvalidRange400, PathErrorMessage.pathMetric);
-						throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-					}
-				}
-				if (Integer.parseInt(date[2]) > 31 && Integer.parseInt(date[2]) != 02) {
-					MetricsApplication.logger.error("Incorrect day");
-					TypeError.httpErrorMessage(HttpStatus.BAD_REQUEST, new Exception(),
-							HttpExceptionMessage.DateInvalidDay400, PathErrorMessage.pathMetric);
-					throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-				}
-				if (Integer.parseInt(date[2]) > 29 && Integer.parseInt(date[1]) == 02
-						&& Integer.parseInt(date[0]) % 4 == 0) {
-					MetricsApplication.logger.error("Incorrect day to leap year");
-					TypeError.httpErrorMessage(HttpStatus.BAD_REQUEST, new Exception(),
-							HttpExceptionMessage.DateYearIsLeap400, PathErrorMessage.pathMetric);
-					throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-				}
-				if (Integer.parseInt(date[2]) > 28 && Integer.parseInt(date[1]) == 02
-						&& Integer.parseInt(date[0]) % 4 > 0) {
-					MetricsApplication.logger.error("Incorrect day to Month");
-					TypeError.httpErrorMessage(HttpStatus.BAD_REQUEST, new Exception(),
-							HttpExceptionMessage.DateYearIsNotLeap400, PathErrorMessage.pathMetric);
-					throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-				}
-				if (Integer.parseInt(date[1]) > 12) {
-					MetricsApplication.logger.error("Incorrect month");
-					TypeError.httpErrorMessage(HttpStatus.BAD_REQUEST, new Exception(),
-							HttpExceptionMessage.DateInvalidMonth400, PathErrorMessage.pathMetric);
-					throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-				}
-				format.parse(inputString);
-			} else {
+			if (date[0].length() == 4) {
+				inputString = OrderingDate(date[0],date[1],date[2],typeRequest);
+				
+			} else if (date[2].length() == 4) {
+				inputString = OrderingDate(date[2],date[1],date[0],typeRequest);
+			}else if(date[0].length() != 4 || date[2].length() !=4) {
+				MetricsApplication.logger.error("Incorrect year");
 				TypeError.httpErrorMessage(HttpStatus.BAD_REQUEST, new Exception(),
-						HttpExceptionMessage.DateInvalidFormat400, PathErrorMessage.pathMetric);
+						HttpExceptionMessage.DateInvalidYearFormat400, PathErrorMessage.pathMetric);
 				throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
 			}
 
 		} catch (ParseException error) {
-			MetricsApplication.logger.error("Date format validation failed!");
-			TypeError.httpErrorMessage(HttpStatus.BAD_REQUEST, error, HttpExceptionMessage.DateInvalidFormat400,
+			TypeError.httpErrorMessage(HttpStatus.BAD_REQUEST, new Exception(),
+					HttpExceptionMessage.DateInvalidFormat400, PathErrorMessage.pathMetric);
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+		}
+		MetricsApplication.logger.info("Returning new date " + inputString);
+		return inputString;
+	}
+
+	private static String OrderingDate(String year, String month, String day, int typeRequest) throws ParseException {
+		if(month.length() != 2) {
+			MetricsApplication.logger.error("Incorrect month");
+			TypeError.httpErrorMessage(HttpStatus.BAD_REQUEST, new Exception(),
+					HttpExceptionMessage.DateInvalidMonthFormat400, PathErrorMessage.pathMetric);
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+		}
+		if(day.length() != 2) {
+			MetricsApplication.logger.error("Incorrect day");
+			TypeError.httpErrorMessage(HttpStatus.BAD_REQUEST, new Exception(),
+					HttpExceptionMessage.DateInvalidDayFormat400, PathErrorMessage.pathMetric);
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+		}
+		MetricsApplication.logger.info("Starting date format validation.." + year + "-" + month + "-" + day);
+		SimpleDateFormat format = new java.text.SimpleDateFormat("yyyy-MM-dd");
+		if (typeRequest != 2) {
+			if (!TechnicalValidations
+					.isWithinRange(TechnicalValidations.stringToDate(year + "-" + month + "-" + day))) {
+				TypeError.httpErrorMessage(HttpStatus.BAD_REQUEST, new Exception(),
+						HttpExceptionMessage.DateInvalidRange400, PathErrorMessage.pathMetric);
+				throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+			}
+		}
+		if (Integer.parseInt(day) > 31 && Integer.parseInt(day) != 02) {
+			MetricsApplication.logger.error("Incorrect day");
+			TypeError.httpErrorMessage(HttpStatus.BAD_REQUEST, new Exception(), HttpExceptionMessage.DateInvalidDay400,
 					PathErrorMessage.pathMetric);
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
 		}
+		if (Integer.parseInt(day) > 29 && Integer.parseInt(month) == 02 && Integer.parseInt(day) % 4 == 0) {
+			MetricsApplication.logger.error("Incorrect day to leap year");
+			TypeError.httpErrorMessage(HttpStatus.BAD_REQUEST, new Exception(), HttpExceptionMessage.DateYearIsLeap400,
+					PathErrorMessage.pathMetric);
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+		}
+		if (Integer.parseInt(day) > 28 && Integer.parseInt(month) == 02 && Integer.parseInt(day) % 4 > 0) {
+			MetricsApplication.logger.error("Incorrect day to Month");
+			TypeError.httpErrorMessage(HttpStatus.BAD_REQUEST, new Exception(),
+					HttpExceptionMessage.DateYearIsNotLeap400, PathErrorMessage.pathMetric);
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+		}
+		if (Integer.parseInt(month) > 12) {
+			MetricsApplication.logger.error("Incorrect month");
+			TypeError.httpErrorMessage(HttpStatus.BAD_REQUEST, new Exception(),
+					HttpExceptionMessage.DateInvalidMonth400, PathErrorMessage.pathMetric);
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+		}
 
+		format.parse(year + "-" + month + "-" + day);
+		return year + "-" + month + "-" + day;
 	}
 
 	public static CreateMetricRequest testMetricIntegrity(CreateMetricRequest metric, int typeRequest) {
@@ -303,12 +335,12 @@ public class BusinessMethods {
 		MetricsApplication.logger.info("type of request " + typeRequest);
 		try {
 
-			if (metric.getDate() == null && typeRequest == 0) {
+			if ((metric.getDate() == null || metric.getDate().equals("")) || typeRequest == 0) {
 				Date date = new Date();
 				DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 				metric.setDate(dateFormat.format(date));
 			}
-			if (metric.getDate() == null && typeRequest == 1) {
+			if ((metric.getDate() == null || metric.getDate().equals("")) || typeRequest == 1) {
 				String dateCopy = metric.getDate();
 				metric.setDate(dateCopy);
 			}

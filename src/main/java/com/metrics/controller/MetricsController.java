@@ -14,21 +14,16 @@ import com.metrics.MetricsApplication;
 import com.metrics.domain.CreateMetricRequest;
 import com.metrics.model.MetricsCollection;
 import com.metrics.service.BusinessMethods;
-import com.metrics.service.ClientValidations;
 import com.metrics.service.MetricsServiceImpl;
-import com.metrics.service.SortingMethods;
 import com.metrics.service.TechnicalValidations;
 import com.metrics.service.ErrorHandler.HttpExceptionMessage;
 import com.metrics.service.ErrorHandler.PathErrorMessage;
 import com.metrics.service.ErrorHandler.TypeError;
 import com.metrics.service.StaticFunctionsVariables.StaticVariables;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
-import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -66,19 +61,23 @@ public class MetricsController {
 	public List<MetricsCollection> getMetrics(@RequestParam(value = "page", defaultValue = "1") String pageStr,
 			@RequestParam(value = "size", defaultValue = "2147483547") String sizeStr,
 			@RequestParam(value = "startDate", defaultValue = "1000-01-01") String startDate,
-			@RequestParam(value = "endDate", defaultValue = "1000-01-02") String endDate,
+			@RequestParam(value = "endDate", defaultValue = "1000-01-01") String endDate,
 			@RequestParam(value = "evaluator_id", defaultValue = "") String evaluator_id,
 			@RequestParam(value = "evaluated_id", defaultValue = "") String evaluated_id,
 			@RequestParam(value = "sprint_id", defaultValue = "") String sprint_id,
 			@RequestParam(value = "orderBy", defaultValue = "1") String orderByStr) {
-		BusinessMethods.VerifyingDateValid(startDate, 2);
-		BusinessMethods.VerifyingDateValid(endDate, 2);
-		MetricsApplication.logger.info(startDate.compareTo(endDate));
-		if(startDate.compareTo(endDate) > 0) {
-			MetricsApplication.logger.error("page or size is wrong");
-			TypeError.httpErrorMessage(HttpStatus.BAD_REQUEST, new Exception(),
-					HttpExceptionMessage.DateInvalidOrder400, PathErrorMessage.pathMetric);
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+		
+		MetricsApplication.logger.error("Verifying startDate");
+		startDate = BusinessMethods.VerifyingDateValid(startDate, 2);
+		MetricsApplication.logger.error("Verifying endDate");
+		endDate = BusinessMethods.VerifyingDateValid(endDate, 2);
+		if (!startDate.equals("1000-01-01") && !endDate.equals("1000-01-01")) {
+			if (startDate.compareTo(endDate) > 0) {
+				MetricsApplication.logger.error("page or size is wrong");
+				TypeError.httpErrorMessage(HttpStatus.BAD_REQUEST, new Exception(),
+						HttpExceptionMessage.DateInvalidOrder400, PathErrorMessage.pathMetric);
+				throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+			}
 		}
 
 		// Verifying only number
@@ -113,17 +112,17 @@ public class MetricsController {
 			TypeError.httpErrorMessage(HttpStatus.BAD_REQUEST, new Exception(),
 					HttpExceptionMessage.InvalidPageAndSizeValue400, PathErrorMessage.pathMetric);
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-		} else if (page < 1){
+		} else if (page < 1) {
 			MetricsApplication.logger.error("page is wrong");
 			TypeError.httpErrorMessage(HttpStatus.BAD_REQUEST, new Exception(),
 					HttpExceptionMessage.InvalidPageValue400, PathErrorMessage.pathMetric);
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-		}else if (size < 1){
+		} else if (size < 1) {
 			MetricsApplication.logger.error("size is wrong");
 			TypeError.httpErrorMessage(HttpStatus.BAD_REQUEST, new Exception(),
 					HttpExceptionMessage.InvalidSizeValue400, PathErrorMessage.pathMetric);
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-		}else {
+		} else {
 			page = page - 1;
 		}
 
@@ -144,9 +143,9 @@ public class MetricsController {
 	@ResponseStatus(value = HttpStatus.OK)
 	@GetMapping("/metrics/{id}")
 	public Optional<MetricsCollection> findById(@PathVariable String id) {
-			TechnicalValidations.VerifyingUUID(id);
-			MetricsApplication.logger.info("Calling findById service");
-			return service.findById(id);
+		TechnicalValidations.VerifyingUUID(id);
+		MetricsApplication.logger.info("Calling findById service");
+		return service.findById(id);
 	}
 
 	@ResponseStatus(value = HttpStatus.CREATED)

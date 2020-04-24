@@ -7,15 +7,15 @@ public class HttpExceptionMessage {
 	//Massage of method "getMetrics"
 	public static final String DateInvalidOrder400 = "The given value for startDate is higger than endDate";
 	public static final String InvalidPageAndSizeValue400 = "page and size are out of range";
-	public static final String InvalidPageValue400 = "page ha a invalid value";
-	public static final String InvalidSizeValue400 = "size had a invalid value";
+	public static final String InvalidPageValue400 = "page had an invalid value";
+	public static final String InvalidSizeValue400 = "size had an invalid value";
 	public static final String OrderByInvalidValue400 = "The given value for orderBy is invalid use '1'(to use sort descending) or '0'(to use sort ascending)";
 	
 	
 	//Message of class MetricServiceImpl
 	
 	//Message of method "findById", "deleteMetric" and "updateMetric"
-	public static final String IdNotFound404 = "Has not been found a metric with the Id that has given";
+	public static final String IdNotFound404 = "Has not been found a metric with the Id has given";
 	//Message of method "getAllMetricsPaginated"
 	public static final String PaginationInvalidRange400 = "Has been found problems with range of metric list";
 	//Messages for method "getItemsFromIdFilter"
@@ -29,9 +29,12 @@ public class HttpExceptionMessage {
 	public static final String DBIsEmpty204 = "The DB has not any records";
 	//Messages for method "VerifyingDateValid" and "stringToDate"
 	public static final String DateInvalidDay400 = "The given date has an invalid day";
+	public static final String DateInvalidDayFormat400 = "The given day has an invalid Day, it format should be dd";
 	public static final String DateInvalidFormat400 = "The given date has incorrect format";
 	public static final String DateInvalidMonth400 = "The given date has an invalid Month";
+	public static final String DateInvalidMonthFormat400 = "The given month has an invalid Month, it format should be MM";
 	public static final String DateInvalidRange400 = "The given date is out of range";
+	public static final String DateInvalidYearFormat400 = "The given year has an invalid year format, it format should be yyyy";
 	public static final String DateYearIsLeap400 = "you can't use that day, the Month has 29 days";
 	public static final String DateYearIsNotLeap400 = "you can't use that day, the Month has 28 days";
 	//Message for method "VerifyingUUID" and "VerifyingID"

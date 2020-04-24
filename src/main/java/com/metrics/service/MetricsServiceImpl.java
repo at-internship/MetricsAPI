@@ -44,11 +44,30 @@ public class MetricsServiceImpl implements MetricsService {
 
 	public List<MetricsCollection> getMetricsFilter(String sprint_id, String evaluator_id, String evaluated_id,
 			String startDate, String endDate, int page, int size, int order) {
+		if (TechnicalValidations.haveOnlyNumbers(evaluator_id) && !evaluator_id.equals("")) {
+			MetricsApplication.logger.error("evaluator_id had only numbers");
+			TypeError.httpErrorMessage(HttpStatus.NOT_FOUND, new Exception(),
+					HttpExceptionMessage.Evaluator_IdNotFound404, PathErrorMessage.pathMetric + "/" + evaluator_id);
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+		}
+		if (TechnicalValidations.haveOnlyNumbers(evaluated_id) && !evaluated_id.equals("")) {
+			MetricsApplication.logger.error("evaluated_id had only numbers");
+			TypeError.httpErrorMessage(HttpStatus.NOT_FOUND, new Exception(),
+					HttpExceptionMessage.Evaluated_IdNotFound404, PathErrorMessage.pathMetric+ "/" + evaluated_id);
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+		}
+		if (TechnicalValidations.haveOnlyNumbers(sprint_id) && !sprint_id.equals("")) {
+			MetricsApplication.logger.error("sprint_id had only numbers");
+			TypeError.httpErrorMessage(HttpStatus.NOT_FOUND, new Exception(),
+					HttpExceptionMessage.Sprint_IdNotFound404, PathErrorMessage.pathMetric+ "/" + sprint_id);
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+		}
+		
 		MetricsApplication.logger.info("Creating list..");
 		List<MetricsCollection> metricsCollection = new ArrayList<>();
 		MetricsApplication.logger.info("Filling list with info");
 
-		if (endDate.equals("1000-01-02")) {
+		if (endDate.equals("1000-01-01")) {
 			Date date = new Date();
 			endDate = new SimpleDateFormat("yyyy-MM-dd").format(date);
 		}
@@ -113,7 +132,7 @@ public class MetricsServiceImpl implements MetricsService {
 			MetricsApplication.logger.error("trying to find a metric but  did not found an ID");
 			TypeError.httpErrorMessage(HttpStatus.NOT_FOUND, new Exception(), HttpExceptionMessage.IdNotFound404,
 					"/metric/" + id);
-			throw new HttpClientErrorException(HttpStatus.NOT_FOUND);
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND);
 		}
 		MetricsApplication.logger.info("Returning metric");
 		return repository.findById(id);

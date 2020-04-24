@@ -1,7 +1,6 @@
 package com.metrics.repository;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 
 import java.io.IOException;
 import org.springframework.http.MediaType;
