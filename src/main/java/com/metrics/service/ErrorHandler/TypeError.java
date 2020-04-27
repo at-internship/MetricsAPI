@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.metrics.model.ErrorMessage;
 
@@ -40,7 +41,7 @@ public class TypeError {
 
 @ControllerAdvice class ExceptionAnyHandler {
 
-	@ExceptionHandler(value = {Exception.class})
+	@ExceptionHandler(value = {ResponseStatusException.class})
 	public ResponseEntity<Object> handleAnyException(Exception error){
 		
 		Date actualDate = new Date();

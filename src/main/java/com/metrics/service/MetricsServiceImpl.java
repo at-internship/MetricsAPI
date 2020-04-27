@@ -44,6 +44,25 @@ public class MetricsServiceImpl implements MetricsService {
 
 	public List<MetricsCollection> getMetricsFilter(String sprint_id, String evaluator_id, String evaluated_id,
 			String startDate, String endDate, int page, int size, int order) {
+		if (TechnicalValidations.haveOnlyNumbers(evaluator_id) && !evaluator_id.equals("")) {
+			MetricsApplication.logger.error("evaluator_id had only numbers");
+			TypeError.httpErrorMessage(HttpStatus.NOT_FOUND, new Exception(),
+					HttpExceptionMessage.Evaluator_IdNotFound404, PathErrorMessage.pathMetric + "/" + evaluator_id);
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+		}
+		if (TechnicalValidations.haveOnlyNumbers(evaluated_id) && !evaluated_id.equals("")) {
+			MetricsApplication.logger.error("evaluated_id had only numbers");
+			TypeError.httpErrorMessage(HttpStatus.NOT_FOUND, new Exception(),
+					HttpExceptionMessage.Evaluated_IdNotFound404, PathErrorMessage.pathMetric+ "/" + evaluated_id);
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+		}
+		if (TechnicalValidations.haveOnlyNumbers(sprint_id) && !sprint_id.equals("")) {
+			MetricsApplication.logger.error("sprint_id had only numbers");
+			TypeError.httpErrorMessage(HttpStatus.NOT_FOUND, new Exception(),
+					HttpExceptionMessage.Sprint_IdNotFound404, PathErrorMessage.pathMetric+ "/" + sprint_id);
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+		}
+		
 		MetricsApplication.logger.info("Creating list..");
 		List<MetricsCollection> metricsCollection = new ArrayList<>();
 		MetricsApplication.logger.info("Filling list with info");
@@ -66,26 +85,41 @@ public class MetricsServiceImpl implements MetricsService {
 			MetricsApplication.logger.info(endDate);
 			metricsCollection = repository.findByDate(startDate, endDate, firstPageRequest);
 		} else if (evaluator_id.equals("") && evaluated_id.equals("")) {
-			MetricsApplication.logger.info("Find by sprint_id");
-			metricsCollection = repository.findBySprintId(sprint_id, startDate, endDate, firstPageRequest);
+			if (TechnicalValidations.VerifyingID(sprint_id)) {
+				MetricsApplication.logger.info("Find by sprint_id");
+				metricsCollection = repository.findBySprintId(sprint_id, startDate, endDate, firstPageRequest);
+			}
 		} else if (sprint_id.equals("") && evaluated_id.equals("")) {
-			MetricsApplication.logger.info("Find by evaluator_id");
-			metricsCollection = repository.findByEvaluatorId(evaluator_id, startDate, endDate, firstPageRequest);
+			if (TechnicalValidations.VerifyingID(evaluator_id)) {
+				MetricsApplication.logger.info("Find by evaluator_id");
+				metricsCollection = repository.findByEvaluatorId(evaluator_id, startDate, endDate, firstPageRequest);
+			}
 		} else if (evaluator_id.equals("") && sprint_id.equals("")) {
-			MetricsApplication.logger.info("Find by evaluated_id");
-			metricsCollection = repository.findByEvaluatedId(evaluated_id, startDate, endDate, firstPageRequest);
+			if (TechnicalValidations.VerifyingID(evaluated_id)) {
+				MetricsApplication.logger.info("Find by evaluated_id");
+				metricsCollection = repository.findByEvaluatedId(evaluated_id, startDate, endDate, firstPageRequest);
+			}
 		} else if (sprint_id.equals("")) {
-			metricsCollection = repository.findByEvaluatorIdAndEvaluatedId(evaluator_id, evaluated_id, startDate,
-					endDate, firstPageRequest);
+			if (TechnicalValidations.VerifyingID(evaluated_id) && TechnicalValidations.VerifyingID(evaluator_id)) {
+				metricsCollection = repository.findByEvaluatorIdAndEvaluatedId(evaluator_id, evaluated_id, startDate,
+						endDate, firstPageRequest);
+			}
 		} else if (evaluator_id.equals("")) {
-			metricsCollection = repository.findBySprintIdAndEvaluatedId(sprint_id, evaluated_id, startDate, endDate,
-					firstPageRequest);
+			if (TechnicalValidations.VerifyingID(sprint_id) && TechnicalValidations.VerifyingID(evaluated_id)) {
+				metricsCollection = repository.findBySprintIdAndEvaluatedId(sprint_id, evaluated_id, startDate, endDate,
+						firstPageRequest);
+			}
 		} else if (evaluated_id.equals("")) {
-			metricsCollection = repository.findBySpritIdAndEvaluatorId(sprint_id, evaluator_id, startDate, endDate,
-					firstPageRequest);
+			if (TechnicalValidations.VerifyingID(sprint_id) && TechnicalValidations.VerifyingID(evaluator_id)) {
+				metricsCollection = repository.findBySpritIdAndEvaluatorId(sprint_id, evaluator_id, startDate, endDate,
+						firstPageRequest);
+			}
 		} else {
-			metricsCollection = repository.findBySprintIdAndEvaluatedIdAndEvaluatorId(sprint_id, evaluated_id,
-					evaluator_id, startDate, endDate, firstPageRequest);
+			if (TechnicalValidations.VerifyingID(sprint_id) && TechnicalValidations.VerifyingID(evaluator_id)
+					&& TechnicalValidations.VerifyingID(evaluated_id)) {
+				metricsCollection = repository.findBySprintIdAndEvaluatedIdAndEvaluatorId(sprint_id, evaluated_id,
+						evaluator_id, startDate, endDate, firstPageRequest);
+			}
 		}
 
 		MetricsApplication.logger.info("Returning lists");
@@ -98,7 +132,7 @@ public class MetricsServiceImpl implements MetricsService {
 			MetricsApplication.logger.error("trying to find a metric but  did not found an ID");
 			TypeError.httpErrorMessage(HttpStatus.NOT_FOUND, new Exception(), HttpExceptionMessage.IdNotFound404,
 					"/metric/" + id);
-			throw new HttpClientErrorException(HttpStatus.NOT_FOUND);
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND);
 		}
 		MetricsApplication.logger.info("Returning metric");
 		return repository.findById(id);

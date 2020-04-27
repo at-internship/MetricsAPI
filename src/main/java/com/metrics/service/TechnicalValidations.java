@@ -116,6 +116,9 @@ public class TechnicalValidations {
 	}
 
 	public static boolean haveOnlyNumbers(String uuid) {
+		if (verifyingIfNegativeNumber(uuid) < 0) {
+			return true;
+		}
 		int counter = 0;
 		for (char letter : uuid.toCharArray()) {
 			if (letter == '1' || letter == '2' || letter == '3' || letter == '4' || letter == '5' || letter == '6'
@@ -126,6 +129,18 @@ public class TechnicalValidations {
 		if (counter == uuid.length())
 			return true;
 		return false;
+	}
+	
+	public static int verifyingIfNegativeNumber(String value) {
+		int parse = 1;
+		if (value.contains("-")) {
+			try {
+				parse = Integer.parseInt(value);
+			}catch(NumberFormatException error) {
+				parse = 0;
+			}
+		}
+		return parse;
 	}
 
 	static boolean isWithinRange(Date testDate) {
@@ -272,10 +287,10 @@ public class TechnicalValidations {
 
 	public static boolean VerifyingID(String uuid) {
 		Pattern patt = Pattern.compile("^[a-zA-Z0-9]+$");
-		MetricsApplication.logger.error("Valiting id " + uuid);
+		MetricsApplication.logger.info("Valiting id " + uuid);
 
 		boolean validObjectId = patt.matcher(uuid).matches();
-		MetricsApplication.logger.error(validObjectId);
+		MetricsApplication.logger.info(validObjectId);
 		if (!validObjectId) {
 			TypeError.httpErrorMessage(HttpStatus.BAD_REQUEST, new Exception(),
 					HttpExceptionMessage.IdHasSpecialChar400, "/metrics/" + uuid);

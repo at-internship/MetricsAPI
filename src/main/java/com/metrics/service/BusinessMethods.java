@@ -59,77 +59,109 @@ public class BusinessMethods {
 		}
 	}
 
-	public static void VerifyingDateValid(String inputString, int typeRequest) {
-		SimpleDateFormat format = new java.text.SimpleDateFormat("yyyy-MM-dd");
+	public static String VerifyingDateValid(String inputString, int typeRequest) {
+		String[] date = new String[2];
 		try {
-			MetricsApplication.logger.info("Starting date format validation.." + inputString);
-			if (inputString.split("-").length != 3) {
+			MetricsApplication.logger.info("Verifying if date has only letters " + inputString.split("-").length);
+			if (TechnicalValidations.haveOnlyLetters(inputString)) {
+				MetricsApplication.logger.info("Returning default date because " + inputString + " isn't allowed ");
+				return "1000-01-01";
+			}
+			if (inputString.split("-").length < 3 || inputString.split("-").length > 3){
+				MetricsApplication.logger.info("Returning default date becasue " + inputString +" isn't a date");
+				return "1000-01-01";
+			}
+			
+			date = inputString.split("-");
+			if (date[0].length() != 4 && typeRequest != 2) {
 				TypeError.httpErrorMessage(HttpStatus.BAD_REQUEST, new Exception(),
 						HttpExceptionMessage.DateInvalidFormat400, PathErrorMessage.pathMetric);
 				throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
 			}
-			String[] date = inputString.split("-");
-			if (date[0].length() == 4 && date[1].length() == 2 && date[2].length() == 2) {
-				if (typeRequest != 2) {
-					if (!TechnicalValidations.isWithinRange(TechnicalValidations.stringToDate(inputString))) {
-						TypeError.httpErrorMessage(HttpStatus.BAD_REQUEST, new Exception(),
-								HttpExceptionMessage.DateInvalidRange400, PathErrorMessage.pathMetric);
-						throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-					}
-				}
-				if (Integer.parseInt(date[2]) > 31 && Integer.parseInt(date[2]) != 02) {
-					MetricsApplication.logger.error("Incorrect day");
-					TypeError.httpErrorMessage(HttpStatus.BAD_REQUEST, new Exception(),
-							HttpExceptionMessage.DateInvalidDay400, PathErrorMessage.pathMetric);
-					throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-				}
-				if (Integer.parseInt(date[2]) > 29 && Integer.parseInt(date[1]) == 02
-						&& Integer.parseInt(date[0]) % 4 == 0) {
-					MetricsApplication.logger.error("Incorrect day to leap year");
-					TypeError.httpErrorMessage(HttpStatus.BAD_REQUEST, new Exception(),
-							HttpExceptionMessage.DateYearIsLeap400, PathErrorMessage.pathMetric);
-					throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-				}
-				if (Integer.parseInt(date[2]) > 28 && Integer.parseInt(date[1]) == 02
-						&& Integer.parseInt(date[0]) % 4 > 0) {
-					MetricsApplication.logger.error("Incorrect day to Month");
-					TypeError.httpErrorMessage(HttpStatus.BAD_REQUEST, new Exception(),
-							HttpExceptionMessage.DateYearIsNotLeap400, PathErrorMessage.pathMetric);
-					throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-				}
-				if (Integer.parseInt(date[1]) > 12) {
-					MetricsApplication.logger.error("Incorrect month");
-					TypeError.httpErrorMessage(HttpStatus.BAD_REQUEST, new Exception(),
-							HttpExceptionMessage.DateInvalidMonth400, PathErrorMessage.pathMetric);
-					throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-				}
-				format.parse(inputString);
-			} else {
+			if (date[0].length() == 4) {
+				inputString = OrderingDate(date[0],date[1],date[2],typeRequest);
+				
+			} else if (date[2].length() == 4) {
+				inputString = OrderingDate(date[2],date[1],date[0],typeRequest);
+			}else if(date[0].length() != 4 || date[2].length() !=4) {
+				MetricsApplication.logger.error("Incorrect year");
 				TypeError.httpErrorMessage(HttpStatus.BAD_REQUEST, new Exception(),
-						HttpExceptionMessage.DateInvalidFormat400, PathErrorMessage.pathMetric);
+						HttpExceptionMessage.DateInvalidYearFormat400, PathErrorMessage.pathMetric);
 				throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
 			}
 
 		} catch (ParseException error) {
-			MetricsApplication.logger.error("Date format validation failed!");
-			TypeError.httpErrorMessage(HttpStatus.BAD_REQUEST, error, HttpExceptionMessage.DateInvalidFormat400,
+			TypeError.httpErrorMessage(HttpStatus.BAD_REQUEST, new Exception(),
+					HttpExceptionMessage.DateInvalidFormat400, PathErrorMessage.pathMetric);
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+		}
+		MetricsApplication.logger.info("Returning new date " + inputString);
+		return inputString;
+	}
+
+	private static String OrderingDate(String year, String month, String day, int typeRequest) throws ParseException {
+		if(month.length() != 2) {
+			MetricsApplication.logger.error("Incorrect month");
+			TypeError.httpErrorMessage(HttpStatus.BAD_REQUEST, new Exception(),
+					HttpExceptionMessage.DateInvalidMonthFormat400, PathErrorMessage.pathMetric);
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+		}
+		if(day.length() != 2) {
+			MetricsApplication.logger.error("Incorrect day");
+			TypeError.httpErrorMessage(HttpStatus.BAD_REQUEST, new Exception(),
+					HttpExceptionMessage.DateInvalidDayFormat400, PathErrorMessage.pathMetric);
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+		}
+		MetricsApplication.logger.info("Starting date format validation.." + year + "-" + month + "-" + day);
+		SimpleDateFormat format = new java.text.SimpleDateFormat("yyyy-MM-dd");
+		if (typeRequest != 2) {
+			if (!TechnicalValidations
+					.isWithinRange(TechnicalValidations.stringToDate(year + "-" + month + "-" + day))) {
+				TypeError.httpErrorMessage(HttpStatus.BAD_REQUEST, new Exception(),
+						HttpExceptionMessage.DateInvalidRange400, PathErrorMessage.pathMetric);
+				throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+			}
+		}
+		if (Integer.parseInt(day) > 31 && Integer.parseInt(day) != 02) {
+			MetricsApplication.logger.error("Incorrect day");
+			TypeError.httpErrorMessage(HttpStatus.BAD_REQUEST, new Exception(), HttpExceptionMessage.DateInvalidDay400,
 					PathErrorMessage.pathMetric);
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
 		}
+		if (Integer.parseInt(day) > 29 && Integer.parseInt(month) == 02 && Integer.parseInt(day) % 4 == 0) {
+			MetricsApplication.logger.error("Incorrect day to leap year");
+			TypeError.httpErrorMessage(HttpStatus.BAD_REQUEST, new Exception(), HttpExceptionMessage.DateYearIsLeap400,
+					PathErrorMessage.pathMetric);
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+		}
+		if (Integer.parseInt(day) > 28 && Integer.parseInt(month) == 02 && Integer.parseInt(day) % 4 > 0) {
+			MetricsApplication.logger.error("Incorrect day to Month");
+			TypeError.httpErrorMessage(HttpStatus.BAD_REQUEST, new Exception(),
+					HttpExceptionMessage.DateYearIsNotLeap400, PathErrorMessage.pathMetric);
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+		}
+		if (Integer.parseInt(month) > 12) {
+			MetricsApplication.logger.error("Incorrect month");
+			TypeError.httpErrorMessage(HttpStatus.BAD_REQUEST, new Exception(),
+					HttpExceptionMessage.DateInvalidMonth400, PathErrorMessage.pathMetric);
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+		}
 
+		format.parse(year + "-" + month + "-" + day);
+		return year + "-" + month + "-" + day;
 	}
 
 	public static CreateMetricRequest testMetricIntegrity(CreateMetricRequest metric, int typeRequest) {
 		// Verifying if the body request has id and it is PUT or POST
 		if (metric.getId() != null && typeRequest != 2) {
-			MetricsApplication.logger.info("id field must be null");
+			MetricsApplication.logger.error("id field must be null");
 			TypeError.httpErrorMessage(HttpStatus.BAD_REQUEST, new Exception(), HttpExceptionMessage.IdIsInBody400,
 					PathErrorMessage.pathMetric);
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
 		}
 		if (metric.getEvaluated_id() != null && metric.getEvaluator_id() != null) {
 			if (typeRequest != 2 && (metric.getEvaluated_id().equals(metric.getEvaluator_id()))) {
-				MetricsApplication.logger.info("Evaluator and Evaluated ID are the same");
+				MetricsApplication.logger.error("Evaluator and Evaluated ID are the same");
 				TypeError.httpErrorMessage(HttpStatus.BAD_REQUEST, new Exception(), HttpExceptionMessage.SameIDs400,
 						PathErrorMessage.pathMetric);
 				throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
@@ -137,25 +169,25 @@ public class BusinessMethods {
 		}
 		MetricsApplication.logger.info("Verifying integrity of metrics objects and fields");
 		if (metric.getType() == null) {
-			MetricsApplication.logger.info("The field type should not be null");
+			MetricsApplication.logger.error("The field type should not be null");
 			TypeError.httpErrorMessage(HttpStatus.BAD_REQUEST, new Exception(), HttpExceptionMessage.FieldTypeNull400,
 					PathErrorMessage.pathMetric);
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
 		} else if (metric.getType().isEmpty()) {
-			MetricsApplication.logger.info("The field type should not be null");
+			MetricsApplication.logger.error("The field type should not be null");
 			TypeError.httpErrorMessage(HttpStatus.BAD_REQUEST, new Exception(), HttpExceptionMessage.FieldTypeNull400,
 					PathErrorMessage.pathMetric);
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
 		}
 
 		if (metric.getMetrics() == null) {
-			MetricsApplication.logger.info("The Metrics Object should not be null");
+			MetricsApplication.logger.error("The Metrics Object should not be null");
 			TypeError.httpErrorMessage(HttpStatus.BAD_REQUEST, new Exception(),
 					HttpExceptionMessage.ObjectMetricNull400, PathErrorMessage.pathMetric);
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
 		}
 		if (metric.getMetrics().getAttendance() == null) {
-			MetricsApplication.logger.info("The Attendance field should not be null");
+			MetricsApplication.logger.error("The Attendance field should not be null");
 			TypeError.httpErrorMessage(HttpStatus.BAD_REQUEST, new Exception(),
 					HttpExceptionMessage.FieldAttendanceNull400, PathErrorMessage.pathMetric);
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The Attendance field should not be null");
@@ -169,7 +201,7 @@ public class BusinessMethods {
 		}
 
 		if (metric.getMetrics().getCarried_over() == null) {
-			MetricsApplication.logger.info("The Carried_over field should not be null");
+			MetricsApplication.logger.error("The Carried_over field should not be null");
 			TypeError.httpErrorMessage(HttpStatus.BAD_REQUEST, new Exception(),
 					HttpExceptionMessage.FieldCarried_OverNull400, PathErrorMessage.pathMetric);
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
@@ -183,13 +215,13 @@ public class BusinessMethods {
 		}
 
 		if (metric.getMetrics().getBlockers() == null) {
-			MetricsApplication.logger.info("The Blockers Object should not be null");
+			MetricsApplication.logger.error("The Blockers Object should not be null");
 			TypeError.httpErrorMessage(HttpStatus.BAD_REQUEST, new Exception(),
 					HttpExceptionMessage.ObjectBlockersNull400, PathErrorMessage.pathMetric);
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
 		}
 		if (metric.getMetrics().getBlockers().getBlocked() == null) {
-			MetricsApplication.logger.info("The Blocked field should not be null");
+			MetricsApplication.logger.error("The Blocked field should not be null");
 			TypeError.httpErrorMessage(HttpStatus.BAD_REQUEST, new Exception(),
 					HttpExceptionMessage.FieldBlockedNull400, PathErrorMessage.pathMetric);
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The Blocked field should not be null");
@@ -205,13 +237,13 @@ public class BusinessMethods {
 			metric.getMetrics().getBlockers().setComments("");
 
 		if (metric.getMetrics().getProactive() == null) {
-			MetricsApplication.logger.info("The Proactive Object should not be null");
+			MetricsApplication.logger.error("The Proactive Object should not be null");
 			TypeError.httpErrorMessage(HttpStatus.BAD_REQUEST, new Exception(),
 					HttpExceptionMessage.ObjectProactiveNull400, PathErrorMessage.pathMetric);
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
 		}
 		if (metric.getMetrics().getProactive().getLooked_for_help() == null) {
-			MetricsApplication.logger.info("The Looked_for_help field should not be null");
+			MetricsApplication.logger.error("The Looked_for_help field should not be null");
 			TypeError.httpErrorMessage(HttpStatus.BAD_REQUEST, new Exception(),
 					HttpExceptionMessage.FieldLooked_for_helpNull400, PathErrorMessage.pathMetric);
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
@@ -224,7 +256,7 @@ public class BusinessMethods {
 
 		}
 		if (metric.getMetrics().getProactive().getProvided_help() == null) {
-			MetricsApplication.logger.info("The Provided_help field should not be null");
+			MetricsApplication.logger.error("The Provided_help field should not be null");
 			TypeError.httpErrorMessage(HttpStatus.BAD_REQUEST, new Exception(),
 					HttpExceptionMessage.FieldProvided_helpNull400, PathErrorMessage.pathMetric);
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
@@ -237,7 +269,7 @@ public class BusinessMethods {
 
 		}
 		if (metric.getMetrics().getProactive().getWorked_ahead() == null) {
-			MetricsApplication.logger.info("The Worked_ahead field should not be null");
+			MetricsApplication.logger.error("The Worked_ahead field should not be null");
 			TypeError.httpErrorMessage(HttpStatus.BAD_REQUEST, new Exception(),
 					HttpExceptionMessage.FieldWorked_aheadNull400, PathErrorMessage.pathMetric);
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
@@ -250,7 +282,7 @@ public class BusinessMethods {
 
 		}
 		if (metric.getMetrics().getProactive().getShared_resources() == null) {
-			MetricsApplication.logger.info("The Shared_resources field should not be null");
+			MetricsApplication.logger.error("The Shared_resources field should not be null");
 			TypeError.httpErrorMessage(HttpStatus.BAD_REQUEST, new Exception(),
 					HttpExceptionMessage.FieldShared_resourcesNull400, PathErrorMessage.pathMetric);
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
@@ -264,13 +296,13 @@ public class BusinessMethods {
 		}
 
 		if (metric.getMetrics().getRetroactive() == null) {
-			MetricsApplication.logger.info("The Retroactive Object should not be null");
+			MetricsApplication.logger.error("The Retroactive Object should not be null");
 			TypeError.httpErrorMessage(HttpStatus.BAD_REQUEST, new Exception(),
 					HttpExceptionMessage.ObjectRetroactiveNull400, PathErrorMessage.pathMetric);
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
 		}
 		if (metric.getMetrics().getRetroactive().getDelayed_looking_help() == null) {
-			MetricsApplication.logger.info("The Delayed_looking_help field should not be null");
+			MetricsApplication.logger.error("The Delayed_looking_help field should not be null");
 			TypeError.httpErrorMessage(HttpStatus.BAD_REQUEST, new Exception(),
 					HttpExceptionMessage.FieldDelayed_looking_helpNull400, PathErrorMessage.pathMetric);
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
@@ -291,7 +323,7 @@ public class BusinessMethods {
 			MetricsApplication.logger.info("Validation integrity of the json");
 			mapper.readValue(TechnicalValidations.mapToJson(metric), CreateMetricRequest.class);
 		} catch (Exception error) {
-			MetricsApplication.logger.info("Json structure is not correct");
+			MetricsApplication.logger.error("Json structure is not correct");
 			TypeError.httpErrorMessage(HttpStatus.BAD_REQUEST, error, HttpExceptionMessage.JsonInvalidFormat400,
 					PathErrorMessage.pathMetric);
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
@@ -300,15 +332,18 @@ public class BusinessMethods {
 		// 0 is POST Request
 		// 1 is PUT Request
 		// 2 is GET or another method
+		MetricsApplication.logger.info("The date element has..: " + metric.getDate());
 		MetricsApplication.logger.info("type of request " + typeRequest);
 		try {
 
-			if (metric.getDate() == null && typeRequest == 0) {
+			if ((metric.getDate() == null || metric.getDate().isEmpty()) && typeRequest == 0) {
+				MetricsApplication.logger.info("POST Assigning new date..: " + metric.getDate());
 				Date date = new Date();
 				DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 				metric.setDate(dateFormat.format(date));
 			}
-			if (metric.getDate() == null && typeRequest == 1) {
+			if ((metric.getDate() == null || metric.getDate().isEmpty()) && typeRequest == 1) {
+				MetricsApplication.logger.info("PUT Assigning new date..: " + metric.getDate());
 				String dateCopy = metric.getDate();
 				metric.setDate(dateCopy);
 			}
@@ -323,10 +358,10 @@ public class BusinessMethods {
 				DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 				metric.setDate(dateFormat.format(date));
 			} else if (!metric.getDate().isEmpty() && typeRequest == 0) {
-				MetricsApplication.logger.info("Verifying integrity of date field");
+				MetricsApplication.logger.info("Verifying integrity of date field of " + metric.getDate());
 				VerifyingDateValid(metric.getDate(), 0);
 			} else if (!metric.getDate().isEmpty() && typeRequest == 1) {
-				MetricsApplication.logger.info("Verifying integrity of date field");
+				MetricsApplication.logger.info("Verifying integrity of date field of " + metric.getDate());
 				VerifyingDateValid(metric.getDate(), 1);
 			}
 		} else {
@@ -335,12 +370,12 @@ public class BusinessMethods {
 
 		MetricsApplication.logger.info("Verifying integrity of evaluated_id field");
 		if (metric.getEvaluated_id() == null) {
-			MetricsApplication.logger.info("evaluated_id field should not be null");
+			MetricsApplication.logger.error("evaluated_id field should not be null");
 			TypeError.httpErrorMessage(HttpStatus.BAD_REQUEST, new Exception(),
 					HttpExceptionMessage.FieldEvaluated_idNull400, PathErrorMessage.pathMetric);
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
 		} else if (metric.getEvaluated_id().isEmpty()) {
-			MetricsApplication.logger.info("evaluated_id field should not be null");
+			MetricsApplication.logger.error("evaluated_id field should not be null");
 			TypeError.httpErrorMessage(HttpStatus.BAD_REQUEST, new Exception(),
 					HttpExceptionMessage.FieldEvaluated_idNull400, PathErrorMessage.pathMetric);
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
@@ -349,12 +384,12 @@ public class BusinessMethods {
 		}
 		MetricsApplication.logger.info("Verifying integrity of evaluator_id field");
 		if (metric.getEvaluator_id() == null) {
-			MetricsApplication.logger.info("evaluator_id field should not be null");
+			MetricsApplication.logger.error("evaluator_id field should not be null");
 			TypeError.httpErrorMessage(HttpStatus.BAD_REQUEST, new Exception(),
 					HttpExceptionMessage.FieldEvaluator_idNull400, PathErrorMessage.pathMetric);
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
 		} else if (metric.getEvaluator_id().isEmpty()) {
-			MetricsApplication.logger.info("evaluator_id field should not be null");
+			MetricsApplication.logger.error("evaluator_id field should not be null");
 			TypeError.httpErrorMessage(HttpStatus.BAD_REQUEST, new Exception(),
 					HttpExceptionMessage.FieldEvaluator_idNull400, PathErrorMessage.pathMetric);
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
@@ -363,12 +398,12 @@ public class BusinessMethods {
 		}
 		MetricsApplication.logger.info("Verifying integrity of sprint_id field");
 		if (metric.getSprint_id() == null) {
-			MetricsApplication.logger.info("sprint_id field should not be null");
+			MetricsApplication.logger.error("sprint_id field should not be null");
 			TypeError.httpErrorMessage(HttpStatus.BAD_REQUEST, new Exception(), HttpExceptionMessage.FieldSprint_id400,
 					PathErrorMessage.pathMetric);
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
 		} else if (metric.getSprint_id().isEmpty()) {
-			MetricsApplication.logger.info("sprint_id field should not be null");
+			MetricsApplication.logger.error("sprint_id field should not be null");
 			TypeError.httpErrorMessage(HttpStatus.BAD_REQUEST, new Exception(), HttpExceptionMessage.FieldSprint_id400,
 					PathErrorMessage.pathMetric);
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST);

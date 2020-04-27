@@ -1,5 +1,4 @@
 package com.metrics.service;
-
 import org.springframework.web.client.RestTemplate;
 
 public class ClientValidations {
@@ -15,5 +14,4 @@ public class ClientValidations {
 		RestTemplate restTemplate = new RestTemplate();
 		return restTemplate.getForObject(uri, String.class);
 	}
-
 }
