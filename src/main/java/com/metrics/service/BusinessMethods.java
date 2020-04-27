@@ -332,15 +332,18 @@ public class BusinessMethods {
 		// 0 is POST Request
 		// 1 is PUT Request
 		// 2 is GET or another method
+		MetricsApplication.logger.info("The date element has..: " + metric.getDate());
 		MetricsApplication.logger.info("type of request " + typeRequest);
 		try {
 
-			if ((metric.getDate() == null || metric.getDate().equals("")) || typeRequest == 0) {
+			if ((metric.getDate() == null || metric.getDate().isEmpty()) && typeRequest == 0) {
+				MetricsApplication.logger.info("POST Assigning new date..: " + metric.getDate());
 				Date date = new Date();
 				DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 				metric.setDate(dateFormat.format(date));
 			}
-			if ((metric.getDate() == null || metric.getDate().equals("")) || typeRequest == 1) {
+			if ((metric.getDate() == null || metric.getDate().isEmpty()) && typeRequest == 1) {
+				MetricsApplication.logger.info("PUT Assigning new date..: " + metric.getDate());
 				String dateCopy = metric.getDate();
 				metric.setDate(dateCopy);
 			}
@@ -355,10 +358,10 @@ public class BusinessMethods {
 				DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 				metric.setDate(dateFormat.format(date));
 			} else if (!metric.getDate().isEmpty() && typeRequest == 0) {
-				MetricsApplication.logger.info("Verifying integrity of date field");
+				MetricsApplication.logger.info("Verifying integrity of date field of " + metric.getDate());
 				VerifyingDateValid(metric.getDate(), 0);
 			} else if (!metric.getDate().isEmpty() && typeRequest == 1) {
-				MetricsApplication.logger.info("Verifying integrity of date field");
+				MetricsApplication.logger.info("Verifying integrity of date field of " + metric.getDate());
 				VerifyingDateValid(metric.getDate(), 1);
 			}
 		} else {

@@ -369,17 +369,10 @@ class MetricRepositoryTest {
 	}
 	private MetricsCollection ResponseCreateMetricRequest() {
 
-		try {
-
 			return new MetricsCollection( StaticVariables.id, StaticVariables.evaluator_id, StaticVariables.evaluated_id, "Empty",
 					"2020-03-17", StaticVariables.sprint_id,
 					new metrics(false, false, new blockers(false, "POST TESTV2 2020-03-17"),
 							new proactive(false, false, false, false), new retroactive(false, "Empty")));
-		} catch (Exception e) {
-
-			System.out.println("FALLO PARSEO");
-			return null;
-		}
 	}
 	String idFail = "5e7a600a3b09d6412bb1e663";
 }
