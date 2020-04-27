@@ -95,15 +95,15 @@ public class TechnicalValidations {
 				metric.getEvaluated_id(), metric.getType(), metric.getDate(), metric.getSprint_id(), metric_string);
 		return listIncoming;
 	}
-	
+
 	public static void IsDBEmpty(List<MetricsCollection> metrics) {
-        MetricsApplication.logger.info("The method found " + metrics.size() + " records");
-        if (metrics.size() == 0) {
-            TypeError.httpErrorMessage(new Exception(), HttpStatus.NO_CONTENT.value(), HttpStatus.NO_CONTENT.name(),
-                    HttpExceptionMessage.DBIsEmpty204, PathErrorMessage.pathMetric);
-            throw new ResponseStatusException(HttpStatus.NO_CONTENT);
-        }
-    }
+		MetricsApplication.logger.info("The method found " + metrics.size() + " records");
+		if (metrics.size() == 0) {
+			TypeError.httpErrorMessage(HttpStatus.NO_CONTENT, new Exception(), HttpExceptionMessage.DBIsEmpty204,
+					PathErrorMessage.pathMetric);
+			throw new ResponseStatusException(HttpStatus.NO_CONTENT);
+		}
+	}
 
 	public static boolean haveOnlyLetters(String uuid) {
 		for (char letter : uuid.toCharArray()) {
@@ -144,8 +144,8 @@ public class TechnicalValidations {
 
 			date = new SimpleDateFormat("yyyy-MM-dd").parse(dateIncoming);
 		} catch (ParseException error) {
-			TypeError.httpErrorMessage(error, HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.name(),
-					HttpExceptionMessage.DateInvalidFormat400, PathErrorMessage.pathMetric);
+			TypeError.httpErrorMessage(HttpStatus.BAD_REQUEST, error, HttpExceptionMessage.DateInvalidFormat400,
+					PathErrorMessage.pathMetric);
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
 		}
 		return date;
@@ -183,13 +183,13 @@ public class TechnicalValidations {
 
 		});
 		if (StaticVariables.userSendPage && !StaticVariables.userSendSize) {
-			TypeError.httpErrorMessage(new Exception(), HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.name(),
-					HttpExceptionMessage.SizeNull400, PathErrorMessage.pathMetric);
+			TypeError.httpErrorMessage(HttpStatus.BAD_REQUEST, new Exception(), HttpExceptionMessage.SizeNull400,
+					PathErrorMessage.pathMetric);
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
 		}
 		if (!StaticVariables.userSendPage && StaticVariables.userSendSize) {
-			TypeError.httpErrorMessage(new Exception(), HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.name(),
-					HttpExceptionMessage.PageNull400, PathErrorMessage.pathMetric);
+			TypeError.httpErrorMessage(HttpStatus.BAD_REQUEST, new Exception(), HttpExceptionMessage.PageNull400,
+					PathErrorMessage.pathMetric);
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
 		}
 	}
@@ -214,13 +214,13 @@ public class TechnicalValidations {
 
 		});
 		if (StaticVariables.userSendStartDate && !StaticVariables.userSendEndDate) {
-			TypeError.httpErrorMessage(new Exception(), HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.name(),
-					HttpExceptionMessage.EndDateNull400, PathErrorMessage.pathMetric);
+			TypeError.httpErrorMessage(HttpStatus.BAD_REQUEST, new Exception(), HttpExceptionMessage.EndDateNull400,
+					PathErrorMessage.pathMetric);
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
 		}
 		if (!StaticVariables.userSendStartDate && StaticVariables.userSendEndDate) {
-			TypeError.httpErrorMessage(new Exception(), HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.name(),
-					HttpExceptionMessage.StartDateNull400, PathErrorMessage.pathMetric);
+			TypeError.httpErrorMessage(HttpStatus.BAD_REQUEST, new Exception(), HttpExceptionMessage.StartDateNull400,
+					PathErrorMessage.pathMetric);
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
 		}
 	}
@@ -240,17 +240,15 @@ public class TechnicalValidations {
 			StaticVariables.parameterName = entry.getKey();
 			String paramValue = request.getParameter(StaticVariables.parameterName);
 			if (!allowedParams.contains(StaticVariables.parameterName)) {
-				TypeError.httpErrorMessage(new Exception(), HttpStatus.BAD_REQUEST.value(),
-						HttpStatus.BAD_REQUEST.name(), HttpExceptionMessage.InvalidParameter400,
-						PathErrorMessage.pathMetric);
+				TypeError.httpErrorMessage(HttpStatus.BAD_REQUEST, new Exception(),
+						HttpExceptionMessage.InvalidParameter400, PathErrorMessage.pathMetric);
 				throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
 			} else if ((StaticVariables.parameterName.contains("evaluated_id")
 					|| StaticVariables.parameterName.contains("sprint_id")
 					|| StaticVariables.parameterName.contains("evaluator_id"))) {
 				if (paramValue == "") {
-					TypeError.httpErrorMessage(new Exception(), HttpStatus.BAD_REQUEST.value(),
-							HttpStatus.BAD_REQUEST.name(), HttpExceptionMessage.ParameterNull400,
-							PathErrorMessage.pathMetric);
+					TypeError.httpErrorMessage(HttpStatus.BAD_REQUEST, new Exception(),
+							HttpExceptionMessage.ParameterNull400, PathErrorMessage.pathMetric);
 					throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
 				}
 			}
@@ -264,8 +262,8 @@ public class TechnicalValidations {
 		boolean validObjectId = patt.matcher(uuid).matches();
 		if (!validObjectId || TechnicalValidations.haveOnlyLetters(uuid)
 				|| TechnicalValidations.haveOnlyNumbers(uuid)) {
-			TypeError.httpErrorMessage(new Exception(), HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.name(),
-					HttpExceptionMessage.IDInvalid400, "/metrics/" + uuid);
+			TypeError.httpErrorMessage(HttpStatus.BAD_REQUEST, new Exception(), HttpExceptionMessage.IDInvalid400,
+					"/metrics/" + uuid);
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
 		} else {
 			MetricsApplication.logger.error("The id is valid");
@@ -279,7 +277,7 @@ public class TechnicalValidations {
 		boolean validObjectId = patt.matcher(uuid).matches();
 		MetricsApplication.logger.error(validObjectId);
 		if (!validObjectId) {
-			TypeError.httpErrorMessage(new Exception(), HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.name(),
+			TypeError.httpErrorMessage(HttpStatus.BAD_REQUEST, new Exception(),
 					HttpExceptionMessage.IdHasSpecialChar400, "/metrics/" + uuid);
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
 		}

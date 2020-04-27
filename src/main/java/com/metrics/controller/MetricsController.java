@@ -74,31 +74,31 @@ public class MetricsController {
 		MetricsApplication.logger.info("Verifying if DB is empty");
 		BusinessMethods.VerifyingDateValid(startDate, 2);
 		BusinessMethods.VerifyingDateValid(endDate, 2);
-		
-		//Verifying only number
-		if(!TechnicalValidations.haveOnlyNumbers(sizeStr) || !TechnicalValidations.haveOnlyNumbers(pageStr) || !TechnicalValidations.haveOnlyNumbers(orderByStr)) {
+
+		// Verifying only number
+		if (!TechnicalValidations.haveOnlyNumbers(sizeStr) || !TechnicalValidations.haveOnlyNumbers(pageStr)
+				|| !TechnicalValidations.haveOnlyNumbers(orderByStr)) {
 			MetricsApplication.logger.info("Not are only numbers");
-			TypeError.httpErrorMessage(new Exception(), HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.name(),
+			TypeError.httpErrorMessage(HttpStatus.BAD_REQUEST, new Exception(),
 					HttpExceptionMessage.isOnlyNumberFail400, PathErrorMessage.pathMetric);
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
 		}
-			int page = Integer.parseInt(pageStr);
-			int orderBy = Integer.parseInt(orderByStr);
-			int size = Integer.parseInt(sizeStr);
-		
-		
-		//Verifying page and size
+		int page = Integer.parseInt(pageStr);
+		int orderBy = Integer.parseInt(orderByStr);
+		int size = Integer.parseInt(sizeStr);
+
+		// Verifying page and size
 		if (page < 1 || size < 1) {
-			TypeError.httpErrorMessage(new Exception(), HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.name(),
+			TypeError.httpErrorMessage(HttpStatus.BAD_REQUEST, new Exception(),
 					HttpExceptionMessage.InvalidPageOrSizeValue400, PathErrorMessage.pathMetric);
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
 		} else {
 			page = page - 1;
 		}
-		
-		//Verifying orderBy
+
+		// Verifying orderBy
 		if (orderBy > 1 || orderBy < 0) {
-			TypeError.httpErrorMessage(new Exception(), HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.name(),
+			TypeError.httpErrorMessage(HttpStatus.BAD_REQUEST, new Exception(),
 					HttpExceptionMessage.OrderByInvalidValue400, PathErrorMessage.pathMetric);
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
 		}
@@ -109,7 +109,6 @@ public class MetricsController {
 		return ListMetric;
 	}
 
-	
 	@ResponseStatus(value = HttpStatus.OK)
 	@GetMapping("/metrics/{id}")
 	public Optional<MetricsCollection> findById(@PathVariable String id) {
@@ -121,8 +120,8 @@ public class MetricsController {
 			return service.findById(id);
 		} catch (Exception error) {
 			MetricsApplication.logger.error("trying to call findById service but couldnt find the given ID");
-			TypeError.httpErrorMessage(new Exception(), HttpStatus.NOT_FOUND.value(), HttpStatus.NOT_FOUND.name(),
-					HttpExceptionMessage.IdNotFound404, "/metric/" + id);
+			TypeError.httpErrorMessage(HttpStatus.NOT_FOUND, new Exception(), HttpExceptionMessage.IdNotFound404,
+					"/metric/" + id);
 			StaticVariables.id = null;
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND);
 		}

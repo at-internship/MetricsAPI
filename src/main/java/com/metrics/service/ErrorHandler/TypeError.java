@@ -12,16 +12,18 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import com.metrics.model.ErrorMessage;
 
 public class TypeError {
+	static HttpStatus newTypeError = HttpStatus.BAD_REQUEST;
 	static int httpError;
 	static String httpNameError;
 	static String message;
 	static String path;
 	
-	public static void httpErrorMessage(Exception error, int httpErrorParameter, String httpNameErrorParameter, String messageParameter, String pathParameter) {
+	public static void httpErrorMessage(HttpStatus typeError, Exception error, String messageParameter, String pathParameter) {
 		ExceptionAnyHandler manejador = new ExceptionAnyHandler();
 		CleanMessage();
-		httpError = httpErrorParameter;
-		httpNameError = httpNameErrorParameter;
+		newTypeError = typeError;
+		httpError = typeError.value();
+		httpNameError = typeError.name();
 		message = messageParameter;
 		path = pathParameter;
 		manejador.handleAnyException(error);
@@ -48,7 +50,7 @@ public class TypeError {
 		ErrorMessage errorMessage = new ErrorMessage(objSDF.format(actualDate).toString(),TypeError.httpError, TypeError.httpNameError, TypeError.message, 
 				TypeError.path);
 		
-		return new ResponseEntity<>(errorMessage, new HttpHeaders(),HttpStatus.INTERNAL_SERVER_ERROR);
+		return new ResponseEntity<>(errorMessage, new HttpHeaders(),TypeError.newTypeError);
 	}
 	
 	
