@@ -4,7 +4,6 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
@@ -12,7 +11,6 @@ import org.springframework.web.server.ResponseStatusException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.metrics.MetricsApplication;
 import com.metrics.domain.CreateMetricRequest;
-import com.metrics.model.MetricsCollection;
 import com.metrics.service.ErrorHandler.HttpExceptionMessage;
 import com.metrics.service.ErrorHandler.PathErrorMessage;
 import com.metrics.service.ErrorHandler.TypeError;
@@ -50,13 +48,6 @@ public class BusinessMethods {
 			}
 		}
 		return response;
-	}
-
-	public static void VerifyingAllTypesDatasIntoDB(List<MetricsCollection> metrics) {
-		MetricsApplication.logger.info("Verifying records and validating type data");
-		for (MetricsCollection metric : metrics) {
-			BusinessMethods.testMetricIntegrity(TechnicalValidations.MetricsCollectionToCreateMetricRequest(metric), 2);
-		}
 	}
 
 	public static String VerifyingDateValid(String inputString, int typeRequest) {

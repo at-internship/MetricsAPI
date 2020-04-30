@@ -18,13 +18,6 @@ public interface MetricsService {
 	void deleteMetric(String id);
 
 	MetricsCollection updateMetric(CreateMetricRequest request, String id);
-
-	List<MetricsCollection> getAllMetricsPaginated(int start, int size, List<MetricsCollection> metrics);
-
-	public List<MetricsCollection> getItemsFromIdFilter(String id, List<MetricsCollection> metrics, int typeId,
-			int typeRequest);
-
-	List<MetricsCollection> getItemsFromDateRange(Date startDate, Date endDate, List<MetricsCollection> metrics);
 	
 	List<MetricsCollection> getMetricsFilter(String sprint_id, String evaluator_id,
 			String evaluated_id, String startDate,

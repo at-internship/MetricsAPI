@@ -6,11 +6,9 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
 import java.util.TimeZone;
 import java.util.regex.Pattern;
 
-import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
@@ -23,48 +21,15 @@ import com.metrics.MetricsApplication;
 import com.metrics.domain.CreateMetricRequest;
 import com.metrics.model.MetricsCollection;
 import com.metrics.model.blockers;
-import com.metrics.model.blockersString;
 import com.metrics.model.metrics;
-import com.metrics.model.metricsString;
 import com.metrics.model.proactive;
-import com.metrics.model.proactiveString;
 import com.metrics.model.retroactive;
-import com.metrics.model.retroactiveString;
 import com.metrics.service.ErrorHandler.HttpExceptionMessage;
 import com.metrics.service.ErrorHandler.PathErrorMessage;
 import com.metrics.service.ErrorHandler.TypeError;
-import com.metrics.service.StaticFunctionsVariables.StaticVariables;
 
 public class TechnicalValidations {
-	public static CreateMetricRequest MetricsCollectionToCreateMetricRequest(MetricsCollection metric) {
-
-		blockersString blockers_string = new blockersString();
-		blockers_string.setBlocked(metric.getMetrics().getBlockers().getBlocked().toString());
-		blockers_string.setComments(metric.getMetrics().getBlockers().getComments());
-
-		proactiveString proactive_string = new proactiveString();
-		proactive_string.setLooked_for_help(metric.getMetrics().getProactive().getLooked_for_help().toString());
-		proactive_string.setProvided_help(metric.getMetrics().getProactive().getProvided_help().toString());
-		proactive_string.setShared_resources(metric.getMetrics().getProactive().getShared_resources().toString());
-		proactive_string.setWorked_ahead(metric.getMetrics().getProactive().getWorked_ahead().toString());
-
-		retroactiveString retroactive_string = new retroactiveString();
-		retroactive_string.setComments(metric.getMetrics().getRetroactive().getComments());
-		retroactive_string
-				.setDelayed_looking_help(metric.getMetrics().getRetroactive().getDelayed_looking_help().toString());
-
-		metricsString metric_string = new metricsString();
-		metric_string.setAttendance(metric.getMetrics().getAttendance().toString());
-		metric_string.setBlockers(blockers_string);
-		metric_string.setCarried_over(metric.getMetrics().getCarried_over().toString());
-		metric_string.setProactive(proactive_string);
-		metric_string.setRetroactive(retroactive_string);
-
-		CreateMetricRequest listIncoming = new CreateMetricRequest(metric.getId(), metric.getEvaluator_id(),
-				metric.getEvaluated_id(), metric.getType(), metric.getDate(), metric.getSprint_id(), metric_string);
-		return listIncoming;
-	}
-
+	
 	public static MetricsCollection CreateMetricRequestToMetricsCollection(CreateMetricRequest metric) {
 
 		blockers blockers_string = new blockers();
@@ -176,99 +141,6 @@ public class TechnicalValidations {
 
 		ObjectMapper objectMapper = new ObjectMapper();
 		return objectMapper.readValue(json, clazz);
-	}
-
-	public static void checkPaginationParams(HttpServletRequest request) {
-		StaticVariables.userSendPage = false;
-		StaticVariables.userSendSize = false;
-		request.getParameterMap().entrySet().forEach(entry -> {
-			String param = entry.getKey();
-			String paramValue = request.getParameter(param);
-			if ((param.contains("page"))) {
-				if (paramValue != "") {
-
-					StaticVariables.userSendPage = true;
-				}
-			} else if ((param.contains("size"))) {
-				if (paramValue != "") {
-
-					StaticVariables.userSendSize = true;
-				}
-			}
-
-		});
-		if (StaticVariables.userSendPage && !StaticVariables.userSendSize) {
-			TypeError.httpErrorMessage(HttpStatus.BAD_REQUEST, new Exception(), HttpExceptionMessage.SizeNull400,
-					PathErrorMessage.pathMetric);
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-		}
-		if (!StaticVariables.userSendPage && StaticVariables.userSendSize) {
-			TypeError.httpErrorMessage(HttpStatus.BAD_REQUEST, new Exception(), HttpExceptionMessage.PageNull400,
-					PathErrorMessage.pathMetric);
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-		}
-	}
-
-	public static void checkDateParams(HttpServletRequest request) {
-		StaticVariables.userSendStartDate = false;
-		StaticVariables.userSendEndDate = false;
-		request.getParameterMap().entrySet().forEach(entry -> {
-			String param = entry.getKey();
-			String paramValue = request.getParameter(param);
-			if ((param.contains("startDate"))) {
-				if (paramValue != "") {
-
-					StaticVariables.userSendStartDate = true;
-				}
-			} else if ((param.contains("endDate"))) {
-				if (paramValue != "") {
-
-					StaticVariables.userSendEndDate = true;
-				}
-			}
-
-		});
-		if (StaticVariables.userSendStartDate && !StaticVariables.userSendEndDate) {
-			TypeError.httpErrorMessage(HttpStatus.BAD_REQUEST, new Exception(), HttpExceptionMessage.EndDateNull400,
-					PathErrorMessage.pathMetric);
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-		}
-		if (!StaticVariables.userSendStartDate && StaticVariables.userSendEndDate) {
-			TypeError.httpErrorMessage(HttpStatus.BAD_REQUEST, new Exception(), HttpExceptionMessage.StartDateNull400,
-					PathErrorMessage.pathMetric);
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-		}
-	}
-
-	public static boolean checkIsOnlyGet(HttpServletRequest request) {
-		MetricsApplication.logger.info("Checking if is only a get");
-		StaticVariables.isOnlyGet = false;
-		if (request.getParameterMap().entrySet().isEmpty()) {
-			StaticVariables.isOnlyGet = true;
-		}
-		MetricsApplication.logger.info("is a only get..> " + StaticVariables.isOnlyGet);
-		return StaticVariables.isOnlyGet;
-	}
-
-	public static void checkParams(HttpServletRequest request, Set<String> allowedParams) {
-		request.getParameterMap().entrySet().forEach(entry -> {
-			StaticVariables.parameterName = entry.getKey();
-			String paramValue = request.getParameter(StaticVariables.parameterName);
-			if (!allowedParams.contains(StaticVariables.parameterName)) {
-				TypeError.httpErrorMessage(HttpStatus.BAD_REQUEST, new Exception(),
-						HttpExceptionMessage.InvalidParameter400, PathErrorMessage.pathMetric);
-				throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-			} else if ((StaticVariables.parameterName.contains("evaluated_id")
-					|| StaticVariables.parameterName.contains("sprint_id")
-					|| StaticVariables.parameterName.contains("evaluator_id"))) {
-				if (paramValue == "") {
-					TypeError.httpErrorMessage(HttpStatus.BAD_REQUEST, new Exception(),
-							HttpExceptionMessage.ParameterNull400, PathErrorMessage.pathMetric);
-					throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-				}
-			}
-
-		});
 	}
 
 	public static void VerifyingUUID(String uuid) {
