@@ -22,7 +22,6 @@ import com.metrics.service.ErrorHandler.TypeError;
 import com.metrics.service.StaticFunctionsVariables.StaticVariables;
 
 import java.util.List;
-import java.util.Optional;
 
 
 import org.springframework.web.bind.annotation.GetMapping;
@@ -39,7 +38,7 @@ public class MetricsController {
 		MetricsApplication.logger.info("Creating container");
 		MetricsCollection resultMetric = new MetricsCollection();
 		if (findById(id) != null) {
-			StaticVariables.datePUT = service.findById(id).get();
+			StaticVariables.datePUT = service.findById(id);
 			StaticVariables.evaluated_id = StaticVariables.datePUT.getEvaluated_id();
 			StaticVariables.evaluator_id = StaticVariables.datePUT.getEvaluator_id();
 			StaticVariables.sprint_id = StaticVariables.datePUT.getSprint_id();
@@ -142,7 +141,7 @@ public class MetricsController {
 
 	@ResponseStatus(value = HttpStatus.OK)
 	@GetMapping("/metrics/{id}")
-	public Optional<MetricsCollection> findById(@PathVariable String id) {
+	public MetricsCollection findById(@PathVariable String id) {
 		TechnicalValidations.VerifyingUUID(id);
 		MetricsApplication.logger.info("Calling findById service");
 		return service.findById(id);

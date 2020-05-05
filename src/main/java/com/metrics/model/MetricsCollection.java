@@ -1,13 +1,16 @@
 package com.metrics.model;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import javax.persistence.*;
 
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
@@ -22,12 +25,4 @@ public class MetricsCollection {
 	private String sprint_id;
 	private metrics metrics;
 
-
-	public MetricsCollection(String type, 
-							 String date,
-							 com.metrics.model.metrics metrics) {
-		this.type = type;
-		this.date = date;
-		this.metrics = metrics;
-	}
 }

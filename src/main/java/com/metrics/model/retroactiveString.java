@@ -1,13 +1,15 @@
 package com.metrics.model;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import springfox.documentation.annotations.ApiIgnore;
 
 @NoArgsConstructor
 @AllArgsConstructor
-@Data
+@Getter
+@Setter
 @ApiIgnore
 public class retroactiveString {
 	private String delayed_looking_help;

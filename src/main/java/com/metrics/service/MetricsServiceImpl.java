@@ -4,7 +4,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -30,16 +29,6 @@ public class MetricsServiceImpl implements MetricsService {
 
 	@Autowired
 	MetricRepository repository;
-
-	@Override
-	public List<MetricsCollection> getMetrics() {
-		MetricsApplication.logger.info("Creating list..");
-		List<MetricsCollection> metricsCollection = new ArrayList<>();
-		MetricsApplication.logger.info("Filling list with info");
-		metricsCollection = repository.findAll();
-		MetricsApplication.logger.info("Returning lists");
-		return metricsCollection;
-	}
 
 	public List<MetricsCollection> getMetricsFilter(String sprint_id, String evaluator_id, String evaluated_id,
 			String startDate, String endDate, int page, int size, int order) {
@@ -126,15 +115,18 @@ public class MetricsServiceImpl implements MetricsService {
 	}
 
 	@Override
-	public Optional<MetricsCollection> findById(String id) {
+	public MetricsCollection findById(String id) {
+		MetricsCollection metricsCollection = new MetricsCollection();
 		if (!repository.existsById(id)) {
 			MetricsApplication.logger.error("trying to find a metric but  did not found an ID");
 			TypeError.httpErrorMessage(HttpStatus.NOT_FOUND, new Exception(), HttpExceptionMessage.IdNotFound404,
 					"/metric/" + id);
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+		}else if(repository.findById(id).isPresent()){
+			metricsCollection = repository.findById(id).get();
 		}
 		MetricsApplication.logger.info("Returning metric");
-		return repository.findById(id);
+		return metricsCollection;
 
 	}
 
@@ -164,13 +156,7 @@ public class MetricsServiceImpl implements MetricsService {
 
 	@Override
 	public MetricsCollection updateMetric(CreateMetricRequest request, String id) {
-		if (!repository.existsById(id)) {
-			MetricsApplication.logger.error("Tried to update metric but couldnt find the ID given");
-			TypeError.httpErrorMessage(HttpStatus.NOT_FOUND, new Exception(), HttpExceptionMessage.IdNotFound404,
-					"/metric/" + id);
-			throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-		}
-
+		
 		MetricsApplication.logger.info("Creating metric object");
 		MetricsCollection metric = new MetricsCollection();
 		MetricsApplication.logger.info("calling data validation method");

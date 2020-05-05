@@ -1,6 +1,5 @@
 package com.metrics.service.ErrorHandler;
 
-import com.metrics.service.StaticFunctionsVariables.StaticVariables;
 
 public class HttpExceptionMessage {
 	//Messages of class MetricControllers
@@ -87,8 +86,4 @@ public class HttpExceptionMessage {
 	public static final String EndDateNull400 = "endDate value field is required when startDate is given";
 	public static final String StartDateNull400 = "startDate value field is required when endDate is given";
 	
-	
-	//Messages for method "checkParams"
-	public static final String InvalidParameter400 = "An invalid request param  called " + StaticVariables.parameterName + " has been entered";
-	public static final String ParameterNull400 = "The id key  " + StaticVariables.parameterName + " can not be null or empty";
 }

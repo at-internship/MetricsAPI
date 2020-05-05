@@ -9,9 +9,7 @@ import com.metrics.model.MetricsCollection;
 
 public interface MetricsService {
 
-	List<MetricsCollection> getMetrics();
-
-	Optional<MetricsCollection> findById(String id);
+	MetricsCollection findById(String id);
 
 	MetricsCollection newMetric(CreateMetricRequest request);
 
