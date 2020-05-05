@@ -135,7 +135,6 @@ public class MetricsController {
 		}
 		List<MetricsCollection> ListMetric = service.getMetricsFilter(sprint_id, evaluator_id, evaluated_id, startDate,
 				endDate, page, size, orderBy);
-		TechnicalValidations.IsDBEmpty(ListMetric);
 
 		return ListMetric;
 	}

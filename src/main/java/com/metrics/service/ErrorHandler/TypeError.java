@@ -6,11 +6,14 @@ import java.util.Date;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.metrics.model.ErrorMessage;
+import com.metrics.service.BusinessMethods;
+import com.metrics.service.TechnicalValidations;
 
 public class TypeError {
 	static HttpStatus newTypeError = HttpStatus.BAD_REQUEST;
@@ -25,6 +28,9 @@ public class TypeError {
 		newTypeError = typeError;
 		httpError = typeError.value();
 		httpNameError = typeError.name();
+		httpNameError = httpNameError.replaceAll("_", " ");
+		httpNameError = httpNameError.toLowerCase();
+		httpNameError = BusinessMethods.capitalizeWord(httpNameError);
 		message = messageParameter;
 		path = pathParameter;
 		manejador.handleAnyException(error);
