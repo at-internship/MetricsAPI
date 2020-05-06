@@ -111,6 +111,13 @@
                     </execution>
                 </executions>
                 <configuration>
+	                <excludes>
+	                	<exclude>**/*com/metrics/MetricsApplication.class</exclude>
+	                	<exclude>**/*com/metrics/mapper/MetricMapping.class</exclude>
+	            		<exclude>**/*com/metrics/service/ErrorHandler/PathErrorMessage.class</exclude>
+	            		<exclude>**/*com/metrics/service/ErrorHandler/HttpExceptionMessage.class</exclude>
+	            		<exclude>**/*com/metrics/service/StaticFunctionsVariables/StaticVariables.class</exclude>
+	        		</excludes>
                     <systemPropertyVariables>
                         <jacoco-agent.destfile>target/jacoco.exec</jacoco-agent.destfile>
                     </systemPropertyVariables>

@@ -21,6 +21,8 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import com.metrics.MetricsApplication;
 import com.metrics.controller.MetricsController;
+import com.metrics.controller.ControllerFunctions.FunctionsEnhanceGetPaginationTests;
+import com.metrics.controller.ControllerFunctions.FunctionsEnhanceGetTest;
 import com.metrics.domain.CreateMetricRequest;
 import com.metrics.model.MetricsCollection;
 import com.metrics.model.blockers;
@@ -31,8 +33,6 @@ import com.metrics.model.proactive;
 import com.metrics.model.proactiveString;
 import com.metrics.model.retroactive;
 import com.metrics.model.retroactiveString;
-import com.metrics.repository.FunctionsEnhanceGetPaginationTests;
-import com.metrics.repository.FunctionsEnhanceGetTest;
 import com.metrics.service.TechnicalValidations;
 import com.metrics.service.StaticFunctionsVariables.StaticVariables;
 import org.junit.runners.MethodSorters;
@@ -43,6 +43,7 @@ import org.junit.runners.MethodSorters;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 class MetricRepositoryTest {
 
+	MetricsController metricsController = new MetricsController();
 	FunctionsEnhanceGetPaginationTests testEnhanceGetPagination = new FunctionsEnhanceGetPaginationTests();
 	FunctionsEnhanceGetTest testEnhanceGet = new FunctionsEnhanceGetTest();
 	MockMvc mvc;
@@ -126,6 +127,19 @@ class MetricRepositoryTest {
 		assertEquals(expected, jsonResponse);
 
 	}
+	@Test
+	@DisplayName("test to method PUT expected 404")
+	public void cc() throws Exception {
+		
+		CreateMetricRequest metric = newCreateMetricTRequest();
+		MvcResult mvcResult = mvc
+				.perform(MockMvcRequestBuilders.put("/metrics/{id}", idFail).contentType(MediaType.APPLICATION_JSON_VALUE)
+						.content(TechnicalValidations.mapToJson(metric)))
+				.andExpect(handler().handlerType(MetricsController.class))
+				.andExpect(handler().methodName("updateMetric")).andReturn();
+		assertEquals(404, mvcResult.getResponse().getStatus());
+
+	}
 	
 	@Test
 	@DisplayName("test to method DELETE expected 204")
@@ -184,7 +198,32 @@ class MetricRepositoryTest {
 
 		testEnhanceGet.getMetricsSprint_id(mvc);
 	}
+	@Test
+	@DisplayName("test to method GET without Sprint_ID expected 200")
+	public void ii() throws Exception {
 
+		testEnhanceGet.getMetricsWithoutSprint_id(mvc);
+	}
+	@Test
+	@DisplayName("test to method GET without Evaluated_id expected 200")
+	public void iii() throws Exception {
+
+		testEnhanceGet.getMetricsWithoutEvaluated_id(mvc);
+	}
+	
+	@Test
+	@DisplayName("test to method GET without Evaluator_id expected 200")
+	public void iiii() throws Exception {
+
+		testEnhanceGet.getMetricsWithoutEvaluator_id(mvc);
+	}
+	
+	@Test
+	@DisplayName("test to method GET all id's expected 200")
+	public void iiiii() throws Exception {
+
+		testEnhanceGet.getMetricsAllIds(mvc);
+	}
 	@Test
 	@DisplayName("test to method GET with Dates expected 200")
 	public void j() throws Exception {
@@ -254,6 +293,24 @@ class MetricRepositoryTest {
 		testEnhanceGetPagination.getMetricsPaginationFailType(mvc);
 	}
 	@Test
+	@DisplayName("test to method GET with only numbers in evaluator_id expected 400")
+	public void nnn() throws Exception {
+
+		testEnhanceGetPagination.getMetricsEvaluator_idHaveOnlyNumbers(mvc);
+	}
+	@Test
+	@DisplayName("test to method GET with only numbers in evaluated_id expected 400")
+	public void nnnn() throws Exception {
+
+		testEnhanceGetPagination.getMetricsEvaluated_idHaveOnlyNumbers(mvc);
+	}
+	@Test
+	@DisplayName("test to method GET with only numbers in sprint_id expected 400")
+	public void nnnnn() throws Exception {
+
+		testEnhanceGetPagination.getMetricsSprint_idHaveOnlyNumbers(mvc);
+	}
+	@Test
 	@DisplayName("test to method GET with pagination only page expected 200")
 	public void o() throws Exception {
 
@@ -300,22 +357,52 @@ class MetricRepositoryTest {
 		testEnhanceGet.getFailMetricsSprint_id(mvc);
 	}
 	@Test
-	@DisplayName("test to method GET with letters in orderBy, page or size expected 400")
+	@DisplayName("test to method GET with letters in orderBy expected 400")
 	public void t() throws Exception {
 
-		testEnhanceGet.getFailHaveLetters(mvc);
+		testEnhanceGet.getFailOrderByHaveLetters(mvc);
 	}
 	@Test
-	@DisplayName("test to method GET with invalit value in orderBy , page or size expected 400")
+	@DisplayName("test to method GET with letters in page expected 400")
+	public void tt() throws Exception {
+
+		testEnhanceGet.getFailPageHaveLetters(mvc);
+	}
+	@Test
+	@DisplayName("test to method GET with letters in size expected 400")
+	public void ttt() throws Exception {
+
+		testEnhanceGet.getFailSizeHaveLetters(mvc);
+	}
+	@Test
+	@DisplayName("test to method GET with invalit value in orderBy expected 400")
 	public void u() throws Exception {
 
-		testEnhanceGet.getFailInvalidValue(mvc);
+		testEnhanceGet.getFailInvalidOrderByValue(mvc);
+	}
+	@Test
+	@DisplayName("test to method GET with orderBy ascending expected 200")
+	public void uu() throws Exception {
+
+		testEnhanceGet.getOrderByASC(mvc);
 	}
 	@Test
 	@DisplayName("test to method GET when orderBy is out range expected 400")
 	public void v() throws Exception {
 
 		testEnhanceGet.getFailInvalidValueOrderBy(mvc);
+	}
+	@Test
+	@DisplayName("test to method GET when page have an invalid value expected 400")
+	public void vv() throws Exception {
+
+		testEnhanceGet.getFailInvalidPageValue(mvc);
+	}
+	@Test
+	@DisplayName("test to method GET when size have an invalid value expected 400")
+	public void vvv() throws Exception {
+
+		testEnhanceGet.getFailInvalidSizeValue(mvc);
 	}
 	@Test
 	@DisplayName("test to method GET when startDate is bigger than endDate expected 400")

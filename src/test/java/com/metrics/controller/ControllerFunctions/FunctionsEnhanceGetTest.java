@@ -1,4 +1,4 @@
-package com.metrics.repository;
+package com.metrics.controller.ControllerFunctions;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -18,7 +18,7 @@ public class FunctionsEnhanceGetTest {
 
 		String uri = "/metrics?evaluated_id={evaluated_id}";
 
-		MvcResult mvcResult = mvcEnhanceGetRequest(mvc, uri, StaticVariables.evaluated_id);
+		MvcResult mvcResult = mvcEnhanceGetRequest(mvc, uri, StaticVariables.evaluated_idLocal);
 
 		validatingExpectedResult(mvcResult);
 	}
@@ -27,7 +27,7 @@ public class FunctionsEnhanceGetTest {
 
 
 		String uri = "/metrics?evaluator_id={evaluator_id}";
-		MvcResult mvcResult = mvcEnhanceGetRequest(mvc, uri, StaticVariables.evaluator_id);
+		MvcResult mvcResult = mvcEnhanceGetRequest(mvc, uri, StaticVariables.evaluator_idLocal);
 
 		validatingExpectedResult(mvcResult);
 
@@ -43,7 +43,7 @@ public class FunctionsEnhanceGetTest {
 	public void getMetricsSprint_id(MockMvc mvc) throws Exception {
 
 		String uri = "/metrics?spring_id={sprint_id}";
-		MvcResult mvcResult = mvcEnhanceGetRequest(mvc, uri, StaticVariables.sprint_id);
+		MvcResult mvcResult = mvcEnhanceGetRequest(mvc, uri, StaticVariables.sprint_idLocal);
 
 		validatingExpectedResult(mvcResult);
 	}
@@ -84,17 +84,45 @@ public class FunctionsEnhanceGetTest {
 
 		validatingFailResult(mvcResult);
 	}
-	public void getFailHaveLetters(MockMvc mvc) throws Exception {
+	public void getFailInvalidOrderByValue(MockMvc mvc) throws Exception {
+
+		String uri = "/metrics?orderBy={orderByStr}";
+		MvcResult mvcResult = mvcEnhanceGetRequest(mvc, uri, -1);
+
+		assertEquals(400, mvcResult.getResponse().getStatus());
+	}
+	public void getFailPageHaveLetters(MockMvc mvc) throws Exception {
 
 		String uri = "/metrics?page={pageStr}";
 		MvcResult mvcResult = mvcEnhanceGetRequest(mvc, uri, "asd");
 
 		assertEquals(400, mvcResult.getResponse().getStatus());
 	}
-	public void getFailInvalidValue(MockMvc mvc) throws Exception {
+	public void getFailInvalidSizeValue(MockMvc mvc) throws Exception {
 
 		String uri = "/metrics?size={sizeStr}";
-		MvcResult mvcResult = mvcEnhanceGetRequest(mvc, uri, 0);
+		MvcResult mvcResult = mvcEnhanceGetRequest(mvc, uri, -1);
+
+		assertEquals(400, mvcResult.getResponse().getStatus());
+	}
+	public void getFailInvalidPageValue(MockMvc mvc) throws Exception {
+
+		String uri = "/metrics?page={pageStr}";
+		MvcResult mvcResult = mvcEnhanceGetRequest(mvc, uri, -1);
+
+		assertEquals(400, mvcResult.getResponse().getStatus());
+	}
+	public void getFailSizeHaveLetters(MockMvc mvc) throws Exception {
+
+		String uri = "/metrics?size={sizeStr}";
+		MvcResult mvcResult = mvcEnhanceGetRequest(mvc, uri, "1ds");
+
+		assertEquals(400, mvcResult.getResponse().getStatus());
+	}
+	public void getFailOrderByHaveLetters(MockMvc mvc) throws Exception {
+
+		String uri = "/metrics?orderBy={orderByStr}";
+		MvcResult mvcResult = mvcEnhanceGetRequest(mvc, uri, "1ds");
 
 		assertEquals(400, mvcResult.getResponse().getStatus());
 	}
@@ -152,6 +180,18 @@ public class FunctionsEnhanceGetTest {
 				MockMvcRequestBuilders.get(uri, id).accept(MediaType.APPLICATION_JSON_VALUE))
 				.andReturn();
 	}
+	private MvcResult mvcEnhanceGetIdsRequest(MockMvc mvc, String uri, String id1, String id2)
+			throws Exception {
+		return mvc.perform(
+				MockMvcRequestBuilders.get(uri, id1, id2).accept(MediaType.APPLICATION_JSON_VALUE))
+				.andReturn();
+	}
+	private MvcResult mvcEnhanceGetIdsRequest(MockMvc mvc, String uri, String id1, String id2, String id3)
+			throws Exception {
+		return mvc.perform(
+				MockMvcRequestBuilders.get(uri, id1, id2, id3).accept(MediaType.APPLICATION_JSON_VALUE))
+				.andReturn();
+	}
 	private MvcResult mvcEnhanceGetRequest(MockMvc mvc, String uri, int value)
 			throws Exception {
 		return mvc.perform(
@@ -172,5 +212,49 @@ public class FunctionsEnhanceGetTest {
 	private void validatingFailResult(MvcResult mvcResult)
 			throws JsonParseException, JsonMappingException, IOException {
 		assertEquals(204, mvcResult.getResponse().getStatus());
+	}
+
+	public void getMetricsWithoutSprint_id(MockMvc mvc) throws Exception {
+		String uri = "/metrics?evaluated_id={evaluated_id}&evaluator_id={evaluator_id}";
+
+		MvcResult mvcResult = mvcEnhanceGetIdsRequest(mvc, uri, StaticVariables.evaluated_idLocal, StaticVariables.evaluator_idLocal);
+
+		validatingExpectedResult(mvcResult);
+		
+	}
+
+	public void getMetricsWithoutEvaluated_id(MockMvc mvc) throws Exception {
+		String uri = "/metrics?sprint_id={sprint_id}&evaluator_id={evaluator_id}";
+
+		MvcResult mvcResult = mvcEnhanceGetIdsRequest(mvc, uri, StaticVariables.sprint_idLocal, StaticVariables.evaluator_idLocal);
+
+		validatingExpectedResult(mvcResult);
+		
+	}
+
+	public void getMetricsWithoutEvaluator_id(MockMvc mvc) throws Exception {
+		String uri = "/metrics?sprint_id={sprint_id}&evaluated_id={evaluated_id}";
+
+		MvcResult mvcResult = mvcEnhanceGetIdsRequest(mvc, uri, StaticVariables.sprint_idLocal, StaticVariables.evaluated_idLocal);
+
+		validatingExpectedResult(mvcResult);
+		
+	}
+
+	public void getMetricsAllIds(MockMvc mvc) throws Exception {
+		String uri = "/metrics?sprint_id={sprint_id}&evaluated_id={evaluated_id}&evaluator_id={evaluator_id}";
+
+		MvcResult mvcResult = mvcEnhanceGetIdsRequest(mvc, uri, StaticVariables.sprint_idLocal, StaticVariables.evaluated_idLocal, StaticVariables.evaluator_idLocal);
+
+		validatingExpectedResult(mvcResult);
+		
+	}
+
+	public void getOrderByASC(MockMvc mvc) throws Exception {
+		String uri = "/metrics?orderBy={orderByStr}";
+		MvcResult mvcResult = mvcEnhanceGetRequest(mvc, uri, 0);
+
+		assertEquals(200, mvcResult.getResponse().getStatus());
+		
 	}
 }
