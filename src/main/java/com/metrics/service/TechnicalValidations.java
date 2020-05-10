@@ -156,6 +156,49 @@ public class TechnicalValidations {
 			MetricsApplication.logger.error("The id is valid");
 		}
 	}
+	
+	public static void VerifyingUUID_Evaluator(String uuid, String id) {
+		Pattern patt = Pattern.compile("[0-9a-f]{24}$");
+		MetricsApplication.logger.error("Valiting evluator_id " + uuid);
+		boolean validObjectId = patt.matcher(uuid).matches();
+		if (!validObjectId || TechnicalValidations.haveOnlyLetters(uuid)
+				|| TechnicalValidations.haveOnlyNumbers(uuid)) {
+			TypeError.httpErrorMessage(HttpStatus.BAD_REQUEST, new Exception(), HttpExceptionMessage.EvaluatorIDInvalid400,
+					"/metrics/" + id);
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+		} else {
+			MetricsApplication.logger.error("The evaluator_id is valid");
+		}
+	}
+	
+	public static void VerifyingUUID_Evaluated(String uuid, String id) {
+		Pattern patt = Pattern.compile("[0-9a-f]{24}$");
+		MetricsApplication.logger.error("Valiting evaluated_id " + uuid);
+		boolean validObjectId = patt.matcher(uuid).matches();
+		if (!validObjectId || TechnicalValidations.haveOnlyLetters(uuid)
+				|| TechnicalValidations.haveOnlyNumbers(uuid)) {
+			TypeError.httpErrorMessage(HttpStatus.BAD_REQUEST, new Exception(), HttpExceptionMessage.EvaluatedIDInvalid400,
+					"/metrics/" + id);
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+		} else {
+			MetricsApplication.logger.error("The evaluated_id is valid");
+		}
+	}
+	
+	public static void VerifyingUUID_Sprint(String uuid, String id) {
+		Pattern patt = Pattern.compile("[0-9a-f]{24}$");
+		MetricsApplication.logger.error("Valiting sprint_id " + uuid);
+		boolean validObjectId = patt.matcher(uuid).matches();
+		if (!validObjectId || TechnicalValidations.haveOnlyLetters(uuid)
+				|| TechnicalValidations.haveOnlyNumbers(uuid)) {
+			TypeError.httpErrorMessage(HttpStatus.BAD_REQUEST, new Exception(), HttpExceptionMessage.SprintIDInvalid400,
+					"/metrics/" + id);
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+		} else {
+			MetricsApplication.logger.error("The sprint_id is valid");
+		}
+	}
+
 
 	public static boolean VerifyingID(String uuid) {
 		Pattern patt = Pattern.compile("^[a-zA-Z0-9]+$");

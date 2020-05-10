@@ -1,5 +1,7 @@
+
 package com.metrics.service.ErrorHandler;
 
+import com.metrics.service.StaticFunctionsVariables.StaticVariables;
 
 public class HttpExceptionMessage {
 	//Messages of class MetricControllers
@@ -38,6 +40,9 @@ public class HttpExceptionMessage {
 	public static final String DateYearIsNotLeap400 = "Month has 28 days";
 	//Message for method "VerifyingUUID" and "VerifyingID"
 	public static final String IDInvalid400 = "Metric Id has incorrect format";
+	public static final String EvaluatorIDInvalid400 = "evaluator_Id incorrect format";
+	public static final String EvaluatedIDInvalid400 = "evaluated_Id incorrect format";
+	public static final String SprintIDInvalid400 = "sprint_id incorrect format";
 	//Messages for method "testMetricIntegrity"
 	public static final String isOnlyNumberPageFail400 = "Page must only have numbers";
 	public static final String isOnlyNumberSizeFail400 = "Size must only have numbers";
@@ -70,13 +75,14 @@ public class HttpExceptionMessage {
 	public static final String ObjectMetricNull400 = "Object metric is required";
 	public static final String ObjectProactiveNull400 = "Object proactive is required";
 	public static final String ObjectRetroactiveNull400 = "Object retroactive is required";
+	public static final String MetricIdNull405 = "metric_id not found";
 	
 	//Message for method "ifSprintExist"
-	public static final String Sprint_idConflict409 = "Sprint id not found";
+	public static final String Sprint_idConflict409 = "sprint_id not found";
 	
 	//Messages for method "ifUserExist"
-	public static final String Evaluated_idConflict409 = "Evaluated id not exist";
-	public static final String Evaluator_idConflict409 = "Evaluator id not exist";
+	public static final String Evaluated_idConflict409 = "evaluated_id not exist";
+	public static final String Evaluator_idConflict409 = "evaluator_id not exist";
 	
 	//Messages for method "checkPaginationParams"
 	public static final String PageNull400 = "page value field is required when size is given";
@@ -86,4 +92,8 @@ public class HttpExceptionMessage {
 	public static final String EndDateNull400 = "endDate value field is required when startDate is given";
 	public static final String StartDateNull400 = "startDate value field is required when endDate is given";
 	
+	
+	//Messages for method "checkParams"
+	public static final String InvalidParameter400 = "An invalid request param  called " + StaticVariables.parameterName + " has been entered";
+	public static final String ParameterNull400 = "The id key  " + StaticVariables.parameterName + " can not be null or empty";
 }
