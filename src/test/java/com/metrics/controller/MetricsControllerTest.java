@@ -142,6 +142,20 @@ class MetricRepositoryTest {
 	}
 	
 	@Test
+	@DisplayName("test to method PUT expected 405")
+	public void ccc() throws Exception {
+		
+		CreateMetricRequest metric = newCreateMetricTRequest();
+		System.out.println("******************** Trying change element with id..:  *********************");
+		MvcResult mvcResult = mvc
+				.perform(MockMvcRequestBuilders.put("/metrics/{id}", "").contentType(MediaType.APPLICATION_JSON_VALUE)
+						.content(TechnicalValidations.mapToJson(metric)))
+				.andExpect(handler().handlerType(MetricsController.class))
+				.andExpect(handler().methodName("not_allowed")).andReturn();
+		assertEquals(405, mvcResult.getResponse().getStatus());
+
+	}
+	@Test
 	@DisplayName("test to method DELETE expected 204")
 	public void d() throws Exception {
 		String uri = "/metrics/{id}";
@@ -323,14 +337,14 @@ class MetricRepositoryTest {
 		testEnhanceGetPagination.getMetricsPaginationOnlySize(mvc);
 	}
 	@Test
-	@DisplayName("test to method GET with invalid evaluated_id expected 204")
+	@DisplayName("test to method GET with invalid evaluated_id expected 200")
 	public void q() throws Exception {
 
 		testEnhanceGet.geFailMetricsEvaluated_id(mvc);
 	}
 
 	@Test
-	@DisplayName("test to method GET with invalid evaluator_id expected 204")
+	@DisplayName("test to method GET with invalid evaluator_id expected 200")
 	public void r() throws Exception {
 
 		testEnhanceGet.getFailMetricsEvaluator_id(mvc);
@@ -346,12 +360,12 @@ class MetricRepositoryTest {
 						.perform(MockMvcRequestBuilders.post("/metrics").contentType(MediaType.APPLICATION_JSON)
 						.accept(MediaType.APPLICATION_JSON).content(TechnicalValidations.mapToJson(metric))).andReturn();
 		System.out.println("******************** The metric was created the id..: " + StaticVariables.id + " had been asigned *********************");
-		assertEquals(400, mvcResult.getResponse().getStatus());
+		assertEquals(409, mvcResult.getResponse().getStatus());
 
 	}
 
 	@Test
-	@DisplayName("test to method GET with invalid sprint_id expected 204")
+	@DisplayName("test to method GET with invalid sprint_id expected 200")
 	public void s() throws Exception {
 
 		testEnhanceGet.getFailMetricsSprint_id(mvc);

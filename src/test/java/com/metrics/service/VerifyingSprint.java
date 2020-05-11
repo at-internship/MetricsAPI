@@ -10,11 +10,11 @@ import com.metrics.service.StaticFunctionsVariables.StaticVariables;
 public class VerifyingSprint {
 	
 	public static void ifSprintExistTest() {
-		assertEquals(true, BusinessMethods.ifSprintExist(StaticVariables.sprint_id));
+		assertEquals(true, BusinessMethods.ifSprintExist(StaticVariables.sprint_id, StaticVariables.id));
 	}
 	
 	
 	public static void ifSprintNotExistTest() {
-		assertThrows(ResponseStatusException.class,() -> BusinessMethods.ifSprintExist(StaticVariables.wrongSprint_idLocal));
+		assertThrows(ResponseStatusException.class,() -> BusinessMethods.ifSprintExist(StaticVariables.wrongSprint_idLocal, StaticVariables.id));
 	}
 }

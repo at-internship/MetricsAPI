@@ -211,7 +211,7 @@ public class FunctionsEnhanceGetTest {
 
 	private void validatingFailResult(MvcResult mvcResult)
 			throws JsonParseException, JsonMappingException, IOException {
-		assertEquals(204, mvcResult.getResponse().getStatus());
+		assertEquals(200, mvcResult.getResponse().getStatus());
 	}
 
 	public void getMetricsWithoutSprint_id(MockMvc mvc) throws Exception {
