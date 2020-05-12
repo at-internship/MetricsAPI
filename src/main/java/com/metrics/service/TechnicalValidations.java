@@ -5,7 +5,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 import java.util.TimeZone;
 import java.util.regex.Pattern;
 
@@ -59,15 +58,6 @@ public class TechnicalValidations {
 		MetricsCollection listIncoming = new MetricsCollection(metric.getId(), metric.getEvaluator_id(),
 				metric.getEvaluated_id(), metric.getType(), metric.getDate(), metric.getSprint_id(), metric_string);
 		return listIncoming;
-	}
-
-	public static void IsDBEmpty(List<MetricsCollection> metrics) {
-		MetricsApplication.logger.info("The method found " + metrics.size() + " records");
-		if (metrics.size() == 0) {
-			TypeError.httpErrorMessage(HttpStatus.NO_CONTENT, new Exception(), HttpExceptionMessage.DBIsEmpty204,
-					PathErrorMessage.pathMetric);
-			throw new ResponseStatusException(HttpStatus.NO_CONTENT);
-		}
 	}
 
 	public static boolean haveOnlyLetters(String uuid) {

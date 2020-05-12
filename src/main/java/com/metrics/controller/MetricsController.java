@@ -39,6 +39,7 @@ public class MetricsController {
 		MetricsCollection resultMetric = new MetricsCollection();
 		if (findById(id) != null) {
 			StaticVariables.datePUT = service.findById(id);
+			StaticVariables.id = id;
 			StaticVariables.evaluated_id = StaticVariables.datePUT.getEvaluated_id();
 			StaticVariables.evaluator_id = StaticVariables.datePUT.getEvaluator_id();
 			StaticVariables.sprint_id = StaticVariables.datePUT.getSprint_id();
