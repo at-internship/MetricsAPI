@@ -44,15 +44,23 @@ public class MetricsController {
 			StaticVariables.sprint_id = StaticVariables.datePUT.getSprint_id();
 		}
 		TechnicalValidations.VerifyingUUID(id);
-		BusinessMethods.testMetricIntegrity(request, 1);
-		if (BusinessMethods.ifSprintExist(request.getSprint_id())
-				&& BusinessMethods.ifUserExist(request.getEvaluated_id(), 0)
-				&& BusinessMethods.ifUserExist(request.getEvaluator_id(), 1)) {
+		BusinessMethods.testMetricIntegrity(request, 1, id);
+		if (BusinessMethods.ifSprintExist(request.getSprint_id(), id)
+				&& BusinessMethods.ifUserExist(request.getEvaluated_id(), 0, id)
+				&& BusinessMethods.ifUserExist(request.getEvaluator_id(), 1, id)) {
 			MetricsApplication.logger.info("calling update service");
 			resultMetric = service.updateMetric(request, id);
 			MetricsApplication.logger.info("update successfull, returning updated object..");
 		}
 		return resultMetric;
+	}
+	
+	@ResponseStatus(value = HttpStatus.METHOD_NOT_ALLOWED)
+	@PutMapping("/metrics/")
+	public void not_allowed(@RequestParam(name="name", required=false, defaultValue="Stranger") String name) {
+		TypeError.httpErrorMessage(HttpStatus.METHOD_NOT_ALLOWED, new Exception(), HttpExceptionMessage.MetricIdNull405,
+				"/metrics/");
+		throw new ResponseStatusException(HttpStatus.METHOD_NOT_ALLOWED);
 	}
 
 	@ResponseStatus(value = HttpStatus.OK)
@@ -67,9 +75,9 @@ public class MetricsController {
 			@RequestParam(value = "orderBy", defaultValue = "1") String orderByStr) {
 		
 		MetricsApplication.logger.error("Verifying startDate");
-		startDate = BusinessMethods.VerifyingDateValid(startDate, 2);
+		startDate = BusinessMethods.VerifyingDateValid(startDate, 2, "");
 		MetricsApplication.logger.error("Verifying endDate");
-		endDate = BusinessMethods.VerifyingDateValid(endDate, 2);
+		endDate = BusinessMethods.VerifyingDateValid(endDate, 2, "");
 		if (!startDate.equals("1000-01-01") && !endDate.equals("1000-01-01")) {
 			if (startDate.compareTo(endDate) > 0) {
 				MetricsApplication.logger.error("page or size is wrong");
@@ -153,10 +161,10 @@ public class MetricsController {
 
 		MetricsApplication.logger
 				.info("Calling the data validation method and ID Validation for Evaluator and Evaluated ID");
-		if (BusinessMethods.testMetricIntegrity(request, 0) != null
-				&& BusinessMethods.ifSprintExist(request.getSprint_id())
-				&& BusinessMethods.ifUserExist(request.getEvaluated_id(), 0)
-				&& BusinessMethods.ifUserExist(request.getEvaluator_id(), 1)) {
+		if (BusinessMethods.testMetricIntegrity(request, 0, "") != null
+				&& BusinessMethods.ifSprintExist(request.getSprint_id(), "")
+				&& BusinessMethods.ifUserExist(request.getEvaluated_id(), 0, "")
+				&& BusinessMethods.ifUserExist(request.getEvaluator_id(), 1, "")) {
 			MetricsApplication.logger.info("data validation successfull,calling the newMetric service");
 			id = service.newMetric(request).getId();
 			MetricsApplication.logger.info("saving id into String to return");
